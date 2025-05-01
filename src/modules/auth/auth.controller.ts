@@ -33,7 +33,6 @@ interface Userdata {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiTags('kakao')
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuth() {
@@ -42,6 +41,15 @@ export class AuthController {
 
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
+  @ApiOperation({
+    summary: '카카오 OAuth 콜백',
+    description:
+      '카카오 OAuth 로그인 콜백을 처리하고, 인증된 사용자의 엑세스 토큰을 쿠키 발급.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '인증 후 홈 페이지로 리다이렉트.',
+  })
   async kakaoRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as Userdata;
 
@@ -54,7 +62,6 @@ export class AuthController {
     return res.redirect(REDIRECT_URL);
   }
 
-  @ApiTags('google')
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth() {
@@ -62,6 +69,15 @@ export class AuthController {
   }
 
   @Get('google/callback')
+  @ApiOperation({
+    summary: '구글 OAuth 콜백',
+    description:
+      '구글 OAuth 로그인 콜백을 처리하고, 인증된 사용자의 엑세스 토큰을 쿠키 발급.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '인증 후 홈 페이지로 리다이렉트.',
+  })
   @UseGuards(AuthGuard('google'))
   async googleRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as Userdata;
@@ -75,7 +91,6 @@ export class AuthController {
     return res.redirect(REDIRECT_URL);
   }
 
-  @ApiTags('naver')
   @Get('naver')
   @UseGuards(AuthGuard('naver'))
   async naverAuth() {
@@ -84,6 +99,15 @@ export class AuthController {
 
   @Get('naver/callback')
   @UseGuards(AuthGuard('naver'))
+  @ApiOperation({
+    summary: '네이버 OAuth 콜백',
+    description:
+      '네이버 OAuth 로그인 콜백을 처리하고, 인증된 사용자의 엑세스 토큰을 쿠키 발급.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '인증 후 홈 페이지로 리다이렉트.',
+  })
   async naverRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as Userdata;
 
