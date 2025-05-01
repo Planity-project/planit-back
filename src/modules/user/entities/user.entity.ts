@@ -6,11 +6,15 @@ import {
   OneToMany,
 } from 'typeorm';
 
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-}
+// export enum UserRole {
+//   ADMIN = 'admin',
+//   USER = 'user',
+// }
+// @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+// role: UserRole;
 
+// @Column({ default: 0 })
+// status: number; // 닉네임 입력 되면 1, 미입력 0
 export enum UserType {
   LOCAL = 'LOCAL',
   KAKAO = 'KAKAO',
@@ -34,12 +38,6 @@ export class User {
 
   @Column({ type: 'enum', enum: UserType })
   type: UserType;
-
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
-  role: UserRole;
-
-  @Column({ default: 0 })
-  status: number; // 닉네임 입력 되면 1, 미입력 0
 
   @CreateDateColumn()
   createdAt: Date;

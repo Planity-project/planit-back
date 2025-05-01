@@ -13,6 +13,7 @@ import { PaymentsModule } from 'src/modules/payments/payments.module';
 import { TravelModule } from 'src/modules/travel/travel.module';
 import { PostsModule } from 'src/modules/posts/posts.module';
 import { UserModule } from 'src/modules/user/user.module';
+import { MapModule } from 'src/modules/map/map.module';
 
 import { Report } from 'src/modules/admin/report/entities/report.entity';
 import { Suspension } from 'src/modules/admin/report/entities/suspensions';
@@ -27,7 +28,7 @@ import { Notification } from 'src/modules/notice/entities/notice.entity';
 import { Payment } from 'src/modules/payments/entities/payment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { TripSchedule } from 'src/modules/travel/entities/travel.entity';
-
+import { Admin } from 'src/modules/admin/entities/admin.entity';
 dotenv.config();
 
 @Module({
@@ -36,10 +37,11 @@ dotenv.config();
       type: 'mysql',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT ?? '3306'),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
       entities: [
+        Admin,
         Report,
         Suspension,
         Album,
@@ -55,9 +57,10 @@ dotenv.config();
         TripSchedule,
       ],
       synchronize: true,
-      logging: true,
+      logging: false,
     }),
     TypeOrmModule.forFeature([
+      Admin,
       Report,
       Suspension,
       Album,
@@ -83,6 +86,7 @@ dotenv.config();
     PostsModule,
     TravelModule,
     UserModule,
+    MapModule,
   ],
   exports: [TypeOrmModule],
 })
