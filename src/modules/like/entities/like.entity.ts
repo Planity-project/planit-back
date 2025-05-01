@@ -1,3 +1,5 @@
+//좋아요
+
 import {
   Entity,
   PrimaryGeneratedColumn,

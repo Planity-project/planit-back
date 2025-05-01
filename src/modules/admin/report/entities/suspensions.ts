@@ -1,3 +1,5 @@
+//정지 기록
+
 import {
   Entity,
   PrimaryGeneratedColumn,

@@ -1,3 +1,5 @@
+//결제
+
 import {
   Entity,
   PrimaryGeneratedColumn,

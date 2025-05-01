@@ -1,3 +1,5 @@
+//댓글, 대댓글
+
 import {
   Entity,
   PrimaryGeneratedColumn,

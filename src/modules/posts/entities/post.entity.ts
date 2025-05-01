@@ -1,3 +1,5 @@
+//게시글
+
 import {
   Entity,
   PrimaryGeneratedColumn,

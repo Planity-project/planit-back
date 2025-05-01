@@ -1,3 +1,5 @@
+//여행 일정
+
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Location } from 'src/modules/location/entities/location.entity';

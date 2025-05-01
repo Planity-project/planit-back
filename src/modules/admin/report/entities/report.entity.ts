@@ -1,3 +1,5 @@
+//신고
+
 import {
   Entity,
   PrimaryGeneratedColumn,

@@ -1,3 +1,5 @@
+//앨범 이미지
+
 import {
   Entity,
   PrimaryGeneratedColumn,
