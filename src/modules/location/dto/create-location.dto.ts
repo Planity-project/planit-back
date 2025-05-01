@@ -25,7 +25,7 @@ export class LocationDto {
 export class LocationsResponseDto {
   @ApiProperty({
     description: '위치 목록',
-    type: [LocationDto], // 배열로 반환
+    type: [LocationDto], // 배열
     example: [
       {
         id: 1,

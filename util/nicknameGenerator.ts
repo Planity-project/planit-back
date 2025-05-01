@@ -1,3 +1,5 @@
+//랜덤 닉네임 만들기 함수
+
 export const nicknameMaker = (): string => {
   const time = [
     '동틀녘의',
