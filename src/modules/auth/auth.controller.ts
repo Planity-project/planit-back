@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   Res,
+  HttpException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -121,13 +122,23 @@ export class AuthController {
   }
 
   @Get('cookieCheck')
-  async cookeCheck(@Req() req: Request, @Res() res: Response) {
+  async cookieCheck(@Req() req: Request, @Res() res: Response) {
     const token = req.cookies?.access_token;
 
     if (token) {
-      return res.status(200).json({ result: true });
+      return res.status(200).json({ result: true, token: token });
     } else {
       return res.status(200).json({ result: false });
     }
+  }
+
+  @Get('logout')
+  async cookieClear(@Res() res: Response) {
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false,
+    });
+    return res.status(200).json({ message: '로그아웃 성공' });
   }
 }

@@ -11,22 +11,22 @@ import {
   Query,
 } from '@nestjs/common';
 import { MapService } from './map.service';
+import { addressToChange } from 'util/generator';
 
 @Controller('map')
 export class MapController {
   constructor(private readonly mapService: MapService) {}
 
   @Get('nearby')
-  async searchNearby(
-    @Query('latitude') latitude: string,
-    @Query('longitude') longitude: string,
-  ) {
-    if (!latitude || !longitude) {
-      console.error('위도 경도 입력 필요');
-      throw new HttpException('위도 경도 입력 필요 .', HttpStatus.BAD_REQUEST);
+  async searchNearby(@Query('address') address: string) {
+    if (!address) {
+      console.error('주소 입력 필요');
+      throw new HttpException('주소 입력 필요 .', HttpStatus.BAD_REQUEST);
     }
-
+    console.log(address, '주소');
     try {
+      const { latitude, longitude } = await addressToChange(address);
+      console.log(latitude, longitude, '위도 경도');
       const locations = await this.mapService.searchKakao(latitude, longitude);
       return { locations };
     } catch (error) {

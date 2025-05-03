@@ -1,5 +1,7 @@
-//랜덤 닉네임 만들기 함수
+import axios from 'axios';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
+//랜덤 닉네임 만들기 함수
 export const nicknameMaker = (): string => {
   const time = [
     '동틀녘의',
@@ -119,3 +121,27 @@ export const nicknameMaker = (): string => {
   // 랜덤 조합
   return `${time[timeIndex]} ${face[faceIndex]} ${animal[animalIndex]}`;
 };
+
+//주소를 위도 경도로 변환해주는 함수
+export async function addressToChange(
+  address: string,
+): Promise<{ latitude: string; longitude: string }> {
+  const apiKey = process.env.KAKAO_KEY;
+  const url = 'https://dapi.kakao.com/v2/local/search/address.json';
+
+  try {
+    const response = await axios.get(url, {
+      params: { query: address },
+      headers: { Authorization: `KakaoAK ${apiKey}` },
+    });
+
+    if (!response.data.documents || response.data.documents.length === 0) {
+      throw new Error('주소에 해당하는 위도/경도를 찾을 수 없습니다.');
+    }
+
+    const { x: longitude, y: latitude } = response.data.documents[0].address;
+    return { latitude, longitude };
+  } catch (error) {
+    throw new HttpException('주소 변환 오류', HttpStatus.BAD_REQUEST);
+  }
+}

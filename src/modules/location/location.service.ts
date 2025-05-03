@@ -18,4 +18,8 @@ export class LocationService {
 
     return arr;
   }
+
+  async locationFindAll(): Promise<Location[]> {
+    return await this.locationRepo.find();
+  }
 }

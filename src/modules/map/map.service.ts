@@ -10,7 +10,7 @@ export class MapService {
   async searchNaver(latitude: string, longitude: string): Promise<any[]> {
     try {
       const query = '관광지, 식당, 카페'; // 검색 키워드
-      const radius = 5000; // 고정된 반경 값 (1000 미터)
+      const radius = 5000; //반경
 
       const response = await axios.get(
         'https://openapi.naver.com/v1/search/local.json',

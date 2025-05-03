@@ -8,12 +8,20 @@ import {
   Delete,
 } from '@nestjs/common';
 import { LocationService } from './location.service';
-import { ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiBody, ApiTags } from '@nestjs/swagger';
 import { LocationsResponseDto } from './dto/create-location.dto';
-
+import { LocationDto } from './dto/create-location.dto';
+@ApiTags('Location')
 @Controller('location')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
+
+  @Get('/findAll')
+  @ApiOperation({ summary: '모든 지역 반환' })
+  @ApiResponse({ status: 200, type: LocationDto })
+  async locationFindAll() {
+    return await this.locationService.locationFindAll();
+  }
 
   @Post('search')
   @ApiOperation({ summary: '키워드로 지역 검색' })

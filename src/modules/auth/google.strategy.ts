@@ -35,11 +35,19 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     if (!user) {
       await this.authService.create(userCreate);
       const userData = await this.authService.findUser(email);
-      const payload = { id: userData?.id, email: userData?.email };
+      const payload = {
+        id: userData?.id,
+        email: userData?.email,
+        nickname: userData?.nickname,
+      };
       const jwt = this.jwtService.sign(payload);
       done(null, { email: email, token: jwt, result: false });
     } else {
-      const payload = { id: user.id, email: user.email };
+      const payload = {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+      };
       const jwt = this.jwtService.sign(payload);
       done(null, { email: email, token: jwt, result: true });
     }
