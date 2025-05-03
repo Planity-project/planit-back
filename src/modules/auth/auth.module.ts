@@ -16,7 +16,7 @@ import { KakaoStrategy } from './kakao.strategy';
     PassportModule,
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'default_jwt_secret',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
   ],

@@ -23,7 +23,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Response, Request } from 'express';
+
 import { REDIRECT_URL } from 'util/api';
+import { SERVER_DOMAIN } from 'util/api';
+
+import * as jwt from 'jsonwebtoken';
 interface Userdata {
   email: string;
   token?: string;
@@ -59,6 +63,7 @@ export class AuthController {
       maxAge: 1000 * 60 * 60,
       sameSite: 'lax',
       secure: false,
+      domain: SERVER_DOMAIN,
     });
     return res.redirect(REDIRECT_URL);
   }
@@ -88,6 +93,7 @@ export class AuthController {
       maxAge: 1000 * 60 * 60,
       sameSite: 'lax',
       secure: false,
+      domain: SERVER_DOMAIN,
     });
     return res.redirect(REDIRECT_URL);
   }
@@ -117,6 +123,7 @@ export class AuthController {
       maxAge: 1000 * 60 * 60,
       sameSite: 'lax',
       secure: false,
+      domain: SERVER_DOMAIN,
     });
     return res.redirect(REDIRECT_URL);
   }
@@ -124,11 +131,22 @@ export class AuthController {
   @Get('cookieCheck')
   async cookieCheck(@Req() req: Request, @Res() res: Response) {
     const token = req.cookies?.access_token;
-
-    if (token) {
-      return res.status(200).json({ result: true, token: token });
-    } else {
+    console.log(token, 'token 확인');
+    if (!token) {
       return res.status(200).json({ result: false });
+    }
+
+    try {
+      const user = jwt.verify(token, process.env.JWT_SECRET!);
+
+      return res.status(200).json({
+        result: true,
+        user: user,
+      });
+    } catch (err) {
+      return res
+        .status(401)
+        .json({ result: false, message: 'token error', error: err });
     }
   }
 

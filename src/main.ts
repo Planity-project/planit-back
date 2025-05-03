@@ -1,9 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(cookieParser());
 
   const config = new DocumentBuilder()
     .setTitle('Planit API')
@@ -16,7 +19,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors({
-    origin: true, // 모든 origin 허용하되 credentials까지 허용됨
+    origin: 'http://localhost:3000', // 모든 origin 허용하되 credentials까지 허용됨
     credentials: true,
   });
 
