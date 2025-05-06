@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admin } from 'src/modules/admin/entities/admin.entity';
 import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
+import { SERVER_DOMAIN } from 'util/api';
 
 @Injectable()
 export class AdminService {
@@ -11,11 +13,7 @@ export class AdminService {
     private adminRepo: Repository<Admin>,
     private jwtService: JwtService,
   ) {}
-
-  async adminLogin(
-    email: string,
-    password: string,
-  ): Promise<{ accessToken: string }> {
+  async adminLogin(email: string, password: string): Promise<string> {
     const admin = await this.adminRepo.findOne({ where: { email } });
 
     if (!admin || admin.password !== password) {
@@ -25,6 +23,6 @@ export class AdminService {
     const payload = { sub: admin.id, email: admin.email };
     const accessToken = this.jwtService.sign(payload);
 
-    return { accessToken };
+    return accessToken;
   }
 }

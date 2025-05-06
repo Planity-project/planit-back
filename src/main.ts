@@ -19,7 +19,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors({
-    origin: 'http://localhost:3000', // 모든 origin 허용하되 credentials까지 허용됨
+    origin: ['http://localhost:3000', 'http://localhost:4000'], // 모든 origin 허용하되 credentials까지 허용됨
     credentials: true,
   });
 
