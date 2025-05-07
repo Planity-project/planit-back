@@ -26,7 +26,3 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 5001);
 }
 bootstrap();
-
-//커밋 메세지
-// feat - 추가
-// fix - 수정
