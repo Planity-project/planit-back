@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 @Entity('notifications')
-export class Notification {
+export class Notice {
   @PrimaryGeneratedColumn()
   id: number;
   @ManyToOne(() => User)

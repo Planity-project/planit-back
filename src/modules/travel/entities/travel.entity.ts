@@ -3,7 +3,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Location } from 'src/modules/location/entities/location.entity';
-export class TripSchedule {
+export class Travel {
   @PrimaryGeneratedColumn()
   id: number;
   @ManyToOne(() => User)

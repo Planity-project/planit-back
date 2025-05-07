@@ -24,10 +24,10 @@ import { User } from 'src/modules/user/entities/user.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Like } from 'src/modules/like/entities/like.entity';
 import { Location } from 'src/modules/location/entities/location.entity';
-import { Notification } from 'src/modules/notice/entities/notice.entity';
+import { Notice } from 'src/modules/notice/entities/notice.entity';
 import { Payment } from 'src/modules/payments/entities/payment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
-import { TripSchedule } from 'src/modules/travel/entities/travel.entity';
+import { Travel } from 'src/modules/travel/entities/travel.entity';
 import { Admin } from 'src/modules/admin/entities/admin.entity';
 dotenv.config();
 
@@ -54,7 +54,8 @@ dotenv.config();
         Notification,
         Payment,
         Post,
-        TripSchedule,
+        Notice,
+        Travel,
       ],
       synchronize: true,
       logging: false,
@@ -73,7 +74,7 @@ dotenv.config();
       Notification,
       Payment,
       Post,
-      TripSchedule,
+      Travel,
     ]),
     AdminModule,
     AlbumModule,
