@@ -27,7 +27,7 @@ export class MapController {
     try {
       const { latitude, longitude } = await addressToChange(address);
       console.log(latitude, longitude, '위도 경도');
-      const locations = await this.mapService.searchKakao(latitude, longitude);
+      const locations = await this.mapService.searchTours(latitude, longitude);
       return { locations };
     } catch (error) {
       console.error('searchNearby', error);

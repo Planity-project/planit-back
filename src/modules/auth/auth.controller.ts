@@ -63,7 +63,6 @@ export class AuthController {
       maxAge: 1000 * 60 * 60,
       sameSite: 'lax',
       secure: false,
-      domain: SERVER_DOMAIN,
     });
     return res.redirect(REDIRECT_URL);
   }
@@ -93,7 +92,6 @@ export class AuthController {
       maxAge: 1000 * 60 * 60,
       sameSite: 'lax',
       secure: false,
-      domain: SERVER_DOMAIN,
     });
     return res.redirect(REDIRECT_URL);
   }
@@ -123,7 +121,6 @@ export class AuthController {
       maxAge: 1000 * 60 * 60,
       sameSite: 'lax',
       secure: false,
-      domain: SERVER_DOMAIN,
     });
     return res.redirect(REDIRECT_URL);
   }

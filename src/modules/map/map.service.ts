@@ -69,14 +69,7 @@ export class MapService {
 
     if (!data.response?.body?.items?.item) return [];
 
-    return data.response.body.items.item.map((item: any) => ({
-      title: item.title,
-      address: item.addr1,
-      image: item.firstimage,
-      tel: item.tel,
-      latitude: item.mapy,
-      longitude: item.mapx,
-    }));
+    return data.response.body.items.item;
   }
 
   private readonly kakaoApiKey = process.env.KAKAO_KEY;
