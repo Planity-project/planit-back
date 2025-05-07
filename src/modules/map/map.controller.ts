@@ -18,7 +18,10 @@ export class MapController {
   constructor(private readonly mapService: MapService) {}
 
   @Get('nearby')
-  async searchNearby(@Query('address') address: string) {
+  async searchNearby(
+    @Query('address') address: string,
+    @Query('page') pageNo: string,
+  ) {
     if (!address) {
       console.error('주소 입력 필요');
       throw new HttpException('주소 입력 필요 .', HttpStatus.BAD_REQUEST);
@@ -27,7 +30,11 @@ export class MapController {
     try {
       const { latitude, longitude } = await addressToChange(address);
       console.log(latitude, longitude, '위도 경도');
-      const locations = await this.mapService.searchTours(latitude, longitude);
+      const locations = await this.mapService.searchTours(
+        latitude,
+        longitude,
+        Number(pageNo),
+      );
       return { locations };
     } catch (error) {
       console.error('searchNearby', error);

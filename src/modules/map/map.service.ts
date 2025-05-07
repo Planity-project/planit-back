@@ -49,27 +49,56 @@ export class MapService {
   private readonly apiKey = process.env.TOUR_API_KEY;
 
   // 한국 관광 공사
-  async searchTours(lat: string, lon: string, radius = '2000'): Promise<any[]> {
+  async searchTours(
+    lat: string,
+    lon: string,
+    pageNo: number,
+    radius = '2000',
+  ): Promise<any[]> {
     const url =
       'https://apis.data.go.kr/B551011/KorService1/locationBasedList1';
+
     const params = {
-      serviceKey: this.apiKey, //key 발급 필요
-      MobileOS: 'ETC', // 운영체제 구분값 (Android, iOS, ETC 중 택1) 웹이므로 ETC
-      MobileApp: 'AppTest', // 호출하는 애플리케이션 명 임의 값
-      mapX: lon, // 경도
-      mapY: lat, // 위도
-      radius, // 검색 반경
-      arrange: 'E', // 정렬: 거리순
-      numOfRows: 10, //뭔지 모름 10개까지..?
-      pageNo: 1, //표기할 페이지 넘버 ( 전체 데이터가 55개라면 1페이지에 10개씩 )
-      _type: 'json', //응답 받을 때 데이터 형식
+      serviceKey: this.apiKey,
+      MobileOS: 'ETC',
+      MobileApp: 'AppTest',
+      mapX: lon,
+      mapY: lat,
+      radius,
+      arrange: 'E',
+      numOfRows: 10,
+      pageNo: pageNo,
+      _type: 'json',
     };
 
     const { data } = await axios.get(url, { params });
 
-    if (!data.response?.body?.items?.item) return [];
+    const items = data.response?.body?.items?.item;
+    if (!items) return [];
 
-    return data.response.body.items.item;
+    // contentTypeId로 category를 분류하는 매핑 함수
+    const getCategory = (typeId: string | number): string => {
+      const map: Record<string, string> = {
+        '12': '관광지',
+        '14': '문화시설',
+        '15': '행사',
+        '28': '레포츠',
+        '32': '숙박',
+        '38': '쇼핑',
+        '39': '음식점',
+      };
+      return map[String(typeId)] || '기타';
+    };
+
+    // 필요한 정보만 추려서 정리
+    return items.map((item: any) => ({
+      title: item.title || item.addr1 || '이름 없음',
+      category: getCategory(item.contenttypeid),
+      imageSrc: item.firstimage || '', // 이미지 없을 수도 있음
+      lat: item.mapy,
+      lon: item.mapx,
+      tel: item.tel || '전화번호 없음',
+    }));
   }
 
   private readonly kakaoApiKey = process.env.KAKAO_KEY;

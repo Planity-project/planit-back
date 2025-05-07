@@ -19,7 +19,15 @@ export class LocationService {
     return arr;
   }
 
-  async locationFindAll(): Promise<Location[]> {
-    return await this.locationRepo.find();
+  async locationFindAll(): Promise<any[]> {
+    const locations = await this.locationRepo.find();
+    const plainLocations = locations.map((loc) => ({
+      id: loc.id,
+      name: loc.name,
+      country: loc.country,
+      lat: loc.lat,
+      lng: loc.lng,
+    }));
+    return plainLocations;
   }
 }
