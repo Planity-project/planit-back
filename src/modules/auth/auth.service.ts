@@ -23,7 +23,10 @@ export class AuthService {
   }
 
   async create(userData: any): Promise<{ result: boolean }> {
-    if (!userData.nickname) {
+    const user = await this.userRepository.findOne({
+      where: { nickname: userData.nickname },
+    });
+    if (!userData.nickname && user) {
       userData.nickname = nicknameMaker();
     }
 

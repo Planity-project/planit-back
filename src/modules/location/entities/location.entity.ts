@@ -8,4 +8,10 @@ export class Location {
 
   @Column({ nullable: true, default: '대한민국' })
   country: string;
+
+  @Column({ nullable: true })
+  lat: number;
+
+  @Column({ nullable: true })
+  lng: number;
 }

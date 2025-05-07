@@ -20,6 +20,18 @@ export class LocationDto {
     default: '대한민국',
   })
   country: string;
+
+  @ApiProperty({
+    description: '위도',
+    example: 37.252,
+  })
+  lat: number;
+
+  @ApiProperty({
+    description: '경도',
+    example: 36.252,
+  })
+  lng: number;
 }
 
 export class LocationsResponseDto {
@@ -31,11 +43,15 @@ export class LocationsResponseDto {
         id: 1,
         name: '서울',
         country: '대한민국',
+        lat: 37.252,
+        lng: 36.252,
       },
       {
         id: 2,
         name: '부산',
         country: '대한민국',
+        lat: 37.252,
+        lng: 36.252,
       },
     ],
   })

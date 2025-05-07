@@ -11,13 +11,6 @@ import { UserType } from '../user/entities/user.entity';
 
 dotenv.config();
 
-interface KakaoProfile {
-  id: number;
-  displayName: string;
-  emails: { value: string }[];
-  _json: { kakao_account: { email: string } };
-}
-
 type VerifyCallback = (error: any, user?: any, info?: any) => void;
 
 @Injectable()
@@ -40,13 +33,20 @@ export class KakaoStrategy extends PassportStrategy(
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: KakaoProfile,
+    profile: any,
     done: VerifyCallback,
   ) {
+    const kakaoData = profile._json || JSON.parse(profile._raw || '{}');
     const email = profile._json.kakao_account.email;
-    const userCreate = { email: email, type: UserType.KAKAO };
     const user = await this.authService.findUser(email);
+    const nickname = kakaoData?.properties?.nickname;
+    const userCreate = {
+      email: email,
+      type: UserType.KAKAO,
+      nickname: nickname,
+    };
 
+    console.log(userCreate);
     if (!user) {
       await this.authService.create(userCreate);
       const userData = await this.authService.findUser(email);

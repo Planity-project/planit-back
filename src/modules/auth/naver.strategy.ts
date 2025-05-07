@@ -11,7 +11,8 @@ dotenv.config();
 interface NaverProfile {
   id: string;
   emails: string[];
-  _json: { email: string };
+
+  _json: { email: string; nickname: string };
 }
 
 type VerifyCallback = (error: any, user?: any, info?: any) => void;
@@ -38,10 +39,16 @@ export class NaverStrategy extends PassportStrategy(
     profile: NaverProfile,
     done: VerifyCallback,
   ) {
+    const nickname = profile._json.nickname;
     const email = profile._json.email;
-    const userCreate = { email: email, type: UserType.NAVER };
+    const userCreate = {
+      email: email,
+      type: UserType.NAVER,
+      nickname: nickname,
+    };
     const user = await this.authService.findUser(email);
 
+    console.log(userCreate);
     if (!user) {
       await this.authService.create(userCreate);
       const userData = await this.authService.findUser(email);

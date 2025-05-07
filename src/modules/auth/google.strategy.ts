@@ -28,10 +28,20 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: any,
     done: VerifyCallback,
   ) {
+    console.log(profile);
     const email = profile.emails[0].value;
-    const userCreate = { email: email, type: UserType.GOOGLE };
-    const user = await this.authService.findUser(email);
 
+    const user = await this.authService.findUser(email);
+    const nickname =
+      profile.displayName || profile._json?.name || email?.split('@')[0];
+
+    const userCreate = {
+      email: email,
+      type: UserType.GOOGLE,
+      nickname: nickname,
+    };
+
+    console.log(userCreate);
     if (!user) {
       await this.authService.create(userCreate);
       const userData = await this.authService.findUser(email);
