@@ -4,7 +4,7 @@ import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import * as dotenv from 'dotenv';
-import { UserType } from '../user/entities/user.entity';
+import { LoginType } from '../user/entities/user.entity';
 
 dotenv.config();
 
@@ -37,7 +37,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
     const userCreate = {
       email: email,
-      type: UserType.GOOGLE,
+      type: LoginType.GOOGLE,
       nickname: nickname,
     };
 

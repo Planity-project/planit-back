@@ -13,7 +13,7 @@ import {
   Patch,
 } from '@nestjs/common';
 import { ReportService } from './report.service';
-import { Report, TargetType } from './report.entity';
+import { Report, TargetType } from './entities/report.entity';
 import {
   ApiTags,
   ApiOperation,
@@ -69,11 +69,11 @@ export class ReportController {
     return this.reportService.create(report);
   }
 
-  // ✅ 챕터 신고 생성
-  @Post('chapters/:chapterId')
+  // ✅ 게시글 신고 생성
+  @Post('post/:postId')
   @ApiOperation({ summary: '챕터 신고 생성' })
   @ApiParam({
-    name: 'chapterId',
+    name: 'postId',
     type: 'number',
     description: '신고할 챕터 ID',
   })
@@ -89,8 +89,8 @@ export class ReportController {
   @ApiResponse({ status: 201, description: '챕터 신고 완료' })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
   @ApiResponse({ status: 404, description: '해당 챕터를 찾을 수 없음' })
-  async reportChapter(
-    @Param('chapterId', ParseIntPipe) chapterId: number,
+  async reportPost(
+    @Param('postId', ParseIntPipe) postId: number,
     @Body() reportData: { reason: string },
     @Req() req: any,
   ): Promise<Report> {
@@ -100,8 +100,8 @@ export class ReportController {
 
     const report = new Report();
     report.reporter = req.user;
-    report.target_type = TargetType.CHAPTER;
-    report.target_id = chapterId;
+    report.target_type = TargetType.POST;
+    report.target_id = postId;
     report.reason = reportData.reason;
 
     return this.reportService.create(report);
@@ -157,12 +157,12 @@ export class ReportController {
   async handleReport(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<{ message: string }> {
-    const success = await this.reportService.handleReport(id); // handleReport 메서드 호출
+    const success = await this.reportService.handleReport(id);
 
     if (!success) {
       throw new NotFoundException('해당 신고를 처리할 수 없습니다.');
     }
 
-    return { message: '신고가 처리되었습니다.' }; // 처리 성공 메시지 반환
+    return { message: '신고가 처리되었습니다.' };
   }
 }

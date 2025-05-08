@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
-import { UserType } from '../user/entities/user.entity';
+import { LoginType } from '../user/entities/user.entity';
 
 import { JwtService } from '@nestjs/jwt';
 import { nicknameMaker } from 'util/generator';

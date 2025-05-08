@@ -4,7 +4,7 @@ import { Strategy as NaverStrategyOrigin } from 'passport-naver';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import * as dotenv from 'dotenv';
-import { UserType } from '../user/entities/user.entity';
+import { LoginType } from '../user/entities/user.entity';
 
 dotenv.config();
 
@@ -43,7 +43,7 @@ export class NaverStrategy extends PassportStrategy(
     const email = profile._json.email;
     const userCreate = {
       email: email,
-      type: UserType.NAVER,
+      type: LoginType.NAVER,
       nickname: nickname,
     };
     const user = await this.authService.findUser(email);

@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import * as dotenv from 'dotenv';
-import { UserType } from '../user/entities/user.entity';
+import { LoginType } from '../user/entities/user.entity';
 
 dotenv.config();
 
@@ -42,7 +42,7 @@ export class KakaoStrategy extends PassportStrategy(
     const nickname = kakaoData?.properties?.nickname;
     const userCreate = {
       email: email,
-      type: UserType.KAKAO,
+      type: LoginType.KAKAO,
       nickname: nickname,
     };
 

@@ -13,15 +13,14 @@ import { Post } from 'src/modules/posts/entities/post.entity';
 export enum TargetType {
   POST = 'post',
   COMMENT = 'comment',
+  USER = 'user',
 }
 
+// 신고 처리(게시글, 댓글, 유저)가 되면 유저에게 공지 알림이 감
 @Entity('reports')
 export class Report {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @ManyToOne(() => User, (user) => user.reports, { onDelete: 'CASCADE' })
-  reporter: User;
 
   @Column({ type: 'enum', enum: TargetType })
   target_type: TargetType;
@@ -35,22 +34,27 @@ export class Report {
   @Column('text', { nullable: true })
   reported_content: string;
 
-  @ManyToOne(() => Post, (post) => post.reports, {
-    onDelete: 'CASCADE',
-  })
-  post: Post;
-
   @Column({ nullable: true })
   reported_user_id?: number;
+
+  @Column({ default: false })
+  handled: boolean;
 
   @CreateDateColumn()
   created_at: Date;
 
-  @OneToMany(() => Notice, (notice) => notice.reports, {
+  // 📚 관계 설정
+
+  @ManyToOne(() => User, (user) => user.reports, { onDelete: 'CASCADE' })
+  reporter: User;
+
+  @OneToMany(() => Notice, (notice) => notice.report, {
     cascade: true,
   })
   notice: Notice[];
 
-  @Column({ default: false })
-  handled: boolean;
+  @ManyToOne(() => Post, (post) => post.reports, {
+    onDelete: 'CASCADE',
+  })
+  post: Post;
 }

@@ -4,12 +4,20 @@ import {
   Post,
   Body,
   Patch,
+  Request,
+  Put,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
+  HttpCode,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { updateUserDto } from './dto/create-user.dto';
 import {
   ApiOperation,
@@ -26,7 +34,7 @@ import {
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  //닉네임 업데이트
+  // ✅ 닉네임 업데이트
   @Post('update')
   @ApiOperation({ summary: '사용자 닉네임 수정' })
   @ApiBody({ type: updateUserDto })
@@ -57,13 +65,13 @@ export class UserController {
     return await this.userService.updateUserNickname(id, nickname);
   }
 
-  //연동된 계정 조회
+  // ✅ 연동된 계정 조회
   @Get('account/:id')
   @ApiOperation({ summary: '연동된 계정 조회' })
   @ApiParam({ name: 'id', type: Number, description: '유저의 ID' })
   @ApiOkResponse({ schema: { example: { type: 'kakao' } } })
   @ApiBadRequestResponse({ description: '유저를 찾을 수 없습니다.' })
-  async getUserType(@Param('id') id: number) {
+  async getLoginType(@Param('id') id: number) {
     const user = await this.userService.findById(id);
 
     if (!user) {
@@ -76,7 +84,7 @@ export class UserController {
     return { type: user.type };
   }
 
-  //회원 탈퇴
+  // ✅ 회원 탈퇴
   @Delete('destroy/:id')
   @ApiOperation({
     summary: '회원 탈퇴',
@@ -97,5 +105,71 @@ export class UserController {
 
     await this.userService.deleteUser(id);
     return { message: '회원 탈퇴 완료' };
+  }
+
+  // ✅ 프로필 이미지 업로드 및 업데이트
+  @Put('me/profile-image')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '내 프로필 이미지 업데이트' })
+  @UseInterceptors(
+    FileInterceptor('profileImage', {
+      storage: diskStorage({
+        destination: './uploads/profiles',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `profile-${uniqueSuffix}${ext}`;
+          callback(null, filename);
+        },
+      }),
+      limits: { fileSize: 1024 * 1024 * 5 }, // 5MB 제한
+    }),
+  )
+  async uploadProfileImage(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const userId = req.user.id;
+    if (!file) {
+      return { message: '프로필 이미지를 선택해주세요.' };
+    }
+    await this.userService.updateProfileImage(userId, file.filename);
+    return {
+      message: '프로필 이미지가 성공적으로 업데이트되었습니다.',
+      filename: file.filename,
+    };
+  }
+
+  // ✅ 내 프로필 이미지 삭제
+  @Delete('me/profile-image')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '내 프로필 이미지 삭제' })
+  async deleteProfileImage(@Request() req): Promise<{ message: string }> {
+    const userId = req.user.id;
+    await this.userService.deleteProfileImage(userId);
+    return { message: '프로필 이미지가 성공적으로 삭제되었습니다.' };
+  }
+
+  // ✅ 관리자에 의한 여러 유저 완전 삭제
+  @Delete('admin/delete')
+  @ApiOperation({ summary: '관리자가 여러 유저를 완전 삭제' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        userIds: {
+          type: 'array',
+          items: { type: 'number' },
+          example: [1, 2, 3],
+        },
+      },
+    },
+  })
+  async deleteUsersByAdmin(
+    @Body('userIds') userIds: number[],
+  ): Promise<{ message: string }> {
+    await this.userService.deleteUsersByAdmin(userIds);
+    return { message: '선택한 유저들이 완전히 삭제되었습니다.' };
   }
 }

@@ -1,5 +1,3 @@
-//좋아요
-
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,18 +6,34 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
+import { Post } from 'src/modules/posts/entities/post.entity';
+import { Comment } from 'src/modules/comment/entities/comment.entity';
+
 @Entity('likes')
 export class Like {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => User)
-  user: User;
-  @Column({ nullable: true })
-  postId: number;
-  @Column({ nullable: true })
-  commentId: number;
+
   @Column({ type: 'enum', enum: ['POST', 'COMMENT'] })
   type: string;
+
   @CreateDateColumn()
   createdAt: Date;
+
+  // 📚 관계 설정
+
+  @ManyToOne(() => User, (user) => user.likes, { onDelete: 'CASCADE' })
+  user: User;
+
+  @ManyToOne(() => Post, (post) => post.likes, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  post: Post | null;
+
+  @ManyToOne(() => Comment, (comment) => comment.likes, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  comment: Comment | null;
 }
