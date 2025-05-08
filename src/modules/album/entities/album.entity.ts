@@ -8,19 +8,29 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
-import { AlbumGroup } from './albumImage.entity';
+import { AlbumGroup } from './albumGroup.entity';
+import { AlbumImage } from './albumImage';
+
 @Entity('albums')
 export class Album {
   @PrimaryGeneratedColumn()
   id: number;
+
   @ManyToOne(() => User)
   user: User;
+
   @ManyToOne(() => AlbumGroup)
   group: AlbumGroup;
-  @Column()
+
+  @ManyToOne(() => AlbumImage)
+  image: AlbumImage;
+
+  @Column({ nullable: true })
   img: string;
+
   @Column({ type: 'text', nullable: true })
-  content: string;
+  title: string;
+
   @CreateDateColumn()
   createdAt: Date;
 }

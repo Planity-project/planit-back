@@ -8,7 +8,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
-import { AlbumGroup } from 'src/modules/album/entities/albumImage.entity';
+import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
 
 @Entity('payments')
 export class Payment {
