@@ -15,8 +15,7 @@ import { PostsModule } from 'src/modules/posts/posts.module';
 import { UserModule } from 'src/modules/user/user.module';
 import { MapModule } from 'src/modules/map/map.module';
 
-import { Report } from 'src/modules/admin/report/entities/report.entity';
-import { Suspension } from 'src/modules/admin/report/entities/suspensions';
+import { Report } from 'src/modules/reports/entities/report.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
 import { AlbumGroup } from 'src/modules/album/entities/albumImage.entity';
 import { UserLogin } from 'src/modules/auth/entities/auth.entity';
@@ -43,7 +42,6 @@ dotenv.config();
       entities: [
         Admin,
         Report,
-        Suspension,
         Album,
         AlbumGroup,
         UserLogin,
@@ -63,7 +61,6 @@ dotenv.config();
     TypeOrmModule.forFeature([
       Admin,
       Report,
-      Suspension,
       Album,
       AlbumGroup,
       UserLogin,
