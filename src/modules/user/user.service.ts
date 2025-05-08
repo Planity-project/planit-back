@@ -1,15 +1,32 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { join } from 'path';
+import { unlink } from 'fs/promises';
 import { User } from './entities/user.entity';
+import { Payment } from '../payments/entities/payment.entity';
+import { Album } from '../album/entities/album.entity';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Payment)
+    private readonly paymentRepository: Repository<Payment>,
+
+    @InjectRepository(Album)
+    private readonly albumRepository: Repository<Payment>,
   ) {}
 
-  // 닉네임 업데이트
+  // ✅ 닉네임 업데이트
   async updateUserNickname(
     id: number,
     nickname: string,
@@ -28,12 +45,85 @@ export class UserService {
     return { result: true, message: '등록 성공' };
   }
 
-  //id로 유저 검색
+  // ✅ id로 유저 검색
   async findById(id: number): Promise<User | null> {
     return this.userRepository.findOne({ where: { id } });
   }
 
+  // ✅ 유저 단일 조회
+  async findOne(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
+  }
+
+  // ✅ 유저직접 탈퇴
   async deleteUser(id: number): Promise<void> {
     await this.userRepository.delete(id);
+  }
+
+  // ✅ 유저 정보 업데이트
+  async save(user: User): Promise<User> {
+    return this.userRepository.save(user);
+  }
+
+  // ✅ 프로필 이미지 변경
+  async updateProfileImage(userId: number, filename: string): Promise<void> {
+    const user = await this.findOne(userId);
+    user.profile_img = filename;
+    await this.userRepository.save(user);
+  }
+
+  // ✅ 프로필 이미지 삭제
+  async deleteProfileImage(userId: number): Promise<void> {
+    const user = await this.findOne(userId);
+    if (user.profile_img) {
+      const filePath = join(
+        __dirname,
+        '..',
+        '..',
+        'uploads',
+        'profiles',
+        user.profile_img,
+      );
+      try {
+        await unlink(filePath);
+      } catch (err) {
+        this.logger.warn(`프로필 이미지 파일 삭제 실패: ${filePath}`);
+      }
+      user.profile_img = null;
+      await this.userRepository.save(user);
+    }
+  }
+
+  // ✅ 관리자에 의한 유저 완전 삭제
+  async deleteUsersByAdmin(userIds: number[]): Promise<void> {
+    for (const userId of userIds) {
+      await this.deleteUserAndRelatedData(userId);
+    }
+  }
+
+  // ✅ 유저 및 관련 데이터 삭제
+  private async deleteUserAndRelatedData(userId: number): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // 결제 정보 삭제
+    await this.paymentRepository.delete({ user: { id: userId } });
+
+    // 앨범 삭제
+    await this.albumRepository.delete({ user: { id: userId } });
+
+    // 유저 삭제
+    const deleteResult = await this.userRepository.delete(userId);
+    if (deleteResult.affected === 0) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
   }
 }
