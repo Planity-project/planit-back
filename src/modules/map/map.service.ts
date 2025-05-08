@@ -76,7 +76,7 @@ export class MapService {
     const items = data.response?.body?.items?.item;
     if (!items) return [];
 
-    // contentTypeId로 category를 분류하는 매핑 함수
+    // contentTypeId로 category를 분류하는 매핑 함수 필요시 우리한테 맞게 수정
     const getCategory = (typeId: string | number): string => {
       const map: Record<string, string> = {
         '12': '관광지',

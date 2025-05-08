@@ -134,11 +134,11 @@ export class AuthController {
     }
 
     try {
-      const user = jwt.verify(token, process.env.JWT_SECRET!);
-
+      const user: any = jwt.verify(token, process.env.JWT_SECRET!);
+      const userData = await this.authService.findUser(user.email);
       return res.status(200).json({
         result: true,
-        user: user,
+        user: userData,
       });
     } catch (err) {
       return res
