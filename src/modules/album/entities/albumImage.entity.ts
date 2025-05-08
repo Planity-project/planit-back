@@ -16,8 +16,6 @@ export class AlbumGroup {
   user: User;
   @Column({ type: 'enum', enum: ['OWNER', 'MEMBER'], default: 'OWNER' })
   role: string;
-  @Column({ type: 'float', default: 0 })
-  avg: number;
   @Column({ type: 'enum', enum: ['FREE', 'PAID'], default: 'FREE' })
   type: string;
   @Column({ default: 0 })
