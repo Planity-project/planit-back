@@ -30,4 +30,9 @@ export class AlbumController {
   async findAllAlbum() {
     return await this.albumService.findAll();
   }
+
+  @Get('detailData')
+  async getDetailData(@Param('AlbumId') albumId: number) {
+    return await this.albumService.findDetailData(albumId);
+  }
 }
