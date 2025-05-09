@@ -3,11 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Request,
   Put,
   Param,
   Delete,
+  ParseIntPipe,
   UseInterceptors,
   UploadedFile,
   HttpCode,
@@ -18,6 +18,7 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { User } from './entities/user.entity';
 import { updateUserDto } from './dto/create-user.dto';
 import {
   ApiOperation,
@@ -33,6 +34,21 @@ import {
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  // 📌 유저 전체 목록 조회
+  @Get()
+  @ApiOperation({ summary: '유저 전체 목록 조회' })
+  findAll(): Promise<User[]> {
+    return this.userService.findAll();
+  }
+
+  // 📌 유저 단일 조회
+  @Get(':id')
+  @ApiOperation({ summary: '유저 상세 조회' })
+  @ApiParam({ name: 'id', description: '유저 ID' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.userService.findOne(id);
+  }
 
   // ✅ 닉네임 업데이트
   @Post('update')

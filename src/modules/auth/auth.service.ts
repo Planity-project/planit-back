@@ -11,7 +11,7 @@ import { nicknameMaker } from 'util/generator';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    @InjectRepository(User) private userRepository: Repository<User>, // User Repository 주입
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
   async findUser(email: string): Promise<User | null> {

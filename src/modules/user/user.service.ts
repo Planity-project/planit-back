@@ -26,6 +26,22 @@ export class UserService {
     private readonly albumRepository: Repository<Payment>,
   ) {}
 
+  // ✅ 유저 전체 목록 조회
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find();
+  }
+
+  // ✅ 유저 단일 조회
+  async findOne(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
+  }
+
   // ✅ 닉네임 업데이트
   async updateUserNickname(
     id: number,
@@ -48,17 +64,6 @@ export class UserService {
   // ✅ id로 유저 검색
   async findById(id: number): Promise<User | null> {
     return this.userRepository.findOne({ where: { id } });
-  }
-
-  // ✅ 유저 단일 조회
-  async findOne(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id },
-    });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    return user;
   }
 
   // ✅ 유저직접 탈퇴

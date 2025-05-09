@@ -8,6 +8,7 @@ import { SERVER_DOMAIN } from 'util/api';
 export class AdminController {
   constructor(private readonly authService: AdminService) {}
 
+  // 로그인
   @Post('login')
   async adminLogin(@Body() dto: AdminLoginDto, @Res() res: Response) {
     const token = await this.authService.adminLogin(dto.email, dto.password);
@@ -21,4 +22,12 @@ export class AdminController {
 
     return res.status(200).json({ message: '로그인 성공' });
   }
+
+  //
+
+  //
+
+  //
+
+  //
 }

@@ -40,6 +40,4 @@ export class PostsController {
 
     return post;
   }
-  // 내 일정 조회
-  //
 }
