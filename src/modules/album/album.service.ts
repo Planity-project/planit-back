@@ -43,20 +43,22 @@ export class AlbumService {
     return await this.albumRepo.find();
   }
 
-  async findDetailData(
-    albumId: number,
-  ): Promise<{ group: AlbumGroup[]; image: AlbumImage[] }> {
-    // album에 연결된 group과 image들을 relations로 가져옴
+  async findDetailData(albumId: number): Promise<{
+    group: AlbumGroup[];
+    image: AlbumImage[];
+    comment?: Comment[] | null;
+  }> {
     const album = await this.albumRepo.findOne({
       where: { id: albumId },
-      relations: ['group', 'images'], // 반드시 엔티티에서 설정된 relation 명칭 사용
+      relations: ['group', 'images', 'comment'],
     });
 
     if (!album) throw new NotFoundException('앨범을 찾을 수 없습니다');
 
     return {
-      group: album.groups, // 앨범과 연결된 그룹 (단일)
-      image: album.images, // 앨범에 속한 이미지들
+      group: album.groups,
+      image: album.images,
+      comment: album.comment,
     };
   }
 }
