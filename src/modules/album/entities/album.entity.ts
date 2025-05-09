@@ -5,7 +5,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  ManyToMany,
   CreateDateColumn,
+  JoinTable,
+  OneToMany,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { AlbumGroup } from './albumGroup.entity';
@@ -34,9 +37,9 @@ export class Album {
   @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(() => AlbumGroup)
-  group: AlbumGroup;
+  @OneToMany(() => AlbumGroup, (group) => group.albums)
+  groups: AlbumGroup[];
 
-  @ManyToOne(() => AlbumImage)
-  image: AlbumImage;
+  @OneToMany(() => AlbumImage, (image) => image.album)
+  images: AlbumImage[];
 }

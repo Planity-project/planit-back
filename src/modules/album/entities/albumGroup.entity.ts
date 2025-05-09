@@ -1,12 +1,16 @@
+//앨범 이미지
+
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
   CreateDateColumn,
+  ManyToMany,
+  OneToMany,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
-
+import { Album } from './album.entity';
 @Entity('album_groups')
 export class AlbumGroup {
   @PrimaryGeneratedColumn()
@@ -30,4 +34,7 @@ export class AlbumGroup {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(() => Album, (album) => album.groups)
+  albums: Album[];
 }
