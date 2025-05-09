@@ -25,6 +25,12 @@ export class Album {
   @CreateDateColumn()
   createdAt: Date;
 
+  @Column({ nullable: true })
+  likeCnt: number;
+
+  @Column({ nullable: true })
+  commentCnt: number;
+
   @ManyToOne(() => User)
   user: User;
 

@@ -18,6 +18,7 @@ import { MapModule } from 'src/modules/map/map.module';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
 import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
+import { AlbumImage } from 'src/modules/album/entities/albumImage';
 import { UserLogin } from 'src/modules/auth/entities/auth.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
@@ -44,6 +45,7 @@ dotenv.config();
         Report,
         Album,
         AlbumGroup,
+        AlbumImage,
         UserLogin,
         User,
         Comment,
@@ -63,6 +65,7 @@ dotenv.config();
       Report,
       Album,
       AlbumGroup,
+      AlbumImage,
       UserLogin,
       User,
       Comment,
