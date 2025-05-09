@@ -7,9 +7,12 @@ import { Album } from './entities/album.entity';
 import { AlbumGroup } from './entities/albumGroup.entity';
 import { AlbumImage } from './entities/albumImage';
 import { User } from '../user/entities/user.entity';
+import { Comment } from '../comment/entities/comment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Album, AlbumGroup, AlbumImage, User])],
+  imports: [
+    TypeOrmModule.forFeature([Album, AlbumGroup, AlbumImage, User, Comment]),
+  ],
   controllers: [AlbumController],
   providers: [AlbumService],
 })
