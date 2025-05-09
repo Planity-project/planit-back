@@ -26,17 +26,24 @@ export class AlbumService {
     userId: number,
     title: string,
   ): Promise<{ result: boolean; id: number }> {
-    const user = await this.userRepo.findOne({ where: { id: userId } });
-    if (!user) throw new Error('유저를 찾을 수 없습니다');
+    try {
+      const user = await this.userRepo.findOne({ where: { id: userId } });
+      if (!user) {
+        throw new Error('해당 유저를 찾을 수 없습니다.');
+      }
 
-    const data = this.albumRepo.create({
-      user,
-      title,
-    });
+      const album = this.albumRepo.create({
+        user,
+        title,
+      });
 
-    const savedAlbum = await this.albumRepo.save(data);
+      const savedAlbum = await this.albumRepo.save(album);
 
-    return { result: true, id: savedAlbum.id };
+      return { result: true, id: savedAlbum.id };
+    } catch (error) {
+      console.error('앨범 생성 중 에러:', error);
+      throw new Error('앨범 생성에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
   }
 
   async findAll(): Promise<Album[]> {

@@ -1,5 +1,17 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import axios from 'axios';
+const getCategory = (typeId: string | number): string => {
+  const map: Record<string, string> = {
+    '12': '관광지',
+    '14': '문화시설',
+    '15': '행사',
+    '28': '레포츠',
+    '32': '숙박',
+    '38': '쇼핑',
+    '39': '음식점',
+  };
+  return map[String(typeId)] || '기타';
+};
 
 @Injectable()
 export class MapService {
@@ -77,18 +89,6 @@ export class MapService {
     if (!items) return [];
 
     // contentTypeId로 category를 분류하는 매핑 함수 필요시 우리한테 맞게 수정
-    const getCategory = (typeId: string | number): string => {
-      const map: Record<string, string> = {
-        '12': '관광지',
-        '14': '문화시설',
-        '15': '행사',
-        '28': '레포츠',
-        '32': '숙박',
-        '38': '쇼핑',
-        '39': '음식점',
-      };
-      return map[String(typeId)] || '기타';
-    };
 
     // 필요한 정보만 추려서 정리
     return items.map((item: any) => ({
@@ -138,5 +138,45 @@ export class MapService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async searchInputTours(
+    lat: string,
+    lon: string,
+    pageNo: number,
+    radius = '2000',
+    str: string,
+  ): Promise<any[]> {
+    const url = 'https://apis.data.go.kr/B551011/KorService1/searchKeyword1';
+
+    const params = {
+      serviceKey: this.apiKey,
+      MobileOS: 'ETC',
+      MobileApp: 'AppTest',
+      keyword: str, // 입력된 키워드로 검색
+      mapX: lon,
+      mapY: lat,
+      radius,
+      arrange: 'E',
+      numOfRows: 10,
+      pageNo: pageNo,
+      _type: 'json',
+    };
+
+    const { data } = await axios.get(url, { params });
+
+    const items = data.response?.body?.items?.item;
+    if (!items) return [];
+
+    const result = items.map((item: any) => ({
+      title: item.title || item.addr1 || '이름 없음',
+      category: getCategory(item.contenttypeid),
+      imageSrc: item.firstimage || '',
+      lat: item.mapy,
+      lon: item.mapx,
+      tel: item.tel || '전화번호 없음',
+    }));
+
+    return result;
   }
 }

@@ -26,7 +26,7 @@ export class AuthService {
     const user = await this.userRepository.findOne({
       where: { nickname: userData.nickname },
     });
-    if (!userData.nickname && user) {
+    if (!userData.nickname || user) {
       userData.nickname = nicknameMaker();
     }
 

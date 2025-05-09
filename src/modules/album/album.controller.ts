@@ -22,11 +22,11 @@ export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
   // 앨범 등록
-  @Post('submit')
-  async submitAlbum(@Body() userId: number, title: string) {
-    return await this.albumService.submitAlbum(userId, title);
+  @Post('/submit')
+  submitAlbum(@Body() body: { userId: number; title: string }) {
+    const { userId, title } = body;
+    return this.albumService.submitAlbum(userId, title);
   }
-
   // 전체 앨범 데이터 가져오기
   @Get('allData')
   async findAllAlbum() {
