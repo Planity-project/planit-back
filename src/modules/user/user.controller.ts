@@ -13,6 +13,7 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -20,6 +21,8 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { User } from './entities/user.entity';
 import { updateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+
 import {
   ApiOperation,
   ApiResponse,
@@ -49,6 +52,18 @@ export class UserController {
   findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.userService.findOne(id);
   }
+
+  // 📌 유저 정보 업데이트
+  // @Patch(':id')
+  // @ApiOperation({ summary: '회원 정보 수정' })
+  // @ApiParam({ name: 'id', description: '회원 ID' })
+  // @ApiBody({ type: UpdateUserDto })
+  // updateUser(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Body() dto: UpdateUserDto,
+  // ): Promise<User> {
+  //   return this.userService.update(id, dto);
+  // }
 
   // ✅ 닉네임 업데이트
   @Post('update')

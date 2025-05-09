@@ -42,6 +42,8 @@ export class UserService {
     return user;
   }
 
+  // ✅ 유저 정보 업데이트
+
   // ✅ 닉네임 업데이트
   async updateUserNickname(
     id: number,

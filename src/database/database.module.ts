@@ -14,6 +14,7 @@ import { TravelModule } from 'src/modules/trips/trips.module';
 import { PostsModule } from 'src/modules/posts/posts.module';
 import { UserModule } from 'src/modules/user/user.module';
 import { MapModule } from 'src/modules/map/map.module';
+import { BannerModule } from 'src/modules/admin/banner/banner.module';
 
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
@@ -32,6 +33,7 @@ import { Trip } from 'src/modules/trips/entities/trips.entity';
 import { Place } from 'src/modules/trips/entities/place.entity';
 import { TripDay } from 'src/modules/trips/entities/tripday.entity';
 import { TripScheduleItem } from 'src/modules/trips/entities/tripscheduleitems.entity';
+import { Banner } from 'src/modules/admin/banner/entities/banner.entity';
 dotenv.config();
 
 @Module({
@@ -62,6 +64,7 @@ dotenv.config();
         Place,
         TripDay,
         TripScheduleItem,
+        Banner,
       ],
       synchronize: true,
       logging: false,
@@ -94,6 +97,7 @@ dotenv.config();
     TravelModule,
     UserModule,
     MapModule,
+    BannerModule,
   ],
   exports: [TypeOrmModule],
 })
