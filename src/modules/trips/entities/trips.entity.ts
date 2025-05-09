@@ -23,12 +23,14 @@ export class Trip {
   @Column({ type: 'date' })
   endDate: Date;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
+  // 📚 관계 설정
+
   @ManyToOne(() => User)
   user: User;
 
   @OneToMany(() => TripDay, (day) => day.trip)
   tripDays: TripDay[];
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

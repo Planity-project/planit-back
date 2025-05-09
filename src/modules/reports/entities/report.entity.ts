@@ -16,7 +16,6 @@ export enum TargetType {
   USER = 'user',
 }
 
-// 신고 처리(게시글, 댓글, 유저)가 되면 유저에게 공지 알림이 감
 @Entity('reports')
 export class Report {
   @PrimaryGeneratedColumn()

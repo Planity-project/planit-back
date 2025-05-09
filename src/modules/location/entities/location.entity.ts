@@ -18,6 +18,8 @@ export class Location {
   @Column({ nullable: true })
   lng: number;
 
+  // 📚 관계 설정
+
   @OneToMany(() => Place, (place) => place.location)
   places: Place[];
 }

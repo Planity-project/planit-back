@@ -13,7 +13,6 @@ import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Notice } from 'src/modules/notice/entities/notice.entity';
 
-// 게시글 신고 처리가 되면 유저에게 공지 알림이 감
 @Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn()

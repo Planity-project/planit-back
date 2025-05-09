@@ -9,7 +9,6 @@ import { User } from 'src/modules/user/entities/user.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 
-// 신고 처리(게시글, 댓글, 유저)가 되면 유저에게 공지 알림이 감
 @Entity('notice')
 export class Notice {
   @PrimaryGeneratedColumn()

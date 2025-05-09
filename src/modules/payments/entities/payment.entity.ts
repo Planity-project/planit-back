@@ -1,5 +1,3 @@
-//결제
-
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -14,14 +12,21 @@ import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
 export class Payment {
   @PrimaryGeneratedColumn()
   id: number;
-  @ManyToOne(() => AlbumGroup)
-  group: AlbumGroup;
-  @ManyToOne(() => User)
-  user: User;
+
   @Column()
   price: number;
+
   @Column({ type: 'enum', enum: ['CARD', 'BANK', 'PHONE'] })
   method: string;
+
   @CreateDateColumn()
   paidAt: Date;
+
+  // 📚 관계 설정
+
+  @ManyToOne(() => User)
+  user: User;
+
+  @ManyToOne(() => AlbumGroup)
+  group: AlbumGroup;
 }

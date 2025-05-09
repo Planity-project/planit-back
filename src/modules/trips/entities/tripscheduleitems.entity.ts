@@ -7,9 +7,6 @@ export class TripScheduleItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => TripDay, (tripDay) => tripDay.scheduleItems)
-  tripDay: TripDay;
-
   @Column({ type: 'time' })
   startTime: string;
 
@@ -22,9 +19,14 @@ export class TripScheduleItem {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
+  @Column({ default: 0 })
+  order: number;
+
+  // 📚 관계 설정
+
   @ManyToOne(() => Place, { nullable: true })
   place?: Place;
 
-  @Column({ default: 0 })
-  order: number;
+  @ManyToOne(() => TripDay, (tripDay) => tripDay.scheduleItems)
+  tripDay: TripDay;
 }

@@ -9,9 +9,6 @@ export class Place {
   @Column()
   name: string; // 예: 경복궁, 제주흑돼지 맛집
 
-  @ManyToOne(() => Location, (location) => location.places)
-  location: Location;
-
   @Column({ nullable: true })
   category: string; // 관광지, 식당, 숙소 등
 
@@ -23,4 +20,9 @@ export class Place {
 
   @Column({ nullable: true })
   lng: number;
+
+  // 📚 관계 설정
+
+  @ManyToOne(() => Location, (location) => location.places)
+  location: Location;
 }

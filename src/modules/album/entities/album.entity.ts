@@ -1,18 +1,15 @@
-//앨범 그룹
-
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  ManyToMany,
   CreateDateColumn,
-  JoinTable,
   OneToMany,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { AlbumGroup } from './albumGroup.entity';
 import { AlbumImage } from './albumImage';
+import { Comment } from 'src/modules/comment/entities/comment.entity';
 
 @Entity('albums')
 export class Album {
@@ -34,6 +31,8 @@ export class Album {
   @Column({ nullable: true })
   commentCnt: number;
 
+  // 📚 관계 설정
+
   @ManyToOne(() => User)
   user: User;
 
@@ -42,4 +41,7 @@ export class Album {
 
   @OneToMany(() => AlbumImage, (image) => image.album)
   images: AlbumImage[];
+
+  @OneToMany(() => Comment, (comment) => comment.album)
+  comment: Comment[];
 }

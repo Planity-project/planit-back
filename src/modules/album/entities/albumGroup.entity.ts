@@ -1,5 +1,3 @@
-//앨범 이미지
-
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -16,16 +14,6 @@ export class AlbumGroup {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User)
-  user: User;
-
-  @Column({
-    type: 'enum',
-    enum: ['OWNER', 'MEMBER'],
-    default: 'OWNER',
-  })
-  role: string;
-
   @Column({ type: 'enum', enum: ['FREE', 'PAID'], default: 'FREE' })
   type: string;
 
@@ -34,6 +22,18 @@ export class AlbumGroup {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @Column({
+    type: 'enum',
+    enum: ['OWNER', 'MEMBER'],
+    default: 'OWNER',
+  })
+  role: string;
+
+  // 📚 관계 설정
+
+  @ManyToOne(() => User)
+  user: User;
 
   @OneToMany(() => Album, (album) => album.groups)
   albums: Album[];

@@ -13,17 +13,19 @@ export class AlbumImage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User)
-  user: User;
-
-  @ManyToOne(() => Album)
-  album: Album;
-
   @Column({ nullable: true })
   image: string;
 
   @CreateDateColumn()
   createdAt: Date;
+
+  // 📚 관계 설정
+
+  @ManyToOne(() => User)
+  user: User;
+
+  @ManyToOne(() => Album)
+  album: Album;
 
   @OneToMany(() => Album, (album) => album.images)
   albums: Album[];
