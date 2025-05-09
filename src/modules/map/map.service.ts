@@ -65,7 +65,7 @@ export class MapService {
     lat: string,
     lon: string,
     pageNo: number,
-    radius = '2000',
+    radius = '20000',
   ): Promise<any[]> {
     const url =
       'https://apis.data.go.kr/B551011/KorService1/locationBasedList1';
@@ -91,14 +91,16 @@ export class MapService {
     // contentTypeId로 category를 분류하는 매핑 함수 필요시 우리한테 맞게 수정
 
     // 필요한 정보만 추려서 정리
-    return items.map((item: any) => ({
-      title: item.title || item.addr1 || '이름 없음',
-      category: getCategory(item.contenttypeid),
-      imageSrc: item.firstimage || '', // 이미지 없을 수도 있음
-      lat: item.mapy,
-      lon: item.mapx,
-      tel: item.tel || '전화번호 없음',
-    }));
+    return items
+      .map((item: any) => ({
+        title: item.title || item.addr1 || '이름 없음',
+        category: getCategory(item.contenttypeid),
+        imageSrc: item.firstimage || '', // 이미지 없을 수도 있음
+        lat: item.mapy,
+        lon: item.mapx,
+        tel: item.tel || '전화번호 없음',
+      }))
+      .filter((item) => item.category !== '행사');
   }
 
   private readonly kakaoApiKey = process.env.KAKAO_KEY;
@@ -121,7 +123,7 @@ export class MapService {
           },
         },
       );
-      console.log('전체데이터', response.data.documents);
+
       const places = response.data.documents.map((item: any) => ({
         name: item.place_name,
         address: item.address_name,
@@ -130,7 +132,7 @@ export class MapService {
         longitude: item.x,
         url: item.place_url,
       }));
-      console.log('장소', places);
+
       return places;
     } catch (error) {
       throw new HttpException(
@@ -144,8 +146,8 @@ export class MapService {
     lat: string,
     lon: string,
     pageNo: number,
-    radius = '2000',
     str: string,
+    radius = '20000',
   ): Promise<any[]> {
     const url = 'https://apis.data.go.kr/B551011/KorService1/searchKeyword1';
 
@@ -154,9 +156,6 @@ export class MapService {
       MobileOS: 'ETC',
       MobileApp: 'AppTest',
       keyword: str, // 입력된 키워드로 검색
-      mapX: lon,
-      mapY: lat,
-      radius,
       arrange: 'E',
       numOfRows: 10,
       pageNo: pageNo,
@@ -168,14 +167,16 @@ export class MapService {
     const items = data.response?.body?.items?.item;
     if (!items) return [];
 
-    const result = items.map((item: any) => ({
-      title: item.title || item.addr1 || '이름 없음',
-      category: getCategory(item.contenttypeid),
-      imageSrc: item.firstimage || '',
-      lat: item.mapy,
-      lon: item.mapx,
-      tel: item.tel || '전화번호 없음',
-    }));
+    const result = items
+      .map((item: any) => ({
+        title: item.title || item.addr1 || '이름 없음',
+        category: getCategory(item.contenttypeid),
+        imageSrc: item.firstimage || '',
+        lat: item.mapy,
+        lon: item.mapx,
+        tel: item.tel || '전화번호 없음',
+      }))
+      .filter((item) => item.category !== '행사');
 
     return result;
   }

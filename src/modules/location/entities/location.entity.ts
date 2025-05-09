@@ -12,10 +12,10 @@ export class Location {
   @Column({ nullable: true, default: '대한민국' })
   country: string;
 
-  @Column({ nullable: true })
+  @Column('float', { nullable: true })
   lat: number;
 
-  @Column({ nullable: true })
+  @Column('float', { nullable: true })
   lng: number;
 
   // 📚 관계 설정

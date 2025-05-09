@@ -26,7 +26,7 @@ export class MapController {
       console.error('주소 입력 필요');
       throw new HttpException('주소 입력 필요 .', HttpStatus.BAD_REQUEST);
     }
-    console.log(address, '주소');
+
     try {
       const { latitude, longitude } = await addressToChange(address);
       console.log(latitude, longitude, '위도 경도');
@@ -52,11 +52,11 @@ export class MapController {
       console.error('주소 입력 필요');
       throw new HttpException('주소 입력 필요 .', HttpStatus.BAD_REQUEST);
     }
-    console.log(address, '주소');
+
     try {
       const { latitude, longitude } = await addressToChange(address);
-      console.log(latitude, longitude, '위도 경도');
-      const locations = await this.mapService.searchTours(
+
+      const locations = await this.mapService.searchInputTours(
         latitude,
         longitude,
         Number(pageNo),
