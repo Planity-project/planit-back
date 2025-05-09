@@ -16,6 +16,15 @@ export class Album {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  titleImg: string;
+
+  @Column({ type: 'text', nullable: true })
+  title: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
   @ManyToOne(() => User)
   user: User;
 
@@ -24,13 +33,4 @@ export class Album {
 
   @ManyToOne(() => AlbumImage)
   image: AlbumImage;
-
-  @Column({ nullable: true })
-  img: string;
-
-  @Column({ type: 'text', nullable: true })
-  title: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

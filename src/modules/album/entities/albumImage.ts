@@ -21,7 +21,7 @@ export class AlbumImage {
   album: Album;
 
   @Column({ nullable: true })
-  imgsrc: string;
+  image: string;
 
   @CreateDateColumn()
   createdAt: Date;
