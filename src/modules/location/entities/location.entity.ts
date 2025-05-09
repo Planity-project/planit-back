@@ -1,10 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Place } from 'src/modules/trips/entities/place.entity';
+
 @Entity('locations')
 export class Location {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column({ unique: true })
-  name: string;
+  name: string; // 예: 서울, 제주도, 부산
 
   @Column({ nullable: true, default: '대한민국' })
   country: string;
@@ -14,4 +17,7 @@ export class Location {
 
   @Column({ nullable: true })
   lng: number;
+
+  @OneToMany(() => Place, (place) => place.location)
+  places: Place[];
 }

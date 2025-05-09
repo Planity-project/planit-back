@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { TravelService } from './travel.service';
+import { TravelService } from './trips.service';
 @Controller('travel')
 export class TravelController {
   constructor(private readonly travelService: TravelService) {}

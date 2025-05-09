@@ -10,7 +10,7 @@ import { LikeModule } from 'src/modules/like/like.module';
 import { LocationModule } from 'src/modules/location/location.module';
 import { NoticeModule } from 'src/modules/notice/notice.module';
 import { PaymentsModule } from 'src/modules/payments/payments.module';
-import { TravelModule } from 'src/modules/travel/travel.module';
+import { TravelModule } from 'src/modules/trips/trips.module';
 import { PostsModule } from 'src/modules/posts/posts.module';
 import { UserModule } from 'src/modules/user/user.module';
 import { MapModule } from 'src/modules/map/map.module';
@@ -27,8 +27,11 @@ import { Location } from 'src/modules/location/entities/location.entity';
 import { Notice } from 'src/modules/notice/entities/notice.entity';
 import { Payment } from 'src/modules/payments/entities/payment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
-import { Travel } from 'src/modules/travel/entities/travel.entity';
 import { Admin } from 'src/modules/admin/entities/admin.entity';
+import { Trip } from 'src/modules/trips/entities/trips.entity';
+import { Place } from 'src/modules/trips/entities/place.entity';
+import { TripDay } from 'src/modules/trips/entities/tripday.entity';
+import { TripScheduleItem } from 'src/modules/trips/entities/tripscheduleitems.entity';
 dotenv.config();
 
 @Module({
@@ -55,7 +58,10 @@ dotenv.config();
         Payment,
         Post,
         Notice,
-        Travel,
+        Trip,
+        Place,
+        TripDay,
+        TripScheduleItem,
       ],
       synchronize: true,
       logging: false,
@@ -74,7 +80,7 @@ dotenv.config();
       Notice,
       Payment,
       Post,
-      Travel,
+      Trip,
     ]),
     AdminModule,
     AlbumModule,
