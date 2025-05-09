@@ -1,5 +1,3 @@
-//앨범 이미지
-
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,6 +6,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
+
 @Entity('album_groups')
 export class AlbumGroup {
   @PrimaryGeneratedColumn()
