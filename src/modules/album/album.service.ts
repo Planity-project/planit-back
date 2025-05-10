@@ -57,7 +57,7 @@ export class AlbumService {
   }> {
     const album = await this.albumRepo.findOne({
       where: { id: albumId },
-      relations: ['group', 'images', 'comment'],
+      relations: ['groups', 'images', 'comment'],
     });
 
     if (!album) throw new NotFoundException('앨범을 찾을 수 없습니다');

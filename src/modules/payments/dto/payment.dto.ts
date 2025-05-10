@@ -1,15 +1,19 @@
-import { IsNotEmpty, IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
+import { Payment } from '../entities/payment.entity';
 
-export class CreatePaymentDto {
+export class PaymentDto {
+  @ApiProperty({
+    description: '결제 ID',
+    example: 1,
+  })
+  id: number;
+
   @ApiProperty({
     description: '결제 금액',
     example: 10000,
   })
-  @IsNotEmpty()
-  @IsNumber()
   price: number;
 
   @ApiProperty({
@@ -17,21 +21,23 @@ export class CreatePaymentDto {
     example: 'CARD',
     enum: ['CARD', 'BANK', 'PHONE'],
   })
-  @IsNotEmpty()
-  @IsEnum(['CARD', 'BANK', 'PHONE'])
   method: 'CARD' | 'BANK' | 'PHONE';
 
   @ApiProperty({
-    description: '결제 유저 ID',
-    example: 1,
+    description: '결제 일시',
+    example: '2025-05-10T10:00:00Z',
   })
-  @IsNotEmpty()
-  userId: number;
+  paidAt: Date;
 
   @ApiProperty({
-    description: '결제 앨범 ID',
-    example: 1,
+    description: '결제 유저 정보',
+    type: () => User,
   })
-  @IsNotEmpty()
-  albumId: number;
+  user: User;
+
+  @ApiProperty({
+    description: '결제 앨범 정보',
+    type: () => Album,
+  })
+  album: Album;
 }

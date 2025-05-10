@@ -4,9 +4,10 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
-import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
+import { Album } from 'src/modules/album/entities/album.entity';
 
 @Entity('payments')
 export class Payment {
@@ -25,8 +26,10 @@ export class Payment {
   // 📚 관계 설정
 
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => AlbumGroup)
-  group: AlbumGroup;
+  @ManyToOne(() => Album)
+  @JoinColumn({ name: 'albumId' })
+  album: Album;
 }

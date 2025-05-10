@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   ManyToMany,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Album } from './album.entity';
@@ -33,8 +34,10 @@ export class AlbumGroup {
   // 📚 관계 설정
 
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToMany(() => Album, (album) => album.groups)
-  albums: Album[];
+  @ManyToOne(() => Album, (album) => album.groups)
+  @JoinColumn({ name: 'albumId' })
+  albums: Album;
 }

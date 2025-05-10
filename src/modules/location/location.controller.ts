@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { LocationService } from './location.service';
 import { ApiOperation, ApiResponse, ApiBody, ApiTags } from '@nestjs/swagger';
-import { LocationsResponseDto } from './dto/create-location.dto';
-import { LocationDto } from './dto/create-location.dto';
+import { LocationsResponseDto } from './dto/locationFindAll.dto';
+import { LocationDto } from './dto/locationFindAll.dto';
 @ApiTags('Location')
 @Controller('location')
 export class LocationController {
@@ -18,7 +18,7 @@ export class LocationController {
 
   @Get('/findAll')
   @ApiOperation({ summary: '모든 지역 반환' })
-  @ApiResponse({ status: 200, type: LocationDto })
+  @ApiResponse({ status: 200, type: LocationsResponseDto })
   async locationFindAll() {
     return await this.locationService.locationFindAll();
   }
