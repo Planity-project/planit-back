@@ -22,11 +22,11 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @ApiTags('Reports')
 @Controller('reports')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
