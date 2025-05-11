@@ -36,7 +36,7 @@ export class MapController {
     try {
       const { latitude, longitude } = await addressToChange(address);
       const locations =
-        type === 1
+        Number(type) === 1
           ? await this.mapService.searchTours(latitude, longitude, Number(page))
           : await this.mapService.searchStayTours(
               latitude,
@@ -63,7 +63,7 @@ export class MapController {
     try {
       const { latitude, longitude } = await addressToChange(address);
       const locations =
-        type === 1
+        Number(type) === 1
           ? await this.mapService.searchInputTours(
               latitude,
               longitude,

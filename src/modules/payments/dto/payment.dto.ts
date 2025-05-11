@@ -40,4 +40,9 @@ export class PaymentDto {
     type: () => Album,
   })
   album: Album;
+
+  @ApiProperty({
+    description: '결제 고유번호',
+  })
+  impUid: string;
 }

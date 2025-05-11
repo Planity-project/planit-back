@@ -17,14 +17,16 @@ import { ApiTags, ApiResponse } from '@nestjs/swagger';
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  @Post()
+  @Post('verify')
   @ApiResponse({
     status: 201,
-    description: '결제 정보',
-    type: PaymentDto,
+    description: '결제 검증 및 저장 완료',
   })
-  async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
-    const payment = await this.paymentsService.createPayment(createPaymentDto);
-    return payment;
+  async verifyPayment(
+    @Body() body: { imp_uid: string; albumId: number; userId: number },
+  ) {
+    const { imp_uid, albumId, userId } = body;
+    // imp_uid로 결제 검증 후, 결제 정보를 저장
+    return this.paymentsService.verifyAndSavePayment(imp_uid, albumId, userId);
   }
 }
