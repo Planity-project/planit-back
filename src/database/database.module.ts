@@ -15,6 +15,7 @@ import { PostsModule } from 'src/modules/posts/posts.module';
 import { UserModule } from 'src/modules/user/user.module';
 import { MapModule } from 'src/modules/map/map.module';
 import { BannerModule } from 'src/modules/admin/banner/banner.module';
+import { ReportModule } from 'src/modules/reports/report.module';
 
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
@@ -34,6 +35,7 @@ import { Place } from 'src/modules/trips/entities/place.entity';
 import { TripDay } from 'src/modules/trips/entities/tripday.entity';
 import { TripScheduleItem } from 'src/modules/trips/entities/tripscheduleitems.entity';
 import { Banner } from 'src/modules/admin/banner/entities/banner.entity';
+
 dotenv.config();
 
 @Module({
@@ -84,6 +86,7 @@ dotenv.config();
       Payment,
       Post,
       Trip,
+      Report,
     ]),
     AdminModule,
     AlbumModule,
@@ -98,6 +101,7 @@ dotenv.config();
     UserModule,
     MapModule,
     BannerModule,
+    ReportModule,
   ],
   exports: [TypeOrmModule],
 })

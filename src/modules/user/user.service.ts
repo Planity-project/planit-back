@@ -5,12 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { join } from 'path';
 import { unlink } from 'fs/promises';
 import { User } from './entities/user.entity';
 import { Payment } from '../payments/entities/payment.entity';
 import { Album } from '../album/entities/album.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -23,7 +24,7 @@ export class UserService {
     private readonly paymentRepository: Repository<Payment>,
 
     @InjectRepository(Album)
-    private readonly albumRepository: Repository<Payment>,
+    private readonly albumRepository: Repository<Album>,
   ) {}
 
   // ✅ 유저 전체 목록 조회
@@ -42,7 +43,34 @@ export class UserService {
     return user;
   }
 
-  // ✅ 유저 정보 업데이트
+  // ✅ 신고 횟수가 3번 이상인 블랙리스트 회원을 조회
+  async getBlacklistedUsers(): Promise<User[]> {
+    return this.userRepository.find({
+      where: { report_count: MoreThanOrEqual(3) },
+    });
+  }
+
+  // ✅ 앨범 그룹에 속한 회원 조회
+  async getUsersInAlbumGroup(): Promise<User[]> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.albums', 'album')
+      .leftJoin('album.groups', 'group')
+      .where('group.id IS NOT NULL')
+      .getMany();
+  }
+
+  // ✅ 관리자 유저 정보 업데이트
+  async update(id: number, dto: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    Object.assign(user, dto);
+    return this.userRepository.save(user);
+  }
 
   // ✅ 닉네임 업데이트
   async updateUserNickname(

@@ -43,7 +43,10 @@ export class Comment {
   album: Album | null;
 
   @ManyToOne(() => Comment, { nullable: true })
-  parent: Comment;
+  parentComments: Comment | null;
+
+  @OneToMany(() => Comment, (comment) => comment.parentComments)
+  childComments: Comment[];
 
   @OneToMany(() => Like, (like) => like.comment)
   likes: Like[];

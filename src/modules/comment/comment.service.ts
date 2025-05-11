@@ -1,4 +1,198 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, IsNull } from 'typeorm';
+import { Comment } from './entities/comment.entity';
+import { User } from '../user/entities/user.entity';
+import { Post } from '../posts/entities/post.entity';
+import { Report, TargetType } from '../reports/entities/report.entity';
+import { Album } from '../album/entities/album.entity';
 
 @Injectable()
-export class CommentService {}
+export class CommentService {
+  constructor(
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Post)
+    private readonly postRepository: Repository<Post>,
+    @InjectRepository(Album)
+    private readonly albumRepository: Repository<Album>,
+    @InjectRepository(Report)
+    private readonly reportRepository: Repository<Report>,
+  ) {}
+
+  async createComment({
+    userId,
+    content,
+    postId,
+    albumId,
+    parentId,
+  }: {
+    userId: number;
+    content: string;
+    postId?: number;
+    albumId?: number;
+    parentId?: number;
+  }) {
+    const user = await this.userRepository.findOneByOrFail({ id: userId });
+
+    if (!parentId && !postId && !albumId) {
+      throw new Error('게시글 ID 또는 앨범 ID는 필수입니다.');
+    }
+
+    const post = postId
+      ? await this.postRepository.findOneByOrFail({ id: postId })
+      : null;
+    const album = albumId
+      ? await this.albumRepository.findOneBy({ id: albumId })
+      : null;
+    const parent = parentId
+      ? await this.commentRepository.findOneBy({ id: parentId })
+      : null;
+
+    const newComment = this.commentRepository.create({
+      user,
+      post,
+      album,
+      content,
+      parentComments: parent,
+    });
+
+    return await this.commentRepository.save(newComment);
+  }
+
+  // 댓글 가공
+  async getComments(postId?: number, albumId?: number, currentUserId?: number) {
+    const whereCondition: any = {
+      parentComments: IsNull(),
+    };
+
+    if (postId) {
+      whereCondition.post = { id: postId };
+    } else if (albumId) {
+      whereCondition.album = { id: albumId };
+    }
+
+    const rootComments = await this.commentRepository.find({
+      where: whereCondition,
+      relations: [
+        'user',
+        'likes',
+        'likes.user',
+        'childComments',
+        'childComments.user',
+        'childComments.likes',
+        'childComments.likes.user',
+        'childComments.parentComments',
+        'parentComments',
+      ],
+      order: { createdAt: 'ASC' },
+    });
+
+    const formatComment = (comment: Comment) => {
+      const createdAt =
+        comment.createdAt instanceof Date
+          ? comment.createdAt.toISOString()
+          : null;
+
+      const isLikedByUser = currentUserId
+        ? comment.likes?.some((like) => like.user?.id === currentUserId)
+        : false;
+
+      return {
+        id: comment.id,
+        writer: comment.user?.nickname ?? comment.user?.email ?? '익명',
+        writerId: comment.user?.id ?? null,
+        comment: comment.content,
+        date: createdAt,
+        likeNum: comment.likes?.length ?? 0,
+        isliked: isLikedByUser,
+        parentId: comment.parentComments?.id ?? null,
+      };
+    };
+
+    const flatComments = rootComments.flatMap((root) => {
+      const rootFormatted = formatComment(root);
+      const childFormatted = (root.childComments ?? []).map(formatComment);
+      return [rootFormatted, ...childFormatted];
+    });
+
+    return flatComments;
+  }
+
+  async deleteComment(id: number) {
+    const comment = await this.commentRepository.findOne({
+      where: { id },
+      relations: ['childComments'],
+    });
+
+    if (!comment) {
+      throw new Error('댓글을 찾을 수 없습니다.');
+    }
+
+    if (comment.childComments && comment.childComments.length > 0) {
+      await this.commentRepository.remove(comment.childComments);
+    }
+
+    await this.commentRepository.remove(comment);
+
+    return { message: '댓글 및 대댓글이 삭제되었습니다.' };
+  }
+
+  async deleteComments(ids: number[]): Promise<void> {
+    const comments = await this.commentRepository.find({
+      where: ids.map((id) => ({ id })),
+      relations: ['childComments'],
+    });
+
+    if (comments.length !== ids.length) {
+      throw new Error('댓글을 찾을 수 없습니다.');
+    }
+
+    // 대댓글 먼저 모아서 삭제
+    const allChildComments = comments.flatMap(
+      (comment) => comment.childComments,
+    );
+    if (allChildComments.length > 0) {
+      await this.commentRepository.remove(allChildComments);
+    }
+
+    await this.commentRepository.remove(comments);
+  }
+
+  async reportComment(commentId: number, userId: number, reason: string) {
+    const alreadyReported = await this.reportRepository.findOne({
+      where: {
+        reporter: { id: userId },
+        target_type: TargetType.COMMENT,
+        target_id: commentId,
+      },
+    });
+
+    if (alreadyReported) {
+      throw new Error('이미 신고한 댓글입니다.');
+    }
+
+    const reporter = await this.userRepository.findOneByOrFail({ id: userId });
+
+    const report = this.reportRepository.create({
+      reporter,
+      target_type: TargetType.COMMENT,
+      target_id: commentId,
+      reason,
+    });
+
+    await this.reportRepository.save(report);
+
+    return { message: '댓글 신고가 접수되었습니다.' };
+  }
+
+  async findByUser(userId: number): Promise<Comment[]> {
+    return this.commentRepository.find({
+      where: { user: { id: userId } },
+      relations: ['post', 'album'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+}

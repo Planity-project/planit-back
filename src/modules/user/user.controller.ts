@@ -20,7 +20,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { User } from './entities/user.entity';
-import { updateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 import {
@@ -53,22 +52,36 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  // 📌 블랙 리스트 조회
+  @Get('/blacklist')
+  @ApiOperation({ summary: '블랙리스트 회원 조회' })
+  async getBlacklistedUsers() {
+    return this.userService.getBlacklistedUsers();
+  }
+
+  // 📌 앨범 회원 조회
+  @Get('/album')
+  @ApiOperation({ summary: '앨범 그룹에 속한 회원 조회' })
+  async getUsersInAlbumGroup() {
+    return this.userService.getUsersInAlbumGroup();
+  }
+
   // 📌 유저 정보 업데이트
-  // @Patch(':id')
-  // @ApiOperation({ summary: '회원 정보 수정' })
-  // @ApiParam({ name: 'id', description: '회원 ID' })
-  // @ApiBody({ type: UpdateUserDto })
-  // updateUser(
-  //   @Param('id', ParseIntPipe) id: number,
-  //   @Body() dto: UpdateUserDto,
-  // ): Promise<User> {
-  //   return this.userService.update(id, dto);
-  // }
+  @Patch(':id')
+  @ApiOperation({ summary: '회원 정보 수정' })
+  @ApiParam({ name: 'id', description: '회원 ID' })
+  @ApiBody({ type: UpdateUserDto })
+  updateUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserDto,
+  ): Promise<User> {
+    return this.userService.update(id, dto);
+  }
 
   // ✅ 닉네임 업데이트
   @Post('update')
   @ApiOperation({ summary: '사용자 닉네임 수정' })
-  @ApiBody({ type: updateUserDto })
+  @ApiBody({ type: UpdateUserDto })
   @ApiResponse({
     status: 200,
     description: '닉네임 수정 성공',
@@ -90,8 +103,13 @@ export class UserController {
       example: '유저를 찾을 수 없습니다',
     },
   })
-  async userinfoModify(@Body() userData: updateUserDto) {
+  async userinfoModify(@Body() userData: UpdateUserDto) {
     const { id, nickname } = userData;
+
+    // nickname이 없으면 예외 처리
+    if (!nickname) {
+      throw new Error('닉네임은 필수 항목입니다.');
+    }
 
     return await this.userService.updateUserNickname(id, nickname);
   }

@@ -10,7 +10,6 @@ import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { User, UserStatus } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
-import { NoticeService } from 'src/modules/notice/notice.service';
 
 @Injectable()
 export class ReportService {
@@ -22,7 +21,6 @@ export class ReportService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly userService: UserService,
-    private readonly notificationService: NoticeService,
   ) {}
 
   async findAll(): Promise<Report[]> {
@@ -104,7 +102,7 @@ export class ReportService {
     } else if (report.target_type === TargetType.POST) {
       const post = await this.postRepository.findOne({
         where: { id: report.target_id },
-        relations: ['author', 'novel'],
+        relations: ['author', 'post'],
       });
 
       if (!post) throw new NotFoundException('게시글을 찾을 수 없습니다.');

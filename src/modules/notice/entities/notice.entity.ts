@@ -17,17 +17,17 @@ export class Notice {
   @Column('text')
   content: string;
 
-  @Column({
-    type: 'enum',
-    enum: ['SUSPENSION_NOTICE', 'TRIP_COMPLETE'],
-  })
-  type: string;
+  @Column({ type: 'enum', enum: ['REPORT', 'ALARM'], default: 'REPORT' })
+  type: 'REPORT' | 'ALARM';
 
   @Column({ type: 'enum', enum: ['UNREAD', 'READ'], default: 'UNREAD' })
   status: string;
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @Column({ default: false })
+  isRead: boolean;
 
   // 📚 관계 설정
 

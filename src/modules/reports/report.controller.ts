@@ -71,11 +71,11 @@ export class ReportController {
 
   // ✅ 게시글 신고 생성
   @Post('post/:postId')
-  @ApiOperation({ summary: '챕터 신고 생성' })
+  @ApiOperation({ summary: '게시글 신고 생성' })
   @ApiParam({
     name: 'postId',
     type: 'number',
-    description: '신고할 챕터 ID',
+    description: '신고할 게시글 ID',
   })
   @ApiBody({
     schema: {
@@ -86,9 +86,9 @@ export class ReportController {
       required: ['reason'],
     },
   })
-  @ApiResponse({ status: 201, description: '챕터 신고 완료' })
+  @ApiResponse({ status: 201, description: '게시글 신고 완료' })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
-  @ApiResponse({ status: 404, description: '해당 챕터를 찾을 수 없음' })
+  @ApiResponse({ status: 404, description: '해당 게시글을 찾을 수 없음' })
   async reportPost(
     @Param('postId', ParseIntPipe) postId: number,
     @Body() reportData: { reason: string },

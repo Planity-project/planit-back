@@ -9,5 +9,6 @@ import { Album } from '../album/entities/album.entity';
   imports: [TypeOrmModule.forFeature([User, Payment, Album])],
   controllers: [UserController],
   providers: [UserService],
+  exports: [UserService],
 })
 export class UserModule {}
