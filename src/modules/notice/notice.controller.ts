@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { NoticeService } from './notice.service';
 import { Notice } from './entities/notice.entity';
-// import { JwtAuthGuard } from "../auth/jwtauth.guard";
+import { JwtAuthGuard } from '../auth/jwtauth.gurad';
 import { Request } from 'express';
 import { User } from '../user/entities/user.entity';
 import {
@@ -23,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('알림(Notice)')
+@UseGuards(JwtAuthGuard)
 @Controller('Notice')
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}

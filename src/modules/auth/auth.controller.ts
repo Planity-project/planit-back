@@ -10,6 +10,7 @@ import {
   Req,
   Res,
   HttpException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -28,6 +29,7 @@ import { REDIRECT_URL } from 'util/api';
 import { SERVER_DOMAIN } from 'util/api';
 
 import * as jwt from 'jsonwebtoken';
+import { JwtAuthGuard } from './jwtauth.gurad';
 interface Userdata {
   email: string;
   token?: string;
@@ -58,7 +60,7 @@ export class AuthController {
   async kakaoRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as Userdata;
 
-    res.cookie('access_token', user.token, {
+    res.cookie('accessToken', user.token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
       sameSite: 'lax',
@@ -87,7 +89,7 @@ export class AuthController {
   async googleRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as Userdata;
 
-    res.cookie('access_token', user.token, {
+    res.cookie('accessToken', user.token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
       sameSite: 'lax',
@@ -116,7 +118,7 @@ export class AuthController {
   async naverRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as Userdata;
 
-    res.cookie('access_token', user.token, {
+    res.cookie('accessToken', user.token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
       sameSite: 'lax',
@@ -127,7 +129,7 @@ export class AuthController {
 
   @Get('cookieCheck')
   async cookieCheck(@Req() req: Request, @Res() res: Response) {
-    const token = req.cookies?.access_token;
+    const token = req.cookies?.accessToken;
     console.log(token, 'token 확인');
     if (!token) {
       return res.status(200).json({ result: false });
@@ -149,11 +151,44 @@ export class AuthController {
 
   @Get('logout')
   async cookieClear(@Res() res: Response) {
-    res.clearCookie('access_token', {
+    res.clearCookie('accessToken', {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: false,
+      secure: false, // 개발환경이면 false, 배포시 true
+      sameSite: 'none',
     });
     return res.status(200).json({ message: '로그아웃 성공' });
+  }
+
+  // ✅ 관리자 로그인
+  @Post('admin/login')
+  @ApiOperation({
+    summary: '관리자 로그인',
+    description: '관리자 이메일과 비밀번호를 통한 로그인 처리',
+  })
+  @ApiBody({
+    schema: {
+      properties: {
+        email: { type: 'string' },
+        password: { type: 'string', format: 'password' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: '로그인 성공' })
+  @ApiResponse({ status: 401, description: '인증 실패 또는 관리자 아님' })
+  async adminLogin(@Body() body, @Res() res: Response) {
+    const { email, password } = body;
+    const { accessToken, user } = await this.authService.loginAdmin(
+      email,
+      password,
+    );
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ user });
   }
 }

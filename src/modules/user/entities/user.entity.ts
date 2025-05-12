@@ -13,6 +13,7 @@ import { Notice } from 'src/modules/notice/entities/notice.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
+import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
 
 export enum LoginType {
   KAKAO = 'kakao',
@@ -63,6 +64,9 @@ export class User {
 
   @OneToMany(() => Album, (album) => album.user)
   albums: Album[];
+
+  @OneToMany(() => AlbumGroup, (group) => group.user)
+  albumGroups: AlbumGroup[];
 
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];

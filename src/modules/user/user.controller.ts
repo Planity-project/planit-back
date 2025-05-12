@@ -13,7 +13,7 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
-  Patch,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -31,7 +31,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from '../auth/auth.guard';
+import { JwtAuthGuard } from '../auth/jwtauth.gurad';
 
 @ApiTags('User (유저)')
 @UseGuards(JwtAuthGuard)
@@ -46,14 +46,6 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  // 📌 유저 단일 조회
-  @Get(':id')
-  @ApiOperation({ summary: '유저 상세 조회' })
-  @ApiParam({ name: 'id', description: '유저 ID' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.userService.findOne(id);
-  }
-
   // 📌 블랙 리스트 조회
   @Get('/blacklist')
   @ApiOperation({ summary: '블랙리스트 회원 조회' })
@@ -64,20 +56,16 @@ export class UserController {
   // 📌 앨범 회원 조회
   @Get('/album')
   @ApiOperation({ summary: '앨범 그룹에 속한 회원 조회' })
-  async getUsersInAlbumGroup() {
-    return this.userService.getUsersInAlbumGroup();
+  async getUsersInAlbum(@Query('albumId') albumId: number) {
+    return this.userService.getUsersInAlbum(albumId);
   }
 
-  // 📌 유저 정보 업데이트
-  @Patch(':id')
-  @ApiOperation({ summary: '회원 정보 수정' })
-  @ApiParam({ name: 'id', description: '회원 ID' })
-  @ApiBody({ type: UpdateUserDto })
-  updateUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateUserDto,
-  ): Promise<User> {
-    return this.userService.update(id, dto);
+  // 📌 유저 단일 조회
+  @Get(':id')
+  @ApiOperation({ summary: '유저 상세 조회' })
+  @ApiParam({ name: 'id', description: '유저 ID' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.userService.findOne(id);
   }
 
   // ✅ 닉네임 업데이트

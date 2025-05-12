@@ -12,6 +12,7 @@ import { User } from './entities/user.entity';
 import { Payment } from '../payments/entities/payment.entity';
 import { Album } from '../album/entities/album.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AlbumGroup } from '../album/entities/albumGroup.entity';
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,9 @@ export class UserService {
 
     @InjectRepository(Album)
     private readonly albumRepository: Repository<Album>,
+
+    @InjectRepository(AlbumGroup)
+    private readonly albumGroupRepository: Repository<AlbumGroup>,
   ) {}
 
   // ✅ 유저 전체 목록 조회
@@ -51,13 +55,15 @@ export class UserService {
   }
 
   // ✅ 앨범 그룹에 속한 회원 조회
-  async getUsersInAlbumGroup(): Promise<User[]> {
-    return this.userRepository
+  async getUsersInAlbum(albumId: number): Promise<User[]> {
+    const users = await this.userRepository
       .createQueryBuilder('user')
-      .innerJoin('user.albums', 'album')
-      .leftJoin('album.groups', 'group')
-      .where('group.id IS NOT NULL')
+      .innerJoin('user.albumGroups', 'group')
+      .where('group.albumId = :albumId', { albumId })
+      .distinct(true)
       .getMany();
+
+    return users;
   }
 
   // ✅ 관리자 유저 정보 업데이트

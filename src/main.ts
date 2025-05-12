@@ -18,6 +18,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  app.use(cookieParser());
   app.enableCors({
     origin: ['http://localhost:3000', 'http://localhost:4000'], // 모든 origin 허용하되 credentials까지 허용됨
     credentials: true,

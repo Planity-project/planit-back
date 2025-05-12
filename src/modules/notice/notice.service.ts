@@ -18,7 +18,7 @@ export class NoticeService {
     });
   }
 
-  async sendNotification({
+  async sendNotice({
     user,
     content,
     post = null,

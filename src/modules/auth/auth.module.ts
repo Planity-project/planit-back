@@ -11,12 +11,16 @@ import { User } from '../user/entities/user.entity';
 import { GoogleStrategy } from './google.strategy';
 import { NaverStrategy } from './naver.strategy';
 import { KakaoStrategy } from './kakao.strategy';
-import { JwtAuthGuard } from './auth.guard';
+import { JwtAuthGuard } from './jwtauth.gurad';
+import { AdminModule } from '../admin/admin.module';
+import { Admin } from '../admin/entities/admin.entity';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
     PassportModule,
-    TypeOrmModule.forFeature([User]),
+    AdminModule,
+    TypeOrmModule.forFeature([User, Admin]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
@@ -28,8 +32,9 @@ import { JwtAuthGuard } from './auth.guard';
     GoogleStrategy,
     NaverStrategy,
     KakaoStrategy,
+    JwtStrategy,
     JwtAuthGuard,
   ],
-  exports: [AuthService, JwtModule, JwtAuthGuard],
+  exports: [AuthService, JwtModule, JwtAuthGuard, JwtStrategy],
 })
 export class AuthModule {}

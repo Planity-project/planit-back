@@ -15,5 +15,6 @@ import { Comment } from '../comment/entities/comment.entity';
   ],
   controllers: [AlbumController],
   providers: [AlbumService],
+  exports: [TypeOrmModule.forFeature([AlbumGroup])],
 })
 export class AlbumModule {}

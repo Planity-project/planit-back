@@ -22,7 +22,7 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/auth.guard';
+import { JwtAuthGuard } from '../auth/jwtauth.gurad';
 
 @ApiTags('Reports')
 @Controller('reports')
