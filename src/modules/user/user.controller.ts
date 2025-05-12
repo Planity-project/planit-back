@@ -143,7 +143,7 @@ export class UserController {
     }
 
     await this.userService.deleteUser(id);
-    return { message: '회원 탈퇴 완료' };
+    return { result: true, message: '회원 탈퇴 완료' };
   }
 
   // ✅ 프로필 이미지 업로드 및 업데이트
@@ -175,6 +175,7 @@ export class UserController {
     }
     await this.userService.updateProfileImage(userId, file.filename);
     return {
+      result: true,
       message: '프로필 이미지가 성공적으로 업데이트되었습니다.',
       filename: file.filename,
     };
@@ -184,10 +185,14 @@ export class UserController {
   @Delete('me/profile-image')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: '내 프로필 이미지 삭제' })
-  async deleteProfileImage(@Request() req): Promise<{ message: string }> {
-    const userId = req.user.id;
+  async deleteProfileImage(
+    @Query('userId') userId: number,
+  ): Promise<{ result: boolean; message: string }> {
     await this.userService.deleteProfileImage(userId);
-    return { message: '프로필 이미지가 성공적으로 삭제되었습니다.' };
+    return {
+      result: true,
+      message: '프로필 이미지가 성공적으로 삭제되었습니다.',
+    };
   }
 
   // ✅ 관리자에 의한 여러 유저 완전 삭제
