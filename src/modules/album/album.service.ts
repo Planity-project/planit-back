@@ -11,33 +11,34 @@ import { Comment } from '../comment/entities/comment.entity';
 export class AlbumService {
   constructor(
     @InjectRepository(Album)
-    private albumRepo: Repository<Album>,
+    private albumRepository: Repository<Album>,
     @InjectRepository(AlbumImage)
-    private albumImageRepo: Repository<AlbumImage>,
+    private albumImageRepository: Repository<AlbumImage>,
     @InjectRepository(AlbumGroup)
-    private albumGroupRepo: Repository<AlbumGroup>,
+    private albumGroupRepository: Repository<AlbumGroup>,
     @InjectRepository(User)
-    private userRepo: Repository<User>,
+    private userRepository: Repository<User>,
     @InjectRepository(Comment)
-    private commentRepo: Repository<Comment>,
+    private commentRepository: Repository<Comment>,
   ) {}
 
+  // 앨범 등록
   async submitAlbum(
     userId: number,
     title: string,
   ): Promise<{ result: boolean; id: number }> {
     try {
-      const user = await this.userRepo.findOne({ where: { id: userId } });
+      const user = await this.userRepository.findOne({ where: { id: userId } });
       if (!user) {
         throw new Error('해당 유저를 찾을 수 없습니다.');
       }
 
-      const album = this.albumRepo.create({
+      const album = this.albumRepository.create({
         user,
         title,
       });
 
-      const savedAlbum = await this.albumRepo.save(album);
+      const savedAlbum = await this.albumRepository.save(album);
 
       return { result: true, id: savedAlbum.id };
     } catch (error) {
@@ -46,16 +47,18 @@ export class AlbumService {
     }
   }
 
+  // 앨범 찾기
   async findAll(): Promise<Album[]> {
-    return await this.albumRepo.find();
+    return await this.albumRepository.find();
   }
 
+  // 앨범 디테일
   async findDetailData(albumId: number): Promise<{
     group: AlbumGroup[];
     image: AlbumImage[];
     comment?: Comment[] | null;
   }> {
-    const album = await this.albumRepo.findOne({
+    const album = await this.albumRepository.findOne({
       where: { id: albumId },
       relations: ['groups', 'images', 'comment'],
     });
@@ -67,5 +70,24 @@ export class AlbumService {
       image: album.images,
       comment: album.comment,
     };
+  }
+
+  // 앨범 그룹 목록
+  async getAlbumList() {
+    const groups = await this.albumGroupRepository.find({
+      relations: ['user', 'albums', 'reports', 'payments'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return groups.map((group) => ({
+      id: group.id,
+      album_title: group.albums?.title,
+      leader: group.user?.nickname,
+      report_count: group.reportCount,
+      is_paid: group.type === 'PAID',
+      created_at: group.createdAt,
+      photo_count: group.photoCount,
+      invite_link: group.inviteLink,
+    }));
   }
 }

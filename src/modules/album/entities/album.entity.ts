@@ -32,9 +32,12 @@ export class Album {
   @Column({ nullable: true })
   commentCnt: number;
 
+  // 앨범 단톡방 사람(+1)
+
   // 📚 관계 설정
 
   @ManyToOne(() => User)
+  // userid
   user: User;
 
   @OneToMany(() => AlbumGroup, (group) => group.albums)

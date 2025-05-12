@@ -8,6 +8,7 @@ import { Payment } from '../payments/entities/payment.entity';
 import { Album } from '../album/entities/album.entity';
 import { AuthModule } from '../auth/auth.module';
 import { AlbumModule } from '../album/album.module';
+import { AlbumService } from '../album/album.service';
 
 console.log('UserModule loaded');
 @Module({
@@ -18,7 +19,7 @@ console.log('UserModule loaded');
   ],
 
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, AlbumService],
   exports: [UserService],
 })
 export class UserModule {}

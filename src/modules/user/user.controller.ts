@@ -32,12 +32,16 @@ import { extname } from 'path';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/jwtauth.gurad';
+import { AlbumService } from '../album/album.service';
 
 @ApiTags('User (유저)')
 @UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly albumService: AlbumService,
+  ) {}
 
   // 📌 유저 전체 목록 조회
   @Get()
@@ -51,6 +55,12 @@ export class UserController {
   @ApiOperation({ summary: '블랙리스트 회원 조회' })
   async getBlacklistedUsers() {
     return this.userService.getBlacklistedUsers();
+  }
+
+  // 📌 앨범 목록 조회
+  @Get('albumlist')
+  getAlbumList() {
+    return this.albumService.getAlbumList();
   }
 
   // 📌 앨범 회원 조회
