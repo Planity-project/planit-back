@@ -5,7 +5,6 @@ import { DatabaseModule } from './database/database.module';
 import { SeederModule } from './seed/seeder.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { GeminiModule } from './gemini/gemini.module';
 
 @Module({
   imports: [
@@ -15,7 +14,6 @@ import { GeminiModule } from './gemini/gemini.module';
     }),
     DatabaseModule,
     SeederModule,
-    GeminiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

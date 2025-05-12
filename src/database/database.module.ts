@@ -16,6 +16,7 @@ import { UserModule } from 'src/modules/user/user.module';
 import { MapModule } from 'src/modules/map/map.module';
 import { BannerModule } from 'src/modules/admin/banner/banner.module';
 import { ReportModule } from 'src/modules/reports/report.module';
+import { GeminiModule } from 'src/modules/gemini/gemini.module';
 
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
@@ -102,6 +103,7 @@ dotenv.config();
     MapModule,
     BannerModule,
     ReportModule,
+    GeminiModule,
   ],
   exports: [TypeOrmModule],
 })
