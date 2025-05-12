@@ -13,7 +13,7 @@ export class AdminController {
   async adminLogin(@Body() dto: AdminLoginDto, @Res() res: Response) {
     const token = await this.authService.adminLogin(dto.email, dto.password);
 
-    res.cookie('access_token', token, {
+    res.cookie('accesToken', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60, // 1시간
       sameSite: 'lax',

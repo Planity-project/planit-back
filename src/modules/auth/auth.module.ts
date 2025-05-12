@@ -11,6 +11,8 @@ import { User } from '../user/entities/user.entity';
 import { GoogleStrategy } from './google.strategy';
 import { NaverStrategy } from './naver.strategy';
 import { KakaoStrategy } from './kakao.strategy';
+import { JwtAuthGuard } from './auth.guard';
+
 @Module({
   imports: [
     PassportModule,
@@ -21,7 +23,13 @@ import { KakaoStrategy } from './kakao.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, NaverStrategy, KakaoStrategy],
-  exports: [AuthService],
+  providers: [
+    AuthService,
+    GoogleStrategy,
+    NaverStrategy,
+    KakaoStrategy,
+    JwtAuthGuard,
+  ],
+  exports: [AuthService, JwtModule, JwtAuthGuard],
 })
 export class AuthModule {}

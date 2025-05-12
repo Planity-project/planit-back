@@ -14,14 +14,8 @@ import {
   HttpException,
   HttpStatus,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { User } from './entities/user.entity';
-import { UpdateUserDto } from './dto/update-user.dto';
-
 import {
   ApiOperation,
   ApiResponse,
@@ -31,8 +25,16 @@ import {
   ApiBadRequestResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { UserService } from './user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { User } from './entities/user.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
-@ApiTags('user')
+@ApiTags('User (유저)')
+@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

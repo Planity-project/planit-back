@@ -6,9 +6,11 @@ import { UserController } from './user.controller';
 import { User } from './entities/user.entity';
 import { Payment } from '../payments/entities/payment.entity';
 import { Album } from '../album/entities/album.entity';
+import { AuthModule } from '../auth/auth.module';
+
 console.log('UserModule loaded');
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Payment, Album])],
+  imports: [TypeOrmModule.forFeature([User, Payment, Album]), AuthModule],
 
   controllers: [UserController],
   providers: [UserService],
