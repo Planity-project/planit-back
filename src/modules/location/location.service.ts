@@ -7,11 +7,11 @@ import { LocationsResponseDto } from './dto/locationFindAll.dto';
 export class LocationService {
   constructor(
     @InjectRepository(Location)
-    private readonly locationRepo: Repository<Location>,
+    private readonly locationRepository: Repository<Location>,
   ) {}
 
   async searchKeword(str: string): Promise<LocationsResponseDto> {
-    const data = await this.locationRepo.find();
+    const data = await this.locationRepository.find();
     const arr: any = data.map((item) => {
       return { name: item.name.includes(str), country: item.country };
     });
@@ -20,7 +20,7 @@ export class LocationService {
   }
 
   async locationFindAll(): Promise<any[]> {
-    const locations = await this.locationRepo.find();
+    const locations = await this.locationRepository.find();
     const plainLocations = locations.map((loc) => ({
       id: loc.id,
       name: loc.name,
