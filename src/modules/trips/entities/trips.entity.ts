@@ -8,13 +8,14 @@ import {
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { TripDay } from './tripday.entity';
+import { Place } from './place.entity';
 
 @Entity('trips')
 export class Trip {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   title: string;
 
   @Column({ type: 'date' })
@@ -33,4 +34,7 @@ export class Trip {
 
   @OneToMany(() => TripDay, (day) => day.trip)
   tripDays: TripDay[];
+
+  @OneToMany(() => Place, (place) => place.trip)
+  places: Place;
 }

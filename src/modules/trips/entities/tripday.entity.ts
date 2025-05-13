@@ -16,6 +16,9 @@ export class TripDay {
   @Column({ type: 'date' })
   date: Date;
 
+  @Column()
+  order: number;
+
   // 📚 관계 설정
 
   @ManyToOne(() => Trip, (trip) => trip.tripDays)

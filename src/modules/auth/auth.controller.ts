@@ -59,12 +59,12 @@ export class AuthController {
   })
   async kakaoRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as Userdata;
-
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', user.token, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: 'lax',
-      secure: false,
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
     });
     return res.redirect(REDIRECT_URL);
   }
@@ -88,12 +88,12 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as Userdata;
-
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', user.token, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: 'lax',
-      secure: false,
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
     });
     return res.redirect(REDIRECT_URL);
   }
@@ -117,12 +117,12 @@ export class AuthController {
   })
   async naverRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as Userdata;
-
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', user.token, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: 'lax',
-      secure: false,
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
     });
     return res.redirect(REDIRECT_URL);
   }
@@ -151,10 +151,12 @@ export class AuthController {
 
   @Get('logout')
   async cookieClear(@Res() res: Response) {
+    const isProd = process.env.NODE_ENV === 'production';
+
     res.clearCookie('accessToken', {
       httpOnly: true,
-      secure: false, // 개발환경이면 false, 배포시 true
-      sameSite: 'none',
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
     });
     return res.status(200).json({ message: '로그아웃 성공' });
   }
@@ -181,12 +183,12 @@ export class AuthController {
       email,
       password,
     );
-
-    res.cookie('accessToken', accessToken, {
+    const isProd = process.env.NODE_ENV === 'production';
+    res.cookie('accessToken', user.token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
     });
 
     res.json({ user });

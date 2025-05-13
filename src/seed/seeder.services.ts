@@ -21,7 +21,6 @@ const arr = [
   { country: '대한민국', name: '군산', lat: 35.9833, lng: 126.7167 },
   { country: '대한민국', name: '목포', lat: 34.7667, lng: 126.35 },
   { country: '대한민국', name: '안동', lat: 36.5667, lng: 128.7167 },
-  { country: '대한민국', name: '울릉도', lat: 37.4833, lng: 130.9 },
   { country: '대한민국', name: '가평', lat: 37.8315, lng: 127.5097 },
   { country: '대한민국', name: '제천', lat: 37.1333, lng: 128.2 },
   { country: '대한민국', name: '수원', lat: 37.2636, lng: 127.0286 },

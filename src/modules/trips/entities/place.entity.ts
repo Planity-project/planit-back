@@ -1,6 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { Location } from 'src/modules/location/entities/location.entity';
-
+import { Trip } from './trips.entity';
 @Entity('places')
 export class Place {
   @PrimaryGeneratedColumn()
@@ -15,13 +21,17 @@ export class Place {
   @Column({ nullable: true })
   address: string;
 
-  @Column({ nullable: true })
+  @Column('float', { nullable: true })
   lat: number;
 
-  @Column({ nullable: true })
+  @Column('float', { nullable: true })
   lng: number;
 
+  @Column({ nullable: true })
+  order: number;
   // 📚 관계 설정
+  @ManyToOne(() => Trip, (trip) => trip.places)
+  trip: Trip;
 
   @ManyToOne(() => Location, (location) => location.places)
   location: Location;

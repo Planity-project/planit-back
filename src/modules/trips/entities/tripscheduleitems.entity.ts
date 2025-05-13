@@ -13,7 +13,7 @@ export class TripScheduleItem {
   @Column({ type: 'time' })
   endTime: string;
 
-  @Column()
+  @Column({ nullable: true })
   title: string;
 
   @Column({ type: 'text', nullable: true })

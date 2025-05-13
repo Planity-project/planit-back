@@ -27,8 +27,43 @@ export class TripService {
   async generateWithGemini(body: any) {
     console.log(body);
     const str = generateSchedulePrompt(body);
-    const data = await requestGemini(str);
-    console.log(data, 'data');
-    return data;
+    let data = await requestGemini(str);
+
+    try {
+      // ✨ 혹시 JSON 앞뒤에 설명 텍스트가 붙어 있는 경우 제거
+      const jsonStart = data.indexOf('{');
+      const jsonEnd = data.lastIndexOf('}');
+      const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
+
+      const parseData = JSON.parse(jsonSubstring);
+      const dates = Object.keys(parseData);
+      console.log(parseData, '전체 데이터');
+      console.log(dates, '날짜', dates.length);
+
+      //   const data = await this.tripRepository.create()
+      dates.forEach((dateStr) => {
+        const schedules = parseData[dateStr];
+
+        console.log(`📅 날짜: ${dateStr}`);
+        schedules.forEach((item) => {
+          const {
+            순서: order,
+            start,
+            end,
+            장소: place,
+            위도: lat,
+            경도: lng,
+            주소: address,
+            타입: category,
+          } = item;
+
+          console.log(`- [${order}] ${start}~${end} / ${place} (${category})`);
+          console.log(`  ↳ ${address} (${lat}, ${lng})`);
+        });
+      });
+      return data;
+    } catch (error) {
+      throw new Error('유효하지 않은 JSON 형식입니다.');
+    }
   }
 }
