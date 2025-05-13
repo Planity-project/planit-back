@@ -4,8 +4,6 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
-  ManyToMany,
-  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
@@ -24,18 +22,15 @@ export class AlbumGroup {
   @CreateDateColumn()
   createdAt: Date;
 
+  @Column({ default: 1 })
+  memberCount: number;
+
   @Column({
     type: 'enum',
     enum: ['OWNER', 'MEMBER'],
     default: 'OWNER',
   })
   role: string;
-
-  @Column({ default: 0 })
-  photoCount: number; // 앨범 사진 갯수
-
-  @Column({ nullable: true })
-  inviteLink: string;
 
   // 📚 관계 설정
   @ManyToOne(() => User)

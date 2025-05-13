@@ -36,7 +36,7 @@ import { AlbumService } from '../album/album.service';
 
 @ApiTags('User (유저)')
 @UseGuards(JwtAuthGuard)
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
@@ -57,14 +57,14 @@ export class UserController {
     return this.userService.getBlacklistedUsers();
   }
 
-  // 📌 앨범 목록 조회
-  @Get('albumlist')
+  // 📌 앨범 전체 목록 조회
+  @Get('/albumlist')
   getAlbumList() {
     return this.albumService.getAlbumList();
   }
 
   // 📌 앨범 회원 조회
-  @Get('/album')
+  @Get('/albumUser')
   @ApiOperation({ summary: '앨범 그룹에 속한 회원 조회' })
   async getUsersInAlbum(@Query('albumId') albumId: number) {
     return this.userService.getUsersInAlbum(albumId);

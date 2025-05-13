@@ -86,8 +86,6 @@ export class AlbumService {
       report_count: group.reportCount,
       is_paid: group.type === 'PAID',
       created_at: group.createdAt,
-      photo_count: group.photoCount,
-      invite_link: group.inviteLink,
     }));
   }
 }
