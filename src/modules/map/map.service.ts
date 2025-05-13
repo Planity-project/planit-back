@@ -58,7 +58,10 @@ export class MapService {
         imageSrc: item.firstimage || '', // 이미지 없을 수도 있음
         lat: item.mapy,
         lon: item.mapx,
-        tel: item.tel || '전화번호 없음',
+        tel: item.tel,
+        address: item.addr2
+          ? `${item.addr1} ${item.addr2}`
+          : item.addr1 || '주소 없음',
       }))
       .filter((item) => item.category !== '행사' && item.category !== '숙박');
   }
@@ -98,7 +101,10 @@ export class MapService {
         imageSrc: item.firstimage || '',
         lat: item.mapy,
         lon: item.mapx,
-        tel: item.tel || '전화번호 없음',
+        tel: item.tel,
+        address: item.addr2
+          ? `${item.addr1} ${item.addr2}`
+          : item.addr1 || '주소 없음',
       }))
       .filter((item) => item.category !== '행사' && item.category !== '숙박');
 
@@ -143,7 +149,10 @@ export class MapService {
       imageSrc: item.firstimage || '', // 이미지 없을 수도 있음
       lat: item.mapy,
       lon: item.mapx,
-      tel: item.tel || '전화번호 없음',
+      tel: item.tel,
+      address: item.addr2
+        ? `${item.addr1} ${item.addr2}`
+        : item.addr1 || '주소 없음',
     }));
   }
 
@@ -180,7 +189,10 @@ export class MapService {
       imageSrc: item.firstimage || '',
       lat: item.mapy,
       lon: item.mapx,
-      tel: item.tel || '전화번호 없음',
+      tel: item.tel,
+      address: item.addr2
+        ? `${item.addr1} ${item.addr2}`
+        : item.addr1 || '주소 없음',
     }));
 
     return result;
