@@ -1,7 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  Column,
+  JoinColumn,
+} from 'typeorm';
 import { TripDay } from './tripday.entity';
 import { Place } from './place.entity';
-
+import { Trip } from './trips.entity';
 @Entity('trip_schedule_items')
 export class TripScheduleItem {
   @PrimaryGeneratedColumn()
@@ -20,7 +26,7 @@ export class TripScheduleItem {
   description?: string;
 
   @Column({ default: 0 })
-  order: number;
+  todayOrder: number;
 
   // 📚 관계 설정
 
@@ -28,5 +34,9 @@ export class TripScheduleItem {
   place?: Place;
 
   @ManyToOne(() => TripDay, (tripDay) => tripDay.scheduleItems)
+  @JoinColumn({ name: 'tripdayId' })
   tripDay: TripDay;
+
+  @ManyToOne(() => Trip, (trip) => trip.tripItems)
+  trip: Trip;
 }

@@ -6,8 +6,11 @@ import { Place } from './entities/place.entity';
 import { TripDay } from './entities/tripday.entity';
 import { TripScheduleItem } from './entities/tripscheduleitems.entity';
 import { Trip } from './entities/trips.entity';
+import { User } from '../user/entities/user.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Place, TripDay, TripScheduleItem, Trip])],
+  imports: [
+    TypeOrmModule.forFeature([Place, TripDay, TripScheduleItem, Trip, User]),
+  ],
   controllers: [TripController],
   providers: [TripService],
 })

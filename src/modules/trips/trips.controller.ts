@@ -17,4 +17,15 @@ export class TripController {
     const result = await this.tripService.generateWithGemini(body);
     return result;
   }
+
+  @Get('find')
+  async find() {
+    return await this.tripService.findAll();
+  }
+
+  @Post('preview')
+  async previewDate(@Body() body: any[]) {
+    const result = await this.tripService.previewGeneratedTrip(body);
+    return result;
+  }
 }

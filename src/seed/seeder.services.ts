@@ -35,6 +35,9 @@ export class SeederService {
   ) {}
 
   async runSeed() {
+    await this.adminRepo.delete({});
+    await this.locationRepo.delete({});
+
     const user = this.adminRepo.create({
       email: 'admin@abc.abc',
       password: '#a1234567',

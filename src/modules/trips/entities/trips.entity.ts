@@ -9,6 +9,7 @@ import {
 import { User } from 'src/modules/user/entities/user.entity';
 import { TripDay } from './tripday.entity';
 import { Place } from './place.entity';
+import { TripScheduleItem } from './tripscheduleitems.entity';
 
 @Entity('trips')
 export class Trip {
@@ -36,5 +37,8 @@ export class Trip {
   tripDays: TripDay[];
 
   @OneToMany(() => Place, (place) => place.trip)
-  places: Place;
+  place: Place[];
+
+  @OneToMany(() => TripScheduleItem, (items) => items.trip)
+  tripItems: TripScheduleItem[];
 }

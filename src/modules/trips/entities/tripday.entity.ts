@@ -7,17 +7,17 @@ import {
 } from 'typeorm';
 import { Trip } from './trips.entity';
 import { TripScheduleItem } from './tripscheduleitems.entity';
-
+import { Place } from './place.entity';
 @Entity('trip_days')
 export class TripDay {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'date' })
-  date: Date;
+  @Column()
+  date: string;
 
   @Column()
-  order: number;
+  todayOrder: number;
 
   // 📚 관계 설정
 
@@ -26,4 +26,7 @@ export class TripDay {
 
   @OneToMany(() => TripScheduleItem, (item) => item.tripDay)
   scheduleItems: TripScheduleItem[];
+
+  @OneToMany(() => Place, (item) => item.tripDay)
+  place: Place[];
 }
