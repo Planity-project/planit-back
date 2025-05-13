@@ -5,9 +5,12 @@ import {
   ManyToOne,
   CreateDateColumn,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Album } from './album.entity';
+import { Payment } from 'src/modules/payments/entities/payment.entity';
+
 @Entity('album_groups')
 export class AlbumGroup {
   @PrimaryGeneratedColumn()
@@ -40,4 +43,7 @@ export class AlbumGroup {
   @ManyToOne(() => Album, (album) => album.groups)
   @JoinColumn({ name: 'albumId' })
   albums: Album;
+
+  @OneToMany(() => Payment, (payment) => payment.albumGroup)
+  payments: Payment[];
 }

@@ -75,7 +75,7 @@ export class AlbumService {
   // 앨범 그룹 목록
   async getAlbumList() {
     const groups = await this.albumGroupRepository.find({
-      relations: ['user', 'albums', 'reports', 'payments'],
+      relations: ['user', 'albums', 'payments'],
       order: { createdAt: 'DESC' },
     });
 
@@ -83,7 +83,6 @@ export class AlbumService {
       id: group.id,
       album_title: group.albums?.title,
       leader: group.user?.nickname,
-      report_count: group.reportCount,
       is_paid: group.type === 'PAID',
       created_at: group.createdAt,
     }));

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
+import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
 
 @Entity('payments')
 export class Payment {
@@ -32,4 +33,7 @@ export class Payment {
   @ManyToOne(() => Album)
   @JoinColumn({ name: 'albumId' })
   album: Album;
+
+  @ManyToOne(() => AlbumGroup, (albumGroup) => albumGroup.payments)
+  albumGroup: AlbumGroup;
 }
