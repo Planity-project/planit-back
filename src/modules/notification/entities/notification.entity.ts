@@ -9,8 +9,8 @@ import { User } from 'src/modules/user/entities/user.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 
-@Entity('notice')
-export class Notice {
+@Entity('notification')
+export class Notification {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -35,13 +35,13 @@ export class Notice {
   @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(() => Report, (report) => report.notice, {
+  @ManyToOne(() => Report, (report) => report.notification, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   report: Report | null;
 
-  @ManyToOne(() => Post, (post) => post.notice, {
+  @ManyToOne(() => Post, (post) => post.notification, {
     nullable: true,
     onDelete: 'CASCADE',
   })

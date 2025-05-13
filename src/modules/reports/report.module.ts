@@ -8,14 +8,14 @@ import { UserService } from '../user/user.service';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { User } from 'src/modules/user/entities/user.entity';
-import { Notice } from 'src/modules/notice/entities/notice.entity';
+import { Notification } from 'src/modules/notification/entities/notification.entity';
 import { Payment } from '../payments/entities/payment.entity';
 import { Album } from '../album/entities/album.entity';
 
 import { UserModule } from '../user/user.module';
 import { CommentModule } from 'src/modules/comment/comment.module';
 import { PostsModule } from 'src/modules/posts/posts.module';
-import { NoticeModule } from 'src/modules/notice/notice.module';
+import { NotificationModule } from 'src/modules/notification/notification.module';
 import { JwtModule } from '@nestjs/jwt';
 
 console.log('ReportModule loaded');
@@ -26,7 +26,7 @@ console.log('ReportModule loaded');
       Comment,
       Post,
       User,
-      Notice,
+      Notification,
       Album,
       Payment,
     ]),
@@ -34,7 +34,7 @@ console.log('ReportModule loaded');
     UserModule,
     CommentModule,
     PostsModule,
-    NoticeModule,
+    NotificationModule,
   ],
   controllers: [ReportController],
   providers: [ReportService],

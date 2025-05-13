@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsOptional, IsEnum } from 'class-validator';
 
-export class SendNoticeDto {
+export class SendNotificationDto {
   @ApiProperty({
     example: { id: 1, email: 'user@example.com' },
     description: '알림을 받을 사용자 (요약 정보 또는 사용자 ID)',

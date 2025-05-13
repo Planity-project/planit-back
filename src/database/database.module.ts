@@ -8,7 +8,7 @@ import { AuthModule } from 'src/modules/auth/auth.module';
 import { CommentModule } from 'src/modules/comment/comment.module';
 import { LikeModule } from 'src/modules/like/like.module';
 import { LocationModule } from 'src/modules/location/location.module';
-import { NoticeModule } from 'src/modules/notice/notice.module';
+import { NotificationModule } from 'src/modules/notification/notification.module';
 import { PaymentsModule } from 'src/modules/payments/payments.module';
 import { TravelModule } from 'src/modules/trips/trips.module';
 import { PostsModule } from 'src/modules/posts/posts.module';
@@ -27,7 +27,7 @@ import { User } from 'src/modules/user/entities/user.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Like } from 'src/modules/like/entities/like.entity';
 import { Location } from 'src/modules/location/entities/location.entity';
-import { Notice } from 'src/modules/notice/entities/notice.entity';
+import { Notification } from 'src/modules/notification/entities/notification.entity';
 import { Payment } from 'src/modules/payments/entities/payment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { Admin } from 'src/modules/admin/entities/admin.entity';
@@ -59,10 +59,9 @@ dotenv.config();
         Comment,
         Like,
         Location,
-        Notice,
+        Notification,
         Payment,
         Post,
-        Notice,
         Trip,
         Place,
         TripDay,
@@ -83,7 +82,7 @@ dotenv.config();
       Comment,
       Like,
       Location,
-      Notice,
+      Notification,
       Payment,
       Post,
       Trip,
@@ -96,7 +95,7 @@ dotenv.config();
     CommentModule,
     LikeModule,
     LocationModule,
-    NoticeModule,
+    NotificationModule,
     PaymentsModule,
     PostsModule,
     TravelModule,

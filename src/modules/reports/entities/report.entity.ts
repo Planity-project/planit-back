@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
-import { Notice } from 'src/modules/notice/entities/notice.entity';
+import { Notification } from 'src/modules/notification/entities/notification.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 
 export enum TargetType {
@@ -47,10 +47,10 @@ export class Report {
   @ManyToOne(() => User, (user) => user.reports, { onDelete: 'CASCADE' })
   reporter: User;
 
-  @OneToMany(() => Notice, (notice) => notice.report, {
+  @OneToMany(() => Notification, (notification) => notification.report, {
     cascade: true,
   })
-  notice: Notice[];
+  notification: Notification[];
 
   @ManyToOne(() => Post, (post) => post.reports, {
     onDelete: 'CASCADE',

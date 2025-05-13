@@ -10,7 +10,7 @@ import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { User, UserStatus } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
-import { NoticeService } from '../notice/notice.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class ReportService {
@@ -22,7 +22,7 @@ export class ReportService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly userService: UserService,
-    private readonly notifieService: NoticeService,
+    private readonly notificationeService: NotificationService,
   ) {}
 
   async findAll(): Promise<Report[]> {
@@ -193,7 +193,7 @@ export class ReportService {
         ? '🚨 신고가 누적되어 계정이 정지되었습니다!'
         : '⚠️ 신고가 접수되었습니다. 주의해 주세요!';
 
-    await this.notifieService.sendNotice({
+    await this.notificationeService.sendNotification({
       user: reportedUser,
       content: message,
     });

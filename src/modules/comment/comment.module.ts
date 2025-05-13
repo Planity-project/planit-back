@@ -10,13 +10,13 @@ import { Album } from 'src/modules/album/entities/album.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 
 import { UserModule } from 'src/modules/user/user.module';
-import { NoticeModule } from 'src/modules/notice/notice.module';
+import { NotificationModule } from 'src/modules/notification/notification.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Comment, User, Post, Album, Report]),
     UserModule,
-    NoticeModule,
+    NotificationModule,
   ],
   providers: [CommentService],
   controllers: [CommentController],

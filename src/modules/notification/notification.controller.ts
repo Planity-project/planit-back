@@ -8,8 +8,8 @@ import {
   Body,
   ParseIntPipe,
 } from '@nestjs/common';
-import { NoticeService } from './notice.service';
-import { Notice } from './entities/notice.entity';
+import { NotificationService } from './notification.service';
+import { Notification } from './entities/notification.entity';
 import { JwtAuthGuard } from '../auth/jwtauth.gurad';
 import { Request } from 'express';
 import { User } from '../user/entities/user.entity';
@@ -22,11 +22,11 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 
-@ApiTags('알림(Notice)')
+@ApiTags('알림(Notification)')
 @UseGuards(JwtAuthGuard)
-@Controller('Notice')
-export class NoticeController {
-  constructor(private readonly noticeService: NoticeService) {}
+@Controller('Notification')
+export class NotificationController {
+  constructor(private readonly notificationService: NotificationService) {}
 
   // ✅ 유저의 알림 목록 조회
   @Get()
@@ -39,17 +39,17 @@ export class NoticeController {
   @ApiResponse({ status: 200, description: '알림 목록 반환' })
   async getUserNotice(@Req() req: Request) {
     const user = req.user as User;
-    return this.noticeService.getUserNotice(user.id);
+    return this.notificationService.getUserNotification(user.id);
   }
 
   // ✅ 알림 읽음 처리
-  @Patch(':noticeId/read')
+  @Patch(':Notification/read')
   @ApiOperation({
     summary: '알림 읽음 처리',
     description: '특정 알림을 읽음 상태로 변경합니다.',
   })
   @ApiParam({
-    name: 'noticeId',
+    name: 'notificationId',
     type: Number,
     description: '읽음 처리할 알림 ID',
   })
@@ -64,9 +64,9 @@ export class NoticeController {
   })
   @ApiResponse({ status: 200, description: '읽음 처리된 알림 반환' })
   async markNoticeAsRead(
-    @Param('noticeId', ParseIntPipe) noticeId: number,
+    @Param('notificationId', ParseIntPipe) notificationId: number,
     @Body('userId') userId: number,
-  ): Promise<Notice> {
-    return this.noticeService.markNoticeAsRead(noticeId, userId);
+  ): Promise<Notification> {
+    return this.notificationService.markNoticeAsRead(notificationId, userId);
   }
 }

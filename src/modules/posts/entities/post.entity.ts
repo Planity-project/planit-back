@@ -11,7 +11,7 @@ import { Location } from 'src/modules/location/entities/location.entity';
 import { Like } from 'src/modules/like/entities/like.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
-import { Notice } from 'src/modules/notice/entities/notice.entity';
+import { Notification } from 'src/modules/notification/entities/notification.entity';
 
 @Entity('posts')
 export class Post {
@@ -44,8 +44,8 @@ export class Post {
   @ManyToOne(() => Location)
   location: Location;
 
-  @ManyToOne(() => Notice)
-  notice: Notice[];
+  @ManyToOne(() => Notification)
+  notification: Notification[];
 
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
