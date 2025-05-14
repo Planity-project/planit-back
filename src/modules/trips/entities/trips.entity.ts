@@ -4,13 +4,15 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  OneToOne,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { TripDay } from './tripday.entity';
 import { Place } from './place.entity';
 import { TripScheduleItem } from './tripscheduleitems.entity';
-
+import { Post } from 'src/modules/posts/entities/post.entity';
 @Entity('trips')
 export class Trip {
   @PrimaryGeneratedColumn()
@@ -41,4 +43,8 @@ export class Trip {
 
   @OneToMany(() => TripScheduleItem, (items) => items.trip)
   tripItems: TripScheduleItem[];
+
+  @OneToOne(() => Post, (post) => post.trip)
+  @JoinColumn()
+  post: Post;
 }

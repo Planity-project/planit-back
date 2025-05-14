@@ -5,6 +5,8 @@ import {
   ManyToOne,
   CreateDateColumn,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Location } from 'src/modules/location/entities/location.entity';
@@ -12,16 +14,16 @@ import { Like } from 'src/modules/like/entities/like.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Notification } from 'src/modules/notification/entities/notification.entity';
-
+import { Trip } from 'src/modules/trips/entities/trips.entity';
 @Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   title: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   content: string;
 
   @Column({ nullable: true })
@@ -55,4 +57,7 @@ export class Post {
 
   @OneToMany(() => Report, (report) => report.post)
   reports: Report[];
+
+  @OneToOne(() => Trip, (trip) => trip.post)
+  trip: Trip;
 }

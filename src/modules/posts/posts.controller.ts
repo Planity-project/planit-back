@@ -5,6 +5,7 @@ import {
   Body,
   Patch,
   Param,
+  Query,
   Delete,
   HttpStatus,
   HttpException,
@@ -39,5 +40,10 @@ export class PostsController {
     }
 
     return post;
+  }
+
+  @Get('detailData')
+  getPostDetail(@Query('postId') postId: string) {
+    return this.postsService.getDetail(Number(postId));
   }
 }
