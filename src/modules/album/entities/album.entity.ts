@@ -5,12 +5,12 @@ import {
   ManyToOne,
   CreateDateColumn,
   OneToMany,
-  JoinColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { AlbumGroup } from './albumGroup.entity';
 import { AlbumImage } from './albumImage';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
+import { Notification } from 'src/modules/notification/entities/notification.entity';
 
 @Entity('albums')
 export class Album {
@@ -48,4 +48,7 @@ export class Album {
 
   @OneToMany(() => Comment, (comment) => comment.album)
   comment: Comment[];
+
+  @OneToMany(() => Notification, (notification) => notification.album)
+  notifications: Notification[];
 }

@@ -10,6 +10,7 @@ import {
 import { User } from 'src/modules/user/entities/user.entity';
 import { Album } from './album.entity';
 import { Payment } from 'src/modules/payments/entities/payment.entity';
+import { Notification } from 'src/modules/notification/entities/notification.entity';
 
 @Entity('album_groups')
 export class AlbumGroup {
@@ -46,4 +47,7 @@ export class AlbumGroup {
 
   @OneToMany(() => Payment, (payment) => payment.albumGroup)
   payments: Payment[];
+
+  @OneToMany(() => Notification, (notification) => notification.albumGroup)
+  notifications: Notification[];
 }

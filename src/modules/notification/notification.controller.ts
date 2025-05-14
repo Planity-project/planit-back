@@ -24,7 +24,7 @@ import {
 
 @ApiTags('알림(Notification)')
 @UseGuards(JwtAuthGuard)
-@Controller('Notification')
+@Controller('notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
