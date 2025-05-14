@@ -3,10 +3,10 @@ import axios from 'axios';
 const getCategory = (typeId: string | number): string => {
   const map: Record<string, string> = {
     '12': '관광지',
-    '14': '문화시설',
+    '14': '문화',
     '15': '행사',
     '28': '레포츠',
-    '32': '숙박',
+    '32': '숙소',
     '38': '쇼핑',
     '39': '음식점',
   };
@@ -20,7 +20,7 @@ export class MapService {
   // private readonly kakaoApiKey = process.env.KAKAO_KEY;
   private readonly apiKey = process.env.TOUR_API_KEY;
 
-  // 장소 조회 (숙박, 행사 제외)
+  // 장소 조회 (숙소, 행사 제외)
   async searchTours(
     lat: string,
     lon: string,
@@ -63,12 +63,12 @@ export class MapService {
           ? `${item.addr1} ${item.addr2}`
           : item.addr1 || '주소 없음',
       }))
-      .filter((item) => item.category !== '행사' && item.category !== '숙박');
+      .filter((item) => item.category !== '행사' && item.category !== '숙소');
   }
 
   private readonly kakaoApiKey = process.env.KAKAO_KEY;
 
-  // 장소 검색 (숙박, 행사 제외)
+  // 장소 검색 (숙소, 행사 제외)
   async searchInputTours(
     lat: string,
     lon: string,
@@ -106,12 +106,12 @@ export class MapService {
           ? `${item.addr1} ${item.addr2}`
           : item.addr1 || '주소 없음',
       }))
-      .filter((item) => item.category !== '행사' && item.category !== '숙박');
+      .filter((item) => item.category !== '행사' && item.category !== '숙소');
 
     return result;
   }
 
-  // 장소 조회(숙박)
+  // 장소 조회(숙소)
   async searchStayTours(
     lat: string,
     lon: string,
@@ -156,7 +156,7 @@ export class MapService {
     }));
   }
 
-  // 장소 검색(숙박)
+  // 장소 검색(숙소)
   async searchStayInputTours(
     lat: string,
     lon: string,
