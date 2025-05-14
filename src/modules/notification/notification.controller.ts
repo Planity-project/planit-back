@@ -43,7 +43,7 @@ export class NotificationController {
   }
 
   // ✅ 알림 읽음 처리
-  @Patch(':Notification/read')
+  @Patch(':notification/read')
   @ApiOperation({
     summary: '알림 읽음 처리',
     description: '특정 알림을 읽음 상태로 변경합니다.',
