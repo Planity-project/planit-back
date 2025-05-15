@@ -9,6 +9,7 @@ import { MapService } from './map.service';
 import { addressToChange } from 'util/generator';
 import { SearchInputNearbyDto } from './dto/SearchInputNearby.dto';
 import { SearchNearbyDto, NearbyResponseDto } from './dto/SearchNearby.dto';
+import { AddressChange, PlaceInfoDto } from './dto/AddressChange.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -18,7 +19,7 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('Map')
-@ApiExtraModels(SearchNearbyDto, SearchInputNearbyDto)
+@ApiExtraModels(SearchNearbyDto, SearchInputNearbyDto, AddressChange)
 @Controller('map')
 export class MapController {
   constructor(private readonly mapService: MapService) {}
@@ -37,7 +38,11 @@ export class MapController {
       const { latitude, longitude } = await addressToChange(address);
       const locations =
         Number(type) === 1
-          ? await this.mapService.searchTours(latitude, longitude, Number(page))
+          ? await this.mapService.searchToursGoogle(
+              latitude,
+              longitude,
+              Number(page),
+            )
           : await this.mapService.searchStayTours(
               latitude,
               longitude,
@@ -81,5 +86,15 @@ export class MapController {
       console.error('searchInputNearby', error);
       throw new HttpException('서버 오류.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @Get('addressChange')
+  @ApiOperation({ summary: '장소 등록' })
+  @ApiResponse({ status: 200, type: PlaceInfoDto })
+  async addressChange(@Query() query: AddressChange) {
+    const { keyword } = query;
+    const { latitude, longitude } = await addressToChange(keyword);
+
+    return this.mapService.searchPlacesLatLng(latitude, longitude);
   }
 }

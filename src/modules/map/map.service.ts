@@ -1,5 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import axios from 'axios';
+import { mapGoogleCategory } from 'util/googlemap';
 const getCategory = (typeId: string | number): string => {
   const map: Record<string, string> = {
     '12': '관광지',
@@ -19,7 +20,7 @@ export class MapService {
   // private readonly clientSecret = process.env.NAVER_SECRET_KEY;
   // private readonly kakaoApiKey = process.env.KAKAO_KEY;
   private readonly apiKey = process.env.TOUR_API_KEY;
-
+  private readonly googleApiKey = process.env.GOOGLE_MAP_KEY;
   // 장소 조회 (숙소, 행사 제외)
   async searchTours(
     lat: string,
@@ -198,6 +199,77 @@ export class MapService {
     return result;
   }
 
+  //google
+  async searchToursGoogle(
+    lat: string,
+    lon: string,
+    page: number,
+  ): Promise<any[]> {
+    const radius = 20000;
+    const baseUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json`;
+
+    const params = {
+      location: `${lat},${lon}`,
+      radius,
+      key: this.googleApiKey,
+      type: 'tourist_attraction',
+      language: 'ko',
+    };
+
+    let currentPage = 0;
+    let nextPageToken: string | null = null;
+    let results: any[] = [];
+
+    while (currentPage <= page) {
+      let response;
+
+      if (nextPageToken && currentPage > 0) {
+        // 다음 페이지 호출
+        await new Promise((res) => setTimeout(res, 2000)); // 토큰 활성화까지 딜레이 필요
+        response = await axios.get(baseUrl, {
+          params: {
+            pagetoken: nextPageToken,
+            key: this.googleApiKey,
+            language: 'ko',
+          },
+        });
+      } else {
+        // 첫 페이지 호출
+        response = await axios.get(baseUrl, { params });
+      }
+
+      const data = response.data;
+
+      if (data.status !== 'OK' || !data.results) break;
+      console.log(data, '지역 정보');
+      if (currentPage === page) {
+        // 요청한 페이지 도달 시 해당 결과만 반환
+        return data.results.map((item: any) => ({
+          title: item.name,
+          category: mapGoogleCategory(item.types), // 타입 매핑
+          imageSrc: item.photos?.[0]
+            ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${item.photos[0].photo_reference}&key=${this.googleApiKey}`
+            : '',
+          lat: item.geometry.location.lat,
+          lon: item.geometry.location.lng,
+          address: item.vicinity || '주소 없음',
+          tel: '', // Place Details API 필요
+          rating: item.rating ?? null,
+          reviewCount: item.user_ratings_total ?? 0,
+          openNow: item.opening_hours?.open_now ?? null,
+        }));
+      }
+
+      // 다음 루프를 위한 준비
+      nextPageToken = data.next_page_token;
+      if (!nextPageToken) break;
+
+      currentPage++;
+    }
+
+    return [];
+  }
+
   // async searchKakao(latitude: string, longitude: string): Promise<any[]> {
   //   try {
   //     const response = await axios.get(
@@ -274,4 +346,35 @@ export class MapService {
   //     );
   //   }
   // }
+
+  async searchPlacesLatLng(lat: string, lon: string): Promise<any[]> {
+    const radius = 20000;
+    const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+
+    const params = {
+      location: `${lat},${lon}`,
+      radius,
+      key: this.googleApiKey,
+      type: 'tourist_attraction',
+      language: 'ko',
+    };
+
+    const response = await axios.get(url, { params });
+    const data = response.data;
+
+    if (data.status !== 'OK' || !data.results) return [];
+
+    return data.results.map((item: any) => ({
+      title: item.name,
+      lat: item.geometry.location.lat, //위도
+      lon: item.geometry.location.lng, //경도
+      address: item.vicinity || '', //주소
+      rating: item.rating || null, //평점
+      reviewCount: item.user_ratings_total || 0, //리뷰 수
+      openNow: item.opening_hours?.open_now ?? null, //운영 시간
+      image: item.photos?.[0]
+        ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${item.photos[0].photo_reference}&key=${this.googleApiKey}`
+        : '', //이미지
+    }));
+  }
 }

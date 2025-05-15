@@ -122,28 +122,30 @@ export const nicknameMaker = (): string => {
   return `${time[timeIndex]} ${face[faceIndex]} ${animal[animalIndex]}`;
 };
 
-//주소를 위도 경도로 변환해주는 함수
-export async function addressToChange(
-  address: string,
-): Promise<{ latitude: string; longitude: string }> {
+export async function addressToChange(query: string) {
   const apiKey = process.env.KAKAO_KEY;
-  const url = 'https://dapi.kakao.com/v2/local/search/address.json';
 
-  try {
-    const response = await axios.get(url, {
-      params: { query: address },
-      headers: { Authorization: `KakaoAK ${apiKey}` },
-    });
+  const addressRes = await axios.get(
+    'https://dapi.kakao.com/v2/local/search/address.json',
+    { params: { query }, headers: { Authorization: `KakaoAK ${apiKey}` } },
+  );
 
-    if (!response.data.documents || response.data.documents.length === 0) {
-      throw new Error('주소에 해당하는 위도/경도를 찾을 수 없습니다.');
-    }
-
-    const { x: longitude, y: latitude } = response.data.documents[0].address;
-    return { latitude, longitude };
-  } catch (error) {
-    throw new HttpException('주소 변환 오류', HttpStatus.BAD_REQUEST);
+  if (addressRes.data.documents.length > 0) {
+    const { x: longitude, y: latitude } = addressRes.data.documents[0].address;
+    return { latitude, longitude, type: 'address' };
   }
+
+  const keywordRes = await axios.get(
+    'https://dapi.kakao.com/v2/local/search/keyword.json',
+    { params: { query }, headers: { Authorization: `KakaoAK ${apiKey}` } },
+  );
+
+  if (keywordRes.data.documents.length > 0) {
+    const { x: longitude, y: latitude } = keywordRes.data.documents[0];
+    return { latitude, longitude, type: 'keyword' };
+  }
+
+  throw new Error('주소 혹은 장소를 찾을 수 없습니다.');
 }
 
 //gemini 요청 함수

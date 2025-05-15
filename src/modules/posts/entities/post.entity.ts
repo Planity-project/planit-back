@@ -27,7 +27,7 @@ export class Post {
   content: string;
 
   @Column({ nullable: true })
-  imgUrl: string;
+  image: string;
 
   @Column({ default: 0 })
   viewCount: number;
