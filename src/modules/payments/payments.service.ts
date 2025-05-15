@@ -4,73 +4,100 @@ import { Repository } from 'typeorm';
 
 import { User } from 'src/modules/user/entities/user.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
+import { AlbumGroup } from '../album/entities/albumGroup.entity';
 import { Payment } from './entities/payment.entity';
 import axios from 'axios';
 
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { access } from 'fs';
 @Injectable()
 export class PaymentsService {
   constructor(
     @InjectRepository(Payment)
     private readonly paymentRepository: Repository<Payment>,
+
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
 
     @InjectRepository(Album)
     private readonly albumRepository: Repository<Album>,
+
+    @InjectRepository(AlbumGroup)
+    private readonly albumGroupRepository: Repository<AlbumGroup>,
   ) {}
 
-  private readonly portoneApiUrl = 'https://api.portone.kr/v1'; // PortOne API URL
+  private readonly portoneApiUrl = 'https://api.portone.io/payments/'; // PortOne API URL
   private readonly apiKey = process.env.PORTONE_REST_API_Key; // API Key
   private readonly apiSecret = process.env.PORTONE_REST_API_Secret; // API Secret
 
   async verifyAndSavePayment(
-    imp_uid: string,
+    paymentId: string,
     albumId: number,
     userId: number,
-  ): Promise<Payment> {
+    txId: string,
+  ): Promise<Payment | null> {
     try {
-      // 1. 아임포트 API로 결제 검증
-      const verificationResponse = await axios.post(
-        `${this.portoneApiUrl}/payments/${imp_uid}`,
-        null,
-        {
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-          },
-        },
-      );
-
-      const paymentData = verificationResponse.data;
-      if (paymentData.success && paymentData.amount > 0) {
-        // 2. 결제 성공 시 DB에 저장
-        const user = await this.userRepository.findOne({
-          where: { id: userId },
-        });
-        const album = await this.albumRepository.findOne({
-          where: { id: albumId },
-        });
-
-        if (!user || !album) {
-          throw new Error('사용자 또는 앨범 정보가 존재하지 않습니다.');
-        }
-
-        const payment = this.paymentRepository.create({
-          price: paymentData.amount,
-          method: paymentData.pay_method,
-          user,
-          album,
-          paidAt: new Date(),
-        });
-
-        await this.paymentRepository.save(payment);
-
-        return payment;
-      } else {
-        throw new Error('결제 검증 실패');
+      if (!this.apiSecret) {
+        throw new Error('PORTONE_REST_API_Secret error.');
       }
+
+      const options = {
+        method: 'GET',
+        url: `${this.portoneApiUrl}${paymentId}`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `PortOne ${this.apiSecret}`,
+        },
+      };
+
+      const { data }: any = await axios.request(options);
+      console.log('결제 응답:', data);
+
+      // 2. 결제 상태 검증
+      if (data.status !== 'PAID') {
+        throw new HttpException(
+          '결제가 완료되지 않았습니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const user = await this.userRepository.findOneBy({ id: userId });
+      const album = await this.albumRepository.findOne({
+        where: { id: albumId },
+      });
+
+      const albumGroup = await this.albumGroupRepository.findOne({
+        where: { user: { id: userId }, albums: { id: albumId } },
+        relations: ['user', 'albums'],
+      });
+
+      if (!user || !album || !albumGroup) {
+        throw new HttpException(
+          '대상 정보가 존재하지 않습니다.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      album.type = 'PAID';
+      albumGroup.type = 'PAID';
+      await this.albumRepository.save(album);
+      await this.albumGroupRepository.save(albumGroup);
+
+      const payment = this.paymentRepository.create({
+        method: data.method?.provider,
+        price: data.amount?.total,
+        user,
+        albumGroup,
+      });
+      await this.paymentRepository.save(payment);
+
+      return payment;
     } catch (error) {
-      throw new Error('결제 검증 또는 저장 오류: ' + error.message);
+      console.error('결제 검증 오류:', error);
+      throw new HttpException(
+        '결제 처리 중 오류 발생',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

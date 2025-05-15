@@ -35,6 +35,8 @@ export class Album {
   @Column({ nullable: true })
   inviteLink: string;
 
+  @Column({ type: 'enum', enum: ['FREE', 'PAID'], default: 'FREE' })
+  type: string;
   // 📚 관계 설정
 
   @ManyToOne(() => User)

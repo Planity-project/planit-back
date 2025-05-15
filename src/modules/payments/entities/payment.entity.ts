@@ -18,7 +18,7 @@ export class Payment {
   @Column()
   price: number;
 
-  @Column({ type: 'enum', enum: ['CARD', 'BANK', 'PHONE'] })
+  @Column({ nullable: true })
   method: string;
 
   @CreateDateColumn()
