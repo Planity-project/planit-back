@@ -26,26 +26,26 @@ export class CommentService {
     userId,
     content,
     postId,
-    albumId,
+    albumImageId,
     parentId,
   }: {
     userId: number;
     content: string;
     postId?: number;
-    albumId?: number;
+    albumImageId?: number;
     parentId?: number;
   }) {
     const user = await this.userRepository.findOneByOrFail({ id: userId });
 
-    if (!parentId && !postId && !albumId) {
+    if (!parentId && !postId && !albumImageId) {
       throw new Error('게시글 ID 또는 앨범 ID는 필수입니다.');
     }
 
     const post = postId
       ? await this.postRepository.findOneByOrFail({ id: postId })
       : null;
-    const album = albumId
-      ? await this.albumRepository.findOneBy({ id: albumId })
+    const albumImeage = albumImageId
+      ? await this.albumRepository.findOneBy({ id: albumImageId })
       : null;
     const parent = parentId
       ? await this.commentRepository.findOneBy({ id: parentId })
@@ -54,7 +54,7 @@ export class CommentService {
     const newComment = this.commentRepository.create({
       user,
       post,
-      album,
+      albumImeage,
       content,
       parentComments: parent,
     });

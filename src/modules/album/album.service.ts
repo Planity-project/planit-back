@@ -56,11 +56,10 @@ export class AlbumService {
   async findDetailData(albumId: number): Promise<{
     group: AlbumGroup[];
     image: AlbumImage[];
-    comment?: Comment[] | null;
   }> {
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
-      relations: ['groups', 'images', 'comment'],
+      relations: ['groups', 'images'],
     });
 
     if (!album) throw new NotFoundException('앨범을 찾을 수 없습니다');
@@ -68,7 +67,6 @@ export class AlbumService {
     return {
       group: album.groups,
       image: album.images,
-      comment: album.comment,
     };
   }
 

@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Album } from './album.entity';
+import { Comment } from 'src/modules/comment/entities/comment.entity';
+
 @Entity('album_images')
 export class AlbumImage {
   @PrimaryGeneratedColumn()
@@ -16,6 +18,12 @@ export class AlbumImage {
 
   @Column({ nullable: true })
   image: string;
+
+  @Column({ nullable: true })
+  likeCnt: number;
+
+  @Column({ nullable: true })
+  commentCnt: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -29,4 +37,7 @@ export class AlbumImage {
   @ManyToOne(() => Album)
   @JoinColumn({ name: 'albumId' })
   album: Album;
+
+  @OneToMany(() => Comment, (comment) => comment.albumImeage)
+  comments: Comment[];
 }

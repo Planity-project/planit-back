@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
-import { Album } from 'src/modules/album/entities/album.entity';
+import { AlbumImage } from 'src/modules/album/entities/albumImage';
 import { Like } from 'src/modules/like/entities/like.entity';
 
 @Entity('comments')
@@ -36,11 +36,11 @@ export class Comment {
   })
   post: Post | null;
 
-  @ManyToOne(() => Album, (album) => album.comment, {
+  @ManyToOne(() => AlbumImage, (albumImage) => albumImage.comments, {
     onDelete: 'CASCADE',
     nullable: true,
   })
-  album: Album | null;
+  albumImeage: AlbumImage | null;
 
   @ManyToOne(() => Comment, { nullable: true })
   parentComments: Comment | null;

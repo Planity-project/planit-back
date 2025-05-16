@@ -9,7 +9,6 @@ import {
 import { User } from 'src/modules/user/entities/user.entity';
 import { AlbumGroup } from './albumGroup.entity';
 import { AlbumImage } from './albumImage';
-import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Notification } from 'src/modules/notification/entities/notification.entity';
 
 @Entity('albums')
@@ -27,16 +26,11 @@ export class Album {
   createdAt: Date;
 
   @Column({ nullable: true })
-  likeCnt: number;
-
-  @Column({ nullable: true })
-  commentCnt: number;
-
-  @Column({ nullable: true })
   inviteLink: string;
 
   @Column({ type: 'enum', enum: ['FREE', 'PAID'], default: 'FREE' })
   type: string;
+
   // 📚 관계 설정
 
   @ManyToOne(() => User)
@@ -47,9 +41,6 @@ export class Album {
 
   @OneToMany(() => AlbumImage, (image) => image.album)
   images: AlbumImage[];
-
-  @OneToMany(() => Comment, (comment) => comment.album)
-  comment: Comment[];
 
   @OneToMany(() => Notification, (notification) => notification.album)
   notifications: Notification[];

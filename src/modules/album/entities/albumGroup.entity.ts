@@ -37,6 +37,7 @@ export class AlbumGroup {
   role: string;
 
   // 📚 관계 설정
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
   user: User;
