@@ -14,12 +14,11 @@ export class CreatePaymentDto {
 
   @ApiProperty({
     description: '결제 방법',
-    example: 'CARD',
-    enum: ['CARD', 'BANK', 'PHONE'],
+    example: 'KAKAOPAY',
+    type: String,
   })
   @IsNotEmpty()
-  @IsEnum(['CARD', 'BANK', 'PHONE'])
-  method: 'CARD' | 'BANK' | 'PHONE';
+  method: string;
 
   @ApiProperty({
     description: '결제 유저 ID',

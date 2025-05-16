@@ -204,6 +204,7 @@ export class MapService {
     lat: string,
     lon: string,
     page: number,
+    type: string,
   ): Promise<any[]> {
     const radius = 20000;
     const baseUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json`;
@@ -212,7 +213,7 @@ export class MapService {
       location: `${lat},${lon}`,
       radius,
       key: this.googleApiKey,
-      type: 'tourist_attraction',
+      type: type,
       language: 'ko',
     };
 
@@ -224,8 +225,7 @@ export class MapService {
       let response;
 
       if (nextPageToken && currentPage > 0) {
-        // 다음 페이지 호출
-        await new Promise((res) => setTimeout(res, 2000)); // 토큰 활성화까지 딜레이 필요
+        await new Promise((res) => setTimeout(res, 2000));
         response = await axios.get(baseUrl, {
           params: {
             pagetoken: nextPageToken,
@@ -234,36 +234,32 @@ export class MapService {
           },
         });
       } else {
-        // 첫 페이지 호출
         response = await axios.get(baseUrl, { params });
       }
 
       const data = response.data;
-
       if (data.status !== 'OK' || !data.results) break;
-      console.log(data, '지역 정보');
+
       if (currentPage === page) {
-        // 요청한 페이지 도달 시 해당 결과만 반환
         return data.results.map((item: any) => ({
+          place_id: item.place_id,
           title: item.name,
-          category: mapGoogleCategory(item.types), // 타입 매핑
+          category: mapGoogleCategory(item.types),
           imageSrc: item.photos?.[0]
             ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${item.photos[0].photo_reference}&key=${this.googleApiKey}`
             : '',
           lat: item.geometry.location.lat,
           lon: item.geometry.location.lng,
           address: item.vicinity || '주소 없음',
-          tel: '', // Place Details API 필요
+          tel: '',
           rating: item.rating ?? null,
           reviewCount: item.user_ratings_total ?? 0,
           openNow: item.opening_hours?.open_now ?? null,
         }));
       }
 
-      // 다음 루프를 위한 준비
       nextPageToken = data.next_page_token;
       if (!nextPageToken) break;
-
       currentPage++;
     }
 
