@@ -16,7 +16,7 @@ import { join } from 'path';
     }),
     CacheModule.register({
       isGlobal: true,
-      ttl: 60 * 60,
+      ttl: 60 * 60 * 24,
     }),
     DatabaseModule,
     SeederModule,

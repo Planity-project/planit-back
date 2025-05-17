@@ -7,20 +7,21 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SearchNearbyDto {
-  @ApiProperty({ description: '검색할 주소', example: '서울' })
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({ description: '검색할 주소' })
   address: string;
 
-  @ApiPropertyOptional({ description: '페이지 번호', example: '1' })
-  @IsOptional()
-  @IsNumberString()
-  page: string;
+  @ApiProperty({ description: '페이지 번호', example: 0 })
+  page: number;
 
-  @ApiPropertyOptional({ description: '1: 관광, 2: 숙박', example: '1' })
-  @IsOptional()
-  @IsNumberString()
+  @ApiProperty({ description: '1: 명소,식당,카페, 2: 숙소', example: 1 })
   type: number;
+
+  @ApiProperty({
+    description:
+      '검색 카테고리 리스트 (예: ["restaurant", "cafe", "tourist_attraction"])',
+    isArray: true,
+  })
+  categories: string[];
 }
 
 export class NearbyResponseDto {

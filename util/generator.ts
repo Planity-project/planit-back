@@ -220,3 +220,13 @@ export function generateSchedulePrompt(schedule: any): string {
 
   return prompt;
 }
+
+export function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    // 0부터 i까지 랜덤 인덱스 선택
+    const j = Math.floor(Math.random() * (i + 1));
+    // 두 요소 위치 바꾸기
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
