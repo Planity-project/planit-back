@@ -39,4 +39,11 @@ export class PostsService {
       ? { result: true, post }
       : { result: false, message: '유효하지 않은 아이디입니다.' };
   }
+
+  async getAllPosts(): Promise<Post[]> {
+    return await this.postRepository.find({
+      relations: ['user', 'trip', 'location'],
+      order: { createdAt: 'DESC' }, // 최신순 정렬 (원하신다면)
+    });
+  }
 }

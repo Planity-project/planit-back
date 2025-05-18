@@ -88,4 +88,17 @@ export class PostsController {
 
     return { result: true };
   }
+
+  @Get('list')
+  async getPostList() {
+    const posts = await this.postsService.getAllPosts();
+    return posts.map((post) => ({
+      id: post.id,
+      userid: post.user.id,
+      nickName: post.user.nickname,
+      title: post.title,
+      img: post.image ? [post.image] : [],
+      hashtag: `#${post.location.name}`,
+    }));
+  }
 }
