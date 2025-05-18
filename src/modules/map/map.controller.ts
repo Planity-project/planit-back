@@ -225,7 +225,9 @@ export class MapController {
     console.log(name + ' 중복 제거 후 숙소 개수', dedupedLodging.length);
 
     await Promise.all([
-      this.cacheService.set(cacheKeyTours, dedupedTours, { ttl: 60 * 60 * 24 }),
+      this.cacheService.set(cacheKeyTours, shuffleArray(dedupedTours), {
+        ttl: 60 * 60 * 24,
+      }),
       this.cacheService.set(cacheKeyLodging, dedupedLodging, {
         ttl: 60 * 60 * 24,
       }),
