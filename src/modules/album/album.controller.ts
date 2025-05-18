@@ -23,9 +23,9 @@ export class AlbumController {
 
   // 앨범 등록
   @Post('/submit')
-  submitAlbum(@Body() body: { userId: number; title: string }) {
-    const { userId, title } = body;
-    return this.albumService.submitAlbum(userId, title);
+  submitAlbum(@Body() body: { userId: number; title: string; url: string }) {
+    const { userId, title, url } = body;
+    return this.albumService.submitAlbum(userId, title, url);
   }
   // 전체 앨범 데이터 가져오기
   @Get('allData')
@@ -37,5 +37,13 @@ export class AlbumController {
   @Get('detailData')
   async getDetailData(@Param('AlbumId') albumId: number) {
     return await this.albumService.findDetailData(albumId);
+  }
+  @Get('userrole')
+  async getUserRole(
+    @Param('albumId') albumId: number,
+    @Param('userId') userId: number,
+  ) {
+    const role = await this.albumService.getAlbumRole(albumId, userId);
+    return { role }; // { role: 'OWNER' } 또는 { role: 'MEMBER' }
   }
 }
