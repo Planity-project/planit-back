@@ -26,6 +26,7 @@ export class AlbumService {
   async submitAlbum(
     userId: number,
     title: string,
+    inviteLink: string,
   ): Promise<{ result: boolean; id: number }> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
@@ -36,6 +37,7 @@ export class AlbumService {
       const album = this.albumRepository.create({
         user,
         title,
+        inviteLink,
       });
 
       const savedAlbum = await this.albumRepository.save(album);
@@ -54,6 +56,7 @@ export class AlbumService {
 
   // 앨범 디테일
   async findDetailData(albumId: number): Promise<{
+    link: string[];
     group: AlbumGroup[];
     image: AlbumImage[];
   }> {
@@ -65,6 +68,7 @@ export class AlbumService {
     if (!album) throw new NotFoundException('앨범을 찾을 수 없습니다');
 
     return {
+      link: [album.inviteLink],
       group: album.groups,
       image: album.images,
     };
@@ -84,5 +88,21 @@ export class AlbumService {
       is_paid: group.type === 'PAID',
       created_at: group.createdAt,
     }));
+  }
+  // 앨범 권한 확인
+  async getAlbumRole(AlbumId: number, userId: number): Promise<string> {
+    const albumGroup = await this.albumGroupRepository.findOne({
+      where: {
+        albums: { id: AlbumId },
+        user: { id: userId },
+      },
+      relations: ['albums', 'user'],
+    });
+
+    if (!albumGroup) {
+      throw new NotFoundException('해당 유저는 이 앨범에 속해있지 않습니다');
+    }
+
+    return albumGroup.role; // 'OWNER' 또는 'MEMBER'
   }
 }
