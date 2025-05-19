@@ -15,6 +15,9 @@ import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Notification } from 'src/modules/notification/entities/notification.entity';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
+import { PostHashtag } from './postHashtags.entity';
+import { PostImage } from './postImage.entity';
+
 @Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn()
@@ -26,9 +29,6 @@ export class Post {
   @Column('text', { nullable: true })
   content: string;
 
-  @Column({ nullable: true })
-  image: string;
-
   @Column({ default: 0 })
   viewCount: number;
 
@@ -37,8 +37,6 @@ export class Post {
 
   @CreateDateColumn()
   createdAt: Date;
-
-  // 📚 관계 설정
 
   @ManyToOne(() => User, (user) => user.post, { onDelete: 'CASCADE' })
   user: User;
@@ -60,4 +58,10 @@ export class Post {
 
   @OneToOne(() => Trip, (trip) => trip.post)
   trip: Trip;
+
+  @OneToMany(() => PostHashtag, (hashtag) => hashtag.post, { cascade: true })
+  hashtags: PostHashtag[];
+
+  @OneToMany(() => PostImage, (image) => image.post, { cascade: true })
+  images: PostImage[];
 }

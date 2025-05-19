@@ -144,6 +144,7 @@ export class MapController {
       console.log('지역명 없음');
       throw new HttpException('지역명이 필요합니다.', HttpStatus.BAD_REQUEST);
     }
+
     console.log('요청 받은 지역명:', name);
 
     const cacheKeyTours = `${name}-tours`;
@@ -174,39 +175,34 @@ export class MapController {
     }
 
     const { lat, lng } = regionInfo;
-
-    const gridPoints = generateGridCenters(lat, lng);
-
     const tourCategories = ['tourist_attraction', 'restaurant', 'cafe'];
 
     const tourTasks: Promise<any[]>[] = [];
     const lodgingTasks: Promise<any[]>[] = [];
 
-    for (const point of gridPoints) {
-      for (let page = 0; page <= 2; page++) {
-        for (const category of tourCategories) {
-          tourTasks.push(
-            this.mapService.searchToursGoogle(
-              String(point.lat),
-              String(point.lng),
-              page,
-              category,
-            ),
-          );
-        }
-
-        lodgingTasks.push(
+    // 중심 좌표 한 번만 사용
+    for (let page = 0; page <= 2; page++) {
+      for (const category of tourCategories) {
+        tourTasks.push(
           this.mapService.searchToursGoogle(
-            String(point.lat),
-            String(point.lng),
+            String(lat),
+            String(lng),
             page,
-            'lodging',
+            category,
           ),
         );
       }
+
+      lodgingTasks.push(
+        this.mapService.searchToursGoogle(
+          String(lat),
+          String(lng),
+          page,
+          'lodging',
+        ),
+      );
     }
 
-    // 병렬 요청 실행
     const [tourResultsArrays, lodgingResultsArrays] = await Promise.all([
       Promise.all(tourTasks),
       Promise.all(lodgingTasks),
@@ -232,8 +228,8 @@ export class MapController {
         ttl: 60 * 60 * 24,
       }),
     ]);
-    console.log(' 캐시 저장 완료');
 
+    console.log('캐시 저장 완료');
     return true;
   }
 

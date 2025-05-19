@@ -1,15 +1,15 @@
-// post-image.entity.ts
+// post-hashtag.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Post } from './post.entity';
 
-@Entity('post_images')
-export class PostImage {
+@Entity('post_hashtags')
+export class PostHashtag {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  url: string;
+  hashtag: string;
 
-  @ManyToOne(() => Post, (post) => post.images, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Post, (post) => post.hashtags, { onDelete: 'CASCADE' })
   post: Post;
 }

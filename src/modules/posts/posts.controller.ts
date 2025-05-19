@@ -26,6 +26,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreatePostDto } from './dto/create-post.dto';
+import { SERVER_DOMAIN } from 'util/api';
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
@@ -72,10 +73,16 @@ export class PostsController {
   async create(
     @UploadedFiles() files: Express.Multer.File[],
     @Body()
-    body: { title: string; content: string; hashtags: string; tripId: string },
+    body: {
+      title: string;
+      content: string;
+      hashtags: string;
+      tripId: number;
+      userId: number;
+    },
   ) {
     // hashtags는 JSON.stringify된 문자열 형태로 옴
-    const { title, content, hashtags, tripId } = body;
+    const { title, content, hashtags, tripId, userId } = body;
     const parsedHashtags = JSON.parse(hashtags);
 
     console.log('title:', title);
@@ -85,8 +92,21 @@ export class PostsController {
     console.log('files:', files);
 
     // 여기에 DB 저장
+    const fileUrls = files.map(
+      (file) => `${SERVER_DOMAIN}/uploads/posts/${file.filename}`,
+    );
 
-    return { result: true };
+    // 2. 서비스 호출
+    const savedPost = await this.postsService.createPostWithDetails(
+      title,
+      content,
+      tripId,
+      parsedHashtags,
+      fileUrls,
+      userId,
+    );
+
+    return { result: true, postId: savedPost.id };
   }
 
   @Get('list')
@@ -97,8 +117,22 @@ export class PostsController {
       userid: post.user.id,
       nickName: post.user.nickname,
       title: post.title,
-      img: post.image ? [post.image] : [],
-      hashtag: `#${post.location.name}`,
+      img: post.images?.map((img) => img.url) ?? [],
+      hashtag: [
+        `#${post.trip?.title ?? '위치없음'}`,
+        ...(post.hashtags?.map((tag) =>
+          tag.hashtag.startsWith('#') ? tag.hashtag : `#${tag.hashtag}`,
+        ) ?? []),
+      ],
     }));
+  }
+
+  @Get('detailTrip')
+  async getDetailData(
+    @Query('postId') postId: string,
+    @Query('userId') userId: string,
+  ) {
+    console.log(postId, userId, 'detailData');
+    return await this.postsService.getOnePosts(Number(postId), Number(userId));
   }
 }

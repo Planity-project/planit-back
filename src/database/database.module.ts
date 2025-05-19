@@ -30,6 +30,8 @@ import { Location } from 'src/modules/location/entities/location.entity';
 import { Notification } from 'src/modules/notification/entities/notification.entity';
 import { Payment } from 'src/modules/payments/entities/payment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
+import { PostHashtag } from 'src/modules/posts/entities/postHashtags.entity';
+import { PostImage } from 'src/modules/posts/entities/postImage.entity';
 import { Admin } from 'src/modules/admin/entities/admin.entity';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
 import { Place } from 'src/modules/trips/entities/place.entity';
@@ -62,6 +64,8 @@ dotenv.config();
         Notification,
         Payment,
         Post,
+        PostHashtag,
+        PostImage,
         Trip,
         Place,
         TripDay,
@@ -85,6 +89,8 @@ dotenv.config();
       Notification,
       Payment,
       Post,
+      PostHashtag,
+      PostImage,
       Trip,
       Report,
     ]),

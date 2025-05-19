@@ -11,7 +11,8 @@ import { join } from 'path';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'), // 실제 파일 경로
+      // rootPath: join(__dirname, '..', 'uploads'), // 실제 파일 경로
+      rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads', // 요청 경로 (예: http://localhost:5001/uploads/파일명)
     }),
     CacheModule.register({
