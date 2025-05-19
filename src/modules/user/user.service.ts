@@ -123,14 +123,7 @@ export class UserService {
   async deleteProfileImage(userId: number): Promise<void> {
     const user = await this.findOne(userId);
     if (user.profile_img) {
-      const filePath = join(
-        __dirname,
-        '..',
-        '..',
-        'uploads',
-        'profiles',
-        user.profile_img,
-      );
+      const filePath = join(process.cwd(), user.profile_img);
       try {
         await unlink(filePath);
       } catch (err) {

@@ -79,7 +79,7 @@ export class UserController {
   }
 
   // ✅ 닉네임 업데이트
-  @Post('update')
+  @Post('nicknameUpdate')
   @ApiOperation({ summary: '사용자 닉네임 수정' })
   @ApiBody({ type: UpdateUserDto })
   @ApiResponse({
