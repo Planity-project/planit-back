@@ -7,9 +7,11 @@ import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       // rootPath: join(__dirname, '..', 'uploads'), // 실제 파일 경로
       rootPath: join(process.cwd(), 'uploads'),

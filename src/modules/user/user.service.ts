@@ -142,7 +142,7 @@ export class UserService {
   }
 
   // ✅ 유저 및 관련 데이터 삭제
-  private async deleteUserAndRelatedData(userId: number): Promise<void> {
+  async deleteUserAndRelatedData(userId: number): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
