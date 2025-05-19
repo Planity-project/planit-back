@@ -127,9 +127,9 @@ export class PostsService {
     for (const tripDay of result.trip.tripDays) {
       const dayKey = `day${tripDay.todayOrder}`;
 
-      dayData[dayKey] = tripDay.place.map((place) => ({
+      dayData[dayKey] = tripDay.place.map((place, i) => ({
         id: place.id,
-        todayOrder: tripDay.todayOrder,
+        todayOrder: i + 1,
         name: place.name,
         category: place.category,
         image: place.image ?? '/defaultImage.png',
