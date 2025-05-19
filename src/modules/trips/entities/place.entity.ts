@@ -33,7 +33,7 @@ export class Place {
   @Column({ nullable: true })
   todayOrder: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'longtext', nullable: true })
   image: string;
 
   // 📚 관계 설정
