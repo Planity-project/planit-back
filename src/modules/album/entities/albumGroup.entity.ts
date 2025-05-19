@@ -38,8 +38,8 @@ export class AlbumGroup {
 
   // 📚 관계 설정
 
-  @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => User, (user) => user.albumGroups, { onDelete: 'CASCADE' })
   user: User;
 
   @ManyToOne(() => Album, (album) => album.groups)

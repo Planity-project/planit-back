@@ -26,7 +26,7 @@ export class Payment {
 
   // 📚 관계 설정
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.payments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 

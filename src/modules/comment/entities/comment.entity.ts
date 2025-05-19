@@ -27,7 +27,7 @@ export class Comment {
 
   // 📚 관계 설정
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.comments, { onDelete: 'CASCADE' })
   user: User;
 
   @ManyToOne(() => Post, (post) => post.comments, {

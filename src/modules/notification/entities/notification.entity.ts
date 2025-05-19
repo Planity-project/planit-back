@@ -43,7 +43,7 @@ export class Notification {
 
   // 📚 관계 설정
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.notification, { onDelete: 'CASCADE' })
   user: User;
 
   @ManyToOne(() => Report, (report) => report.notification, {

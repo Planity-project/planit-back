@@ -134,7 +134,7 @@ export class UserController {
   }
 
   // ✅ 회원 탈퇴
-  @Delete('destroy/:id')
+  @Delete('me/destroy/:id')
   @ApiOperation({
     summary: '회원 탈퇴',
     description: '해당 ID의 유저를 삭제합니다.',

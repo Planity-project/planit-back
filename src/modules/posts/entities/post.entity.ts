@@ -38,6 +38,8 @@ export class Post {
   @CreateDateColumn()
   createdAt: Date;
 
+  // 📚 관계 설정
+
   @ManyToOne(() => User, (user) => user.post, { onDelete: 'CASCADE' })
   user: User;
 

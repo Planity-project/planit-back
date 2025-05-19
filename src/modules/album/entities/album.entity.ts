@@ -33,7 +33,7 @@ export class Album {
 
   // 📚 관계 설정
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.albums, { onDelete: 'CASCADE' })
   user: User;
 
   @OneToMany(() => AlbumGroup, (group) => group.albums)

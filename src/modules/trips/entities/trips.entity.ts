@@ -32,7 +32,7 @@ export class Trip {
 
   // 📚 관계 설정
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.trips, { onDelete: 'CASCADE' })
   user: User;
 
   @OneToMany(() => TripDay, (day) => day.trip)
