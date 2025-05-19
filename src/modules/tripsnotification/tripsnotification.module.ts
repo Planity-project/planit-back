@@ -9,5 +9,6 @@ import { Trip } from '../trips/entities/trips.entity';
   imports: [TypeOrmModule.forFeature([TripsNotification, Trip])],
   providers: [TripsNotificationService],
   controllers: [TripsNotificationController],
+  exports: [TripsNotificationService],
 })
 export class TripsNotificationModule {}

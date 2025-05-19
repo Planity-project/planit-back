@@ -134,7 +134,6 @@ export class UserController {
   }
 
   // ✅ 회원 탈퇴
-  // ✅ 회원 탈퇴
   @Delete('me/destroy/:id')
   @ApiOperation({
     summary: '회원 탈퇴',
@@ -153,7 +152,6 @@ export class UserController {
       throw new HttpException('유저를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
     }
 
-    // 👉 연관 데이터까지 삭제
     await this.userService.deleteUserAndRelatedData(id);
 
     return { result: true, message: '회원 탈퇴 완료' };

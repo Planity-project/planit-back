@@ -8,7 +8,7 @@ import {
 import { User } from 'src/modules/user/entities/user.entity';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
 
-@Entity('trips_notifications')
+@Entity('trips_notification')
 export class TripsNotification {
   @PrimaryGeneratedColumn()
   id: number;

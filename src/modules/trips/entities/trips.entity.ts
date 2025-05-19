@@ -27,6 +27,9 @@ export class Trip {
   @Column({ type: 'date' })
   endDate: Date;
 
+  @Column({ type: 'float', nullable: true })
+  rating: number | null; // 평점
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -18,6 +18,7 @@ import { BannerModule } from 'src/modules/admin/banner/banner.module';
 import { ReportModule } from 'src/modules/reports/report.module';
 import { GeminiModule } from 'src/modules/gemini/gemini.module';
 import { TripsNotificationModule } from 'src/modules/tripsnotification/tripsnotification.module';
+import { SchedulerModule } from 'src/modules/scheduler/scheduler.module';
 
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
@@ -113,6 +114,7 @@ dotenv.config();
     ReportModule,
     GeminiModule,
     TripsNotificationModule,
+    SchedulerModule,
   ],
   exports: [TypeOrmModule],
 })
