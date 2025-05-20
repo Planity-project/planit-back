@@ -27,6 +27,7 @@ export class AlbumController {
     const { userId, title, url } = body;
     return this.albumService.submitAlbum(userId, title, url);
   }
+
   // 전체 앨범 데이터 가져오기
   @Get('allData')
   async findAllAlbum() {
@@ -38,6 +39,7 @@ export class AlbumController {
   async getDetailData(@Param('AlbumId') albumId: number) {
     return await this.albumService.findDetailData(albumId);
   }
+
   @Get('userrole')
   async getUserRole(
     @Param('albumId') albumId: number,

@@ -89,6 +89,7 @@ export class AlbumService {
       created_at: group.createdAt,
     }));
   }
+
   // 앨범 권한 확인
   async getAlbumRole(AlbumId: number, userId: number): Promise<string> {
     const albumGroup = await this.albumGroupRepository.findOne({
