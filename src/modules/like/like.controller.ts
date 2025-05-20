@@ -3,7 +3,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
+  Post,
   UseGuards,
   Req,
 } from '@nestjs/common';
@@ -22,7 +22,7 @@ export class LikeController {
   constructor(private readonly likeService: LikeService) {}
 
   // ✅ 게시글 좋아요 토글
-  @Patch('post/:postId/toggle')
+  @Post('post/:postId/toggle')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '소설 좋아요 토글 (추가/취소)' })
@@ -34,7 +34,7 @@ export class LikeController {
   }
 
   // ✅ 댓글 좋아요 토글
-  @Patch('comment/:commentId/toggle')
+  @Post('comment/:commentId/toggle')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '댓글 좋아요 토글 (추가/취소)' })
