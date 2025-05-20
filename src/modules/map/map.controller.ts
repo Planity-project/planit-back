@@ -77,6 +77,8 @@ export class MapController {
       if (!cached) {
         return {
           locations: [],
+          isProcessing: true,
+          message: '해당 지역 데이터 캐싱 중. 잠시 후 다시 시도.',
         };
       }
 
@@ -255,10 +257,11 @@ export class MapController {
       }
 
       if (!cached) {
-        throw new HttpException(
-          '해당 지역 데이터 없음. 먼저 /place 요청 필요.',
-          HttpStatus.NOT_FOUND,
-        );
+        return {
+          locations: [],
+          isProcessing: true,
+          message: '해당 지역 데이터 캐싱 중. 잠시 후 다시 시도.',
+        };
       }
 
       // categories가 없거나 빈 배열이면 필터링 없이 전체 사용
