@@ -62,6 +62,7 @@ export class PaymentsService {
       const user = await this.userRepository.findOneBy({ id: userId });
       const album = await this.albumRepository.findOne({
         where: { id: albumId },
+        relations: ['groups'],
       });
 
       const albumGroup = await this.albumGroupRepository.findOne({
@@ -85,6 +86,7 @@ export class PaymentsService {
         method: data.method?.provider,
         price: data.amount?.total,
         user,
+        album,
         albumGroup,
       });
       await this.paymentRepository.save(payment);
