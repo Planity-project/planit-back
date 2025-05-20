@@ -12,5 +12,3 @@ import { Trip } from '../trips/entities/trips.entity';
   exports: [TripsNotificationService],
 })
 export class TripsNotificationModule {}
-
-//////////

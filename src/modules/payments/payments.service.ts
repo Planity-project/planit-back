@@ -8,8 +8,6 @@ import { AlbumGroup } from '../album/entities/albumGroup.entity';
 import { Payment } from './entities/payment.entity';
 import axios from 'axios';
 
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { access } from 'fs';
 @Injectable()
 export class PaymentsService {
   constructor(
@@ -26,9 +24,9 @@ export class PaymentsService {
     private readonly albumGroupRepository: Repository<AlbumGroup>,
   ) {}
 
-  private readonly portoneApiUrl = 'https://api.portone.io/payments/'; // PortOne API URL
-  private readonly apiKey = process.env.PORTONE_REST_API_Key; // API Key
-  private readonly apiSecret = process.env.PORTONE_REST_API_Secret; // API Secret
+  private readonly portoneApiUrl = 'https://api.portone.io/payments/';
+  private readonly apiKey = process.env.PORTONE_REST_API_Key;
+  private readonly apiSecret = process.env.PORTONE_REST_API_Secret;
 
   async verifyAndSavePayment(
     paymentId: string,
@@ -99,5 +97,14 @@ export class PaymentsService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  // 유저 결제 정보
+  async getPaymentsByUserId(userId: string) {
+    return this.paymentRepository.find({
+      where: { user: { id: Number(userId) } },
+      relations: ['album'],
+      order: { paidAt: 'DESC' },
+    });
   }
 }

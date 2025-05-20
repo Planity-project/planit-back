@@ -8,9 +8,9 @@ import { Trip } from 'src/modules/trips/entities/trips.entity';
 export class TripsNotificationService {
   constructor(
     @InjectRepository(TripsNotification)
-    private readonly notificationRepoitory: Repository<TripsNotification>,
+    private readonly notificationRepository: Repository<TripsNotification>,
     @InjectRepository(Trip)
-    private readonly tripRepo: Repository<Trip>,
+    private readonly tripRepository: Repository<Trip>,
   ) {}
 
   // 여행 종료 후 알림 생성 (종료일 + 1일)
@@ -22,7 +22,7 @@ export class TripsNotificationService {
     const notifyAt = new Date(endDate);
     notifyAt.setDate(notifyAt.getDate() + 1);
 
-    const exists = await this.notificationRepoitory.findOne({
+    const exists = await this.notificationRepository.findOne({
       where: {
         user: { id: userId },
         trip: { id: tripId },
@@ -30,18 +30,18 @@ export class TripsNotificationService {
     });
 
     if (!exists) {
-      const notification = this.notificationRepoitory.create({
+      const notification = this.notificationRepository.create({
         notifyAt,
         user: { id: userId },
         trip: { id: tripId },
       });
-      await this.notificationRepoitory.save(notification);
+      await this.notificationRepository.save(notification);
     }
   }
 
   // 스케줄러용: 전송 시점 도달한 알림 처리
   async sendNotifications(currentTime: Date) {
-    const notifications = await this.notificationRepoitory.find({
+    const notifications = await this.notificationRepository.find({
       where: {
         notifyAt: LessThanOrEqual(currentTime),
         isSent: false,
@@ -52,13 +52,13 @@ export class TripsNotificationService {
     for (const notification of notifications) {
       // 여기에 실제 알림 전송 로직 삽입 가능 (이메일, 푸시 등)
       notification.isSent = true;
-      await this.notificationRepoitory.save(notification);
+      await this.notificationRepository.save(notification);
     }
   }
 
   // 로그인 시: 전송된 알림 조회
   async getUserNotifications(userId: number) {
-    return this.notificationRepoitory.find({
+    return this.notificationRepository.find({
       where: {
         user: { id: userId },
         isSent: true,
@@ -69,7 +69,7 @@ export class TripsNotificationService {
 
   // 평점 제출
   async submitRating(userId: number, tripId: number, rating: number) {
-    const trip = await this.tripRepo.findOne({
+    const trip = await this.tripRepository.findOne({
       where: {
         id: tripId,
         user: { id: userId },
@@ -81,9 +81,9 @@ export class TripsNotificationService {
     }
 
     trip.rating = rating;
-    await this.tripRepo.save(trip);
+    await this.tripRepository.save(trip);
 
-    await this.notificationRepoitory.delete({
+    await this.notificationRepository.delete({
       user: { id: userId },
       trip: { id: tripId },
     });
