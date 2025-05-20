@@ -182,9 +182,8 @@ export async function requestGemini(prompt: string): Promise<string> {
 }
 
 //프롬포트
-export function generateSchedulePrompt(schedule: any): string {
-  const { dataTime, dataPlace, dataStay } = schedule;
-
+export function generateSchedulePrompt(body: any): string {
+  const { dataTime, dataPlace, dataStay } = body.schedule;
   const formatTime = (time: any) => {
     const hour =
       time.hour + (time.meridiem === '오후' && time.hour !== 12 ? 12 : 0);
