@@ -22,6 +22,7 @@ export class CommentService {
     private readonly reportRepository: Repository<Report>,
   ) {}
 
+  // 댓글 생성
   async createComment({
     userId,
     content,
@@ -121,14 +122,20 @@ export class CommentService {
     return flatComments;
   }
 
-  async deleteComment(id: number) {
+  // 댓글 삭제
+  async deleteComment(id: number, userId: number) {
     const comment = await this.commentRepository.findOne({
       where: { id },
-      relations: ['childComments'],
+      relations: ['childComments', 'user'],
     });
 
     if (!comment) {
       throw new Error('댓글을 찾을 수 없습니다.');
+    }
+
+    // 본인 댓글인지 확인
+    if (comment.user.id !== userId) {
+      throw new Error('본인의 댓글만 삭제할 수 있습니다.');
     }
 
     if (comment.childComments && comment.childComments.length > 0) {
@@ -140,27 +147,7 @@ export class CommentService {
     return { message: '댓글 및 대댓글이 삭제되었습니다.' };
   }
 
-  async deleteComments(ids: number[]): Promise<void> {
-    const comments = await this.commentRepository.find({
-      where: ids.map((id) => ({ id })),
-      relations: ['childComments'],
-    });
-
-    if (comments.length !== ids.length) {
-      throw new Error('댓글을 찾을 수 없습니다.');
-    }
-
-    // 대댓글 먼저 모아서 삭제
-    const allChildComments = comments.flatMap(
-      (comment) => comment.childComments,
-    );
-    if (allChildComments.length > 0) {
-      await this.commentRepository.remove(allChildComments);
-    }
-
-    await this.commentRepository.remove(comments);
-  }
-
+  // 댓글 신고
   async reportComment(commentId: number, userId: number, reason: string) {
     const alreadyReported = await this.reportRepository.findOne({
       where: {
