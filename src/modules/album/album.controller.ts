@@ -5,6 +5,7 @@ import {
   Body,
   Patch,
   Param,
+  Query,
   Delete,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
@@ -30,8 +31,10 @@ export class AlbumController {
 
   // 전체 앨범 데이터 가져오기
   @Get('allData')
-  async findAllAlbum() {
-    return await this.albumService.findAll();
+  async findAllAlbum(@Query('page') page = 1, @Query('limit') limit = 4) {
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    return await this.albumService.findPaginated(pageNumber, limitNumber);
   }
 
   // 전체 앨범 디테일 가져오기

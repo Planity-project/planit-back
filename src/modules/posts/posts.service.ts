@@ -55,11 +55,40 @@ export class PostsService {
       : { result: false, message: '유효하지 않은 아이디입니다.' };
   }
 
-  async getAllPosts(): Promise<Post[]> {
-    return await this.postRepository.find({
+  async getAllPosts(
+    page = 1,
+    limit = 4,
+  ): Promise<{ items: Post[]; total: number }> {
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await this.postRepository.findAndCount({
       relations: ['user', 'trip', 'location', 'images', 'hashtags'],
-      order: { createdAt: 'DESC' }, // 최신순 정렬 (원하신다면)
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+
+    return { items, total };
+  }
+
+  async getAllPostsTransformed(page = 1, limit = 4) {
+    const { items, total } = await this.getAllPosts(page, limit);
+
+    const itemsArr = items.map((post) => ({
+      id: post.id,
+      userid: post.user.id,
+      nickName: post.user.nickname,
+      title: post.title,
+      img: post.images?.map((img) => img.url) ?? [],
+      hashtag: [
+        `#${post.trip?.title ?? '위치없음'}`,
+        ...(post.hashtags?.map((tag) =>
+          tag.hashtag.startsWith('#') ? tag.hashtag : `#${tag.hashtag}`,
+        ) ?? []),
+      ],
+    }));
+
+    return { items: itemsArr, total };
   }
 
   async getOnePosts(

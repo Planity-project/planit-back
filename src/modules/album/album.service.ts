@@ -117,12 +117,12 @@ export class AlbumService {
   }
 
   async findPaginated(page: number, limit: number) {
-    const skip = (page - 1) * limit; // 건너뛸 데이터 수
-
-    return await this.albumRepository.find({
-      skip,
+    const [items, total] = await this.albumRepository.findAndCount({
+      skip: (page - 1) * limit,
       take: limit,
       order: { createdAt: 'DESC' },
     });
+
+    return { items, total };
   }
 }

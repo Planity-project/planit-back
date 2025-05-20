@@ -110,21 +110,8 @@ export class PostsController {
   }
 
   @Get('list')
-  async getPostList() {
-    const posts = await this.postsService.getAllPosts();
-    return posts.map((post) => ({
-      id: post.id,
-      userid: post.user.id,
-      nickName: post.user.nickname,
-      title: post.title,
-      img: post.images?.map((img) => img.url) ?? [],
-      hashtag: [
-        `#${post.trip?.title ?? '위치없음'}`,
-        ...(post.hashtags?.map((tag) =>
-          tag.hashtag.startsWith('#') ? tag.hashtag : `#${tag.hashtag}`,
-        ) ?? []),
-      ],
-    }));
+  async getPostList(@Query('page') page = 1, @Query('limit') limit = 4) {
+    return await this.postsService.getAllPosts(page, limit);
   }
 
   @Get('detailTrip')
