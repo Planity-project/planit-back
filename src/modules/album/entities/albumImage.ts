@@ -38,6 +38,6 @@ export class AlbumImage {
   @JoinColumn({ name: 'albumId' })
   album: Album;
 
-  @OneToMany(() => Comment, (comment) => comment.albumImeage)
+  @OneToMany(() => Comment, (comment) => comment.albumImage)
   comments: Comment[];
 }

@@ -2,19 +2,19 @@ import { IsInt, IsOptional, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCommentDto {
-  @ApiProperty({ example: 1, description: '작성자(user) ID' })
-  @IsInt()
-  userId: number;
-
   @ApiProperty({ example: '재밌어요!', description: '댓글 내용' })
   @IsString()
   @MinLength(1)
   content: string;
 
-  @ApiProperty({ example: 1, description: '게시글 ID', required: false })
+  @ApiProperty({
+    example: 10,
+    description: '앨범 이미지 ID (이미지 공유 단톡방)',
+    required: false,
+  })
   @IsOptional()
   @IsInt()
-  postId?: number;
+  albumImageId?: number;
 
   @ApiProperty({
     example: 3,

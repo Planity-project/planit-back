@@ -6,12 +6,10 @@ import {
   CreateDateColumn,
   OneToMany,
   OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Location } from 'src/modules/location/entities/location.entity';
 import { Like } from 'src/modules/like/entities/like.entity';
-import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Notification } from 'src/modules/notification/entities/notification.entity';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
@@ -51,9 +49,6 @@ export class Post {
 
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
-
-  @OneToMany(() => Comment, (comment) => comment.post)
-  comments: Comment[];
 
   @OneToMany(() => Report, (report) => report.post)
   reports: Report[];

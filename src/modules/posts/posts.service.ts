@@ -94,34 +94,7 @@ export class PostsService {
       userImg: result.user.profile_img ?? '/defaultImage.png',
       like: likeCheck ? true : false,
       likeCnt: result.likes.length,
-      comment: result.comments
-        .filter((comment) => !comment.parentComments) // 부모 댓글만
-        .map((parent) => {
-          const childComments = result.comments.filter(
-            (child) => child.parentComments?.id === parent.id,
-          );
-          const parentLikeCnt = parent.likes?.length ?? 0;
-          const parentLike =
-            parent.likes?.some((like) => like.user.id === userId) ?? false;
-
-          return {
-            id: parent.id,
-            userId: parent.user.id,
-            profileImg: parent.user.profile_img ?? '/defaultImage.png',
-            nickname: parent.user.nickname,
-            chat: parent.content,
-            likeCnt: parentLikeCnt,
-            like: parentLike,
-            miniComment: childComments.map((child) => ({
-              userId: child.user.id,
-              profileImg: child.user.profile_img ?? '/defaultImage.png',
-              nickname: child.user.nickname,
-              chat: child.content,
-            })),
-          };
-        }),
     };
-    console.log('tripDays:', result.trip.tripDays);
 
     const dayData: Record<string, any[]> = {};
     for (const tripDay of result.trip.tripDays) {

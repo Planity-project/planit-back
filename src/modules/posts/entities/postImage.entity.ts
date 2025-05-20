@@ -1,4 +1,3 @@
-// post-image.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Post } from './post.entity';
 

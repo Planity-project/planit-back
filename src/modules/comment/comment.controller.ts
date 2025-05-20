@@ -7,6 +7,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { JwtAuthGuard } from '../auth/jwtauth.gurad';
@@ -33,16 +34,17 @@ export class CommentController {
   @Post()
   @ApiOperation({
     summary: '댓글 생성',
-    description: '게시글/앨범에 댓글 또는 대댓글을 작성합니다.',
+    description: '앨범 이미지에 댓글 작성',
   })
   @ApiResponse({ status: 201, description: '댓글 작성 성공' })
   @ApiBody({ type: CreateCommentDto })
   async create(@Req() req, @Body() createCommentDto: CreateCommentDto) {
-    if (!createCommentDto.parentId && !createCommentDto.postId) {
-      throw new Error('게시글 ID 또는 앨범 ID는 하나는 필요합니다.');
+    const loginUserId = req.user.id;
+
+    if (!createCommentDto.albumImageId) {
+      throw new BadRequestException('앨범 이미지 ID는 반드시 필요합니다.');
     }
 
-    const loginUserId = req.user.id;
     return this.commentsService.createComment({
       ...createCommentDto,
       userId: loginUserId,
