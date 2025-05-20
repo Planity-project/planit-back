@@ -42,6 +42,16 @@ export class AlbumService {
 
       const savedAlbum = await this.albumRepository.save(album);
 
+      const albumGroup = this.albumGroupRepository.create({
+        user,
+        albums: savedAlbum,
+        role: 'OWNER',
+        type: 'FREE', // 기본 값이므로 생략 가능하지만 명시 가능
+        memberCount: 1,
+      });
+
+      await this.albumGroupRepository.save(albumGroup);
+
       return { result: true, id: savedAlbum.id };
     } catch (error) {
       console.error('앨범 생성 중 에러:', error);
@@ -89,7 +99,6 @@ export class AlbumService {
       created_at: group.createdAt,
     }));
   }
-
   // 앨범 권한 확인
   async getAlbumRole(AlbumId: number, userId: number): Promise<string> {
     const albumGroup = await this.albumGroupRepository.findOne({
@@ -105,5 +114,15 @@ export class AlbumService {
     }
 
     return albumGroup.role; // 'OWNER' 또는 'MEMBER'
+  }
+
+  async findPaginated(page: number, limit: number) {
+    const skip = (page - 1) * limit; // 건너뛸 데이터 수
+
+    return await this.albumRepository.find({
+      skip,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
   }
 }

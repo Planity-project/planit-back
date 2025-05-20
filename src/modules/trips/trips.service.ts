@@ -6,6 +6,7 @@ import { Place } from './entities/place.entity';
 import { TripDay } from './entities/tripday.entity';
 import { TripScheduleItem } from './entities/tripscheduleitems.entity';
 import { Trip } from './entities/trips.entity';
+import { Post } from '../posts/entities/post.entity';
 import { User } from '../user/entities/user.entity';
 
 import { requestGemini, generateSchedulePrompt } from 'util/generator';
@@ -26,11 +27,13 @@ export class TripService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Post)
+    private readonly postRepository: Repository<Post>,
   ) {}
 
   //최종 일정 생성
   async generateWithGemini(body: any) {
-    console.log(body);
     const str = generateSchedulePrompt(body);
     let data = await requestGemini(str);
 
@@ -121,8 +124,12 @@ export class TripService {
           });
         }
       }
-
-      return data;
+      const post = this.postRepository.create({
+        user: userData,
+        trip: trip,
+      });
+      const savedPost = await this.postRepository.save(post);
+      return savedPost.id;
     } catch (error) {
       console.error(error, 'error message');
     }

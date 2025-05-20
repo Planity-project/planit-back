@@ -7,9 +7,21 @@ import { TripDay } from './entities/tripday.entity';
 import { TripScheduleItem } from './entities/tripscheduleitems.entity';
 import { Trip } from './entities/trips.entity';
 import { User } from '../user/entities/user.entity';
+import { Post } from '../posts/entities/post.entity';
+import { PostImage } from '../posts/entities/postImage.entity';
+import { PostHashtag } from '../posts/entities/postHashtags.entity';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Place, TripDay, TripScheduleItem, Trip, User]),
+    TypeOrmModule.forFeature([
+      Place,
+      TripDay,
+      TripScheduleItem,
+      Trip,
+      User,
+      Post,
+      PostImage,
+      PostHashtag,
+    ]),
   ],
   controllers: [TripController],
   providers: [TripService],
