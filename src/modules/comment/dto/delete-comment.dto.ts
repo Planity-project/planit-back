@@ -1,10 +1,11 @@
 import { IsArray, ArrayNotEmpty, IsInt } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class DeleteCommentsDto {
+export class DeleteCommentDto {
   @ApiProperty({
     example: [1, 2, 3],
     description: '삭제할 댓글 ID 목록',
+    type: [Number],
   })
   @IsArray()
   @ArrayNotEmpty()
