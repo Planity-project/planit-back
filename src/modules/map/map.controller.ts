@@ -75,10 +75,9 @@ export class MapController {
         cached = await this.cacheService.get<any[]>(cacheKeyLodging);
       }
       if (!cached) {
-        throw new HttpException(
-          '해당 지역 데이터 없음. 먼저 /place 요청 필요.',
-          HttpStatus.NOT_FOUND,
-        );
+        return {
+          locations: [],
+        };
       }
 
       // 페이지네이션 (예: 20개씩)
