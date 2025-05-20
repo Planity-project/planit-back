@@ -13,7 +13,7 @@ export class TripController {
   constructor(private readonly tripService: TripService) {}
 
   @Post('generateDate')
-  async generateDate(@Body() body: any[]) {
+  async generateDate(@Body() body: any) {
     const result = await this.tripService.generateWithGemini(body);
     return result;
   }

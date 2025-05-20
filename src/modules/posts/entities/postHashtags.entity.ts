@@ -7,7 +7,7 @@ export class PostHashtag {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   hashtag: string;
 
   @ManyToOne(() => Post, (post) => post.hashtags, { onDelete: 'CASCADE' })

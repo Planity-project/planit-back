@@ -7,7 +7,7 @@ export class PostImage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   url: string;
 
   @ManyToOne(() => Post, (post) => post.images, { onDelete: 'CASCADE' })
