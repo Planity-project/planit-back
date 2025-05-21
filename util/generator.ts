@@ -183,7 +183,8 @@ export async function requestGemini(prompt: string): Promise<string> {
 
 //프롬포트
 export function generateSchedulePrompt(body: any): string {
-  const { dataTime, dataPlace, dataStay } = body.schedule;
+  const { dataTime, dataPlace, dataStay } = body;
+
   const formatTime = (time: any) => {
     const hour =
       time.hour + (time.meridiem === '오후' && time.hour !== 12 ? 12 : 0);
@@ -191,31 +192,39 @@ export function generateSchedulePrompt(body: any): string {
     return `${hour}:${minute}`;
   };
 
-  let prompt = ``;
+  let prompt = `📅 여행 일정 요청\n`;
 
-  dataTime.forEach((day, index) => {
+  // 날짜별 정보 구성
+  dataTime.forEach((day) => {
     const date = day.date;
     const start = formatTime(day.start);
     const end = formatTime(day.end);
-
     const stay = dataStay.find((s) => s.date === date.slice(0, 10));
     const stayTitle = stay?.place?.title || '없음';
 
-    prompt += `\n하루 ${date}\n`;
-    prompt += `- 사용 가능 시간: ${start} ~ ${end}\n`;
+    prompt += `\n🗓️ ${date}\n`;
+    prompt += `- 이용 가능 시간: ${start} ~ ${end}\n`;
     prompt += `- 숙소: ${stayTitle}\n`;
   });
 
-  prompt += `\n\n🔍 방문 가능한 장소 목록:\n`;
-
+  // 장소 정보 구성
+  prompt += `\n\n📍 방문 가능한 장소 목록:\n`;
   dataPlace.forEach((place, idx) => {
-    prompt += `${idx + 1}. ${place.title} (${place.category}) - 예상 소요시간: ${place.minutes}분\n 이미지 소스 : ${place.imageSrc}`;
+    prompt += `${idx + 1}. ${place.title} (${place.category})\n   - 예상 소요시간: ${place.minutes}분\n   - 주소: ${place.address}\n   - 이미지: ${place.imageSrc || '없음'}\n`;
   });
 
-  prompt += `\n위의 장소들을 날짜별로 시간 안에 맞춰  효율적으로 방문할 수 있도록 일정으로 분배해줘.\n`;
-  prompt += `-\n- 장소 간 동선 고려도 해주고\n- 결과는 JSON 형태로 날짜별 장소 배열로 줘.\n`;
-  prompt += `양식은 1일차 : [{시간 : 어디갈지},{시간: 어디갈지}], 2일차 : {} 이런 식으로 배열에 담아서 줘 숙소면 [숙소],음식점이면 [음식점] 표현도 해주고 빈 일정이 생기면 주변 동선에 갈만한 곳 너가 넣어서 일차마다 일정 순서를 번호로 지정해주고 
-  { "2025-05-13 (화)": [  {순서 : 1, "start": "9:00",end:"11:00", "장소": "경주 탈해왕릉","위도": 35,"경도":36,주소:"", "타입": "관광지",image:"" } }, { 순서: 2, "시간": "11:00",end:"13:00", "장소": "오누이","위도": 35,"경도":36,주소:"", "타입": "음식점",image:"imageSrc" } },이런 형태로 줘 숙소는 1박마다 머무를 곳이니까 이것도 위도 경도 포함해서 작성해주고 일정은 꽉꽉 채워서`;
+  // 요청 조건
+  prompt += `\n\n📌 요청 사항:\n`;
+  prompt += `- 위 장소들을 날짜별로 시간 내에서 효율적으로 나눠서 일정 구성해줘.\n`;
+  prompt += `- 장소 간 동선을 고려해줘.\n`;
+  prompt += `- 결과는 **JSON 형태**로 날짜별 일정 배열로 구성해줘.\n`;
+  prompt += `- 형식 예시:\n`;
+  prompt += `  {\n    "2025-05-13 (화)": [\n      {\n        "순서": 1,\n        "start": "09:00",\n        "end": "11:00",\n        "장소": "경주 탈해왕릉",\n        "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "관광지",\n        "image": "..." \n      },\n      {\n        "순서": 2,\n        "start": "11:00",\n        "end": "13:00",\n        "장소": "오누이",\n        "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "음식점",\n        "image": "..." \n      }\n    ]\n  }\n`;
+
+  prompt += `- 숙소도 각 일차에 포함시켜줘 (1박마다).\n`;
+  prompt += `- 가능한 일정을 최대한 꽉 채워서 구성해줘.\n`;
+  prompt += `- 비는 시간은 인근 장소를 넣어 채워줘.\n`;
+  prompt += `- 위도 경도는 무조건 포함하고 image도 무조건 포함하고 장소, 주소도 무조건 포함해야해`;
 
   return prompt;
 }

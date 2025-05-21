@@ -34,9 +34,10 @@ export class TripService {
 
   //최종 일정 생성
   async generateWithGemini(body: any) {
-    const str = generateSchedulePrompt(body);
+    const str = generateSchedulePrompt(body.schedule);
+    console.log(body, 'body');
     let data = await requestGemini(str);
-    console.log(data);
+    console.log(data, 'geminiData');
     try {
       // ✨ 혹시 JSON 앞뒤에 설명 텍스트가 붙어 있는 경우 제거
       const jsonStart = data.indexOf('{');

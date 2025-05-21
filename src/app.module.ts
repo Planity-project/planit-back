@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { SeederModule } from './seed/seeder.module';
+import { MapModule } from './modules/map/map.module';
+import { MapService } from './modules/map/map.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -23,6 +25,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     DatabaseModule,
     SeederModule,
+    MapModule,
   ],
   controllers: [AppController],
   providers: [AppService],

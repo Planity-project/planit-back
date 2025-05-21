@@ -41,7 +41,7 @@ export class Post {
   @ManyToOne(() => User, (user) => user.post, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Location)
+  @ManyToOne(() => Location, { onDelete: 'SET NULL', nullable: true })
   location: Location;
 
   @ManyToOne(() => Notification)

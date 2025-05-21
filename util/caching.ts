@@ -1,4 +1,4 @@
-import { locationArr } from 'src/seed/seeder.services';
+import { locationArr } from 'src/seed/seeder.service';
 
 //캐시
 const tourCache = new Map<string, any[]>(); // key: 지역명, value: 장소 배열

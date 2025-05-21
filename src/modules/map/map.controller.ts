@@ -6,7 +6,9 @@ import {
   Query,
   Post,
   Body,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { MapService } from './map.service';
 import { addressToChange, shuffleArray } from 'util/generator';
 import { SearchInputNearbyDto } from './dto/SearchInputNearby.dto';
@@ -28,6 +30,11 @@ import {
   getLocationByName,
   saveToCache,
 } from 'util/caching';
+import { readFileSync } from 'fs';
+import * as fs from 'fs';
+import * as path from 'path';
+import { join } from 'path';
+import axios from 'axios';
 
 const placeTypes = [
   'tourist_attraction', // 명소
@@ -55,76 +62,68 @@ export class MapController {
     private readonly cacheService: CacheService,
   ) {}
 
-  @Get('nearby')
-  @ApiOperation({ summary: '주소 기반 관광/숙박 장소 검색' })
+  @Post('searchNearby')
+  @ApiOperation({
+    summary: '주소 + 검색어 기반 관광/숙박 장소 검색 (JSON 파일 기반)',
+  })
   @ApiResponse({ status: 200, type: NearbyResponseDto })
-  async searchNearby(@Query() query: SearchNearbyDto) {
-    const { address, page, type } = query;
-    console.log(address, 'address');
-    const cacheKeyTours = `${address}-tours`;
-    const cacheKeyLodging = `${address}-lodging`;
+  async searchInputNearby(@Body() body: SearchInputNearbyDto) {
+    const { address, page = 0, type, str } = body;
+
     if (!address) {
       throw new HttpException('주소 입력 필요.', HttpStatus.BAD_REQUEST);
     }
 
     try {
-      let cached: any[] | null;
-      if (Number(type) === 1) {
-        cached = await this.cacheService.get<any[]>(cacheKeyTours);
-      } else {
-        cached = await this.cacheService.get<any[]>(cacheKeyLodging);
-      }
-      if (!cached) {
-        return {
-          locations: [],
-          isProcessing: true,
-          message: '해당 지역 데이터 캐싱 중. 잠시 후 다시 시도.',
-        };
-      }
-
-      // 페이지네이션 (예: 20개씩)
-      const pageSize = Number(page) === 1 ? 20 : 10;
-      const paged = cached.slice(
-        Number(page) * pageSize,
-        (Number(page) + 1) * pageSize,
+      const placesFilePath = path.join(
+        process.cwd(),
+        'src',
+        'seed',
+        'data',
+        'places.json',
       );
+      const rawData = fs.readFileSync(placesFilePath, 'utf-8');
+      const placesData = JSON.parse(rawData);
 
-      return { locations: shuffleArray(paged) };
+      const regionPlaces = placesData[address];
+      if (!regionPlaces) {
+        throw new HttpException(
+          '해당 지역을 찾을 수 없습니다.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      let filtered = regionPlaces;
+
+      // 검색어(str) 포함 필터링
+      if (str && str.trim() !== '') {
+        const keyword = str.trim().toLowerCase();
+        filtered = filtered.filter((place) =>
+          place.title.toLowerCase().includes(keyword),
+        );
+      }
+
+      // type에 따른 카테고리 필터링
+      if (type === 1) {
+        const allowedCategories = ['명소', '식당', '카페'];
+        filtered = filtered.filter((place) =>
+          allowedCategories.includes(place.category),
+        );
+      } else if (type === 2) {
+        filtered = filtered.filter((place) => place.category === '숙소');
+      }
+
+      // 페이징 처리 (page 0은 10개, 이후는 10개씩)
+      const pageSize = 10;
+      const startIdx = page === 0 ? 0 : 20 + (Number(page) - 1) * 10;
+      const paged = filtered.slice(startIdx, startIdx + pageSize);
+
+      // 첫 페이지는 셔플
+      const resultList = page === 0 ? shuffleArray(paged) : paged;
+
+      return { locations: resultList };
     } catch (error) {
-      console.error('searchNearby', error);
-      throw new HttpException('서버 오류.', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @Get('searchNearby')
-  @ApiOperation({ summary: '주소 + 검색어 기반 관광/숙박 장소 검색' })
-  @ApiResponse({ status: 200, type: NearbyResponseDto })
-  async searchInputNearby(@Query() query: SearchInputNearbyDto) {
-    const { address, page, type, str } = query;
-
-    if (!address) {
-      throw new HttpException('주소 입력 필요.', HttpStatus.BAD_REQUEST);
-    }
-
-    try {
-      const { latitude, longitude } = await addressToChange(address);
-      const locations =
-        Number(type) === 1
-          ? await this.mapService.searchInputTours(
-              latitude,
-              longitude,
-              Number(page),
-              str,
-            )
-          : await this.mapService.searchStayInputTours(
-              latitude,
-              longitude,
-              Number(page),
-              str,
-            );
-      return { locations };
-    } catch (error) {
-      console.error('searchInputNearby', error);
+      console.error('searchInputNearby error:', error);
       throw new HttpException('서버 오류.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -139,103 +138,8 @@ export class MapController {
     return this.mapService.searchPlacesLatLng(latitude, longitude);
   }
 
-  @Get('place')
-  async getByRegion(@Query('name') name: string) {
-    if (!name) {
-      console.log('지역명 없음');
-      throw new HttpException('지역명이 필요합니다.', HttpStatus.BAD_REQUEST);
-    }
-
-    console.log('요청 받은 지역명:', name);
-
-    const cacheKeyTours = `${name}-tours`;
-    const cacheKeyLodging = `${name}-lodging`;
-
-    const [cachedTours, cachedLodging] = await Promise.all([
-      this.cacheService.get(cacheKeyTours),
-      this.cacheService.get(cacheKeyLodging),
-    ]);
-
-    console.log('캐시 조회:', {
-      tours: cachedTours?.length ?? 0,
-      lodging: cachedLodging?.length ?? 0,
-    });
-
-    if (cachedTours && cachedLodging) {
-      console.log('캐시 데이터 반환');
-      return true;
-    }
-
-    const regionInfo = getLocationByName(name);
-    if (!regionInfo) {
-      console.log('지역 정보 없음');
-      throw new HttpException(
-        '해당 지역을 찾을 수 없습니다.',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const { lat, lng } = regionInfo;
-    const tourCategories = ['tourist_attraction', 'restaurant', 'cafe'];
-
-    const tourTasks: Promise<any[]>[] = [];
-    const lodgingTasks: Promise<any[]>[] = [];
-
-    // 중심 좌표 한 번만 사용
-    for (let page = 0; page <= 2; page++) {
-      for (const category of tourCategories) {
-        tourTasks.push(
-          this.mapService.searchToursGoogle(
-            String(lat),
-            String(lng),
-            page,
-            category,
-          ),
-        );
-      }
-
-      lodgingTasks.push(
-        this.mapService.searchToursGoogle(
-          String(lat),
-          String(lng),
-          page,
-          'lodging',
-        ),
-      );
-    }
-
-    const [tourResultsArrays, lodgingResultsArrays] = await Promise.all([
-      Promise.all(tourTasks),
-      Promise.all(lodgingTasks),
-    ]);
-
-    const allTourResults = tourResultsArrays.flat();
-    const allLodgingResults = lodgingResultsArrays.flat();
-
-    console.log('총 관광지 결과 개수:', allTourResults.length);
-    console.log('총 숙소 결과 개수:', allLodgingResults.length);
-
-    const dedupedTours = dedupePlaces(allTourResults);
-    const dedupedLodging = dedupePlaces(allLodgingResults);
-
-    console.log(name + ' 중복 제거 후 관광지 개수', dedupedTours.length);
-    console.log(name + ' 중복 제거 후 숙소 개수', dedupedLodging.length);
-
-    await Promise.all([
-      this.cacheService.set(cacheKeyTours, shuffleArray(dedupedTours), {
-        ttl: 60 * 60 * 24,
-      }),
-      this.cacheService.set(cacheKeyLodging, dedupedLodging, {
-        ttl: 60 * 60 * 24,
-      }),
-    ]);
-
-    console.log('캐시 저장 완료');
-    return true;
-  }
-
   @Post('nearby')
-  @ApiOperation({ summary: '주소 + 카테고리 필터 기반 관광/숙박 장소 검색' })
+  @ApiOperation({ summary: 'JSON 데이터 기반 관광/숙박 장소 검색' })
   @ApiResponse({ status: 200, type: NearbyResponseDto })
   async searchNearby2(@Body() body: SearchNearbyDto) {
     const { address, page = 0, type, categories } = body;
@@ -245,44 +149,76 @@ export class MapController {
     }
 
     try {
-      const cacheKeyTours = `${address}-tours`;
-      const cacheKeyLodging = `${address}-lodging`;
+      const placesFilePath = join(
+        process.cwd(),
+        'src',
+        'seed',
+        'data',
+        'places.json',
+      );
 
-      let cached: any[] | null;
+      const rawData = readFileSync(placesFilePath, 'utf-8');
+      const placesData = JSON.parse(rawData);
 
-      if (Number(type) === 1) {
-        cached = await this.cacheService.get<any[]>(cacheKeyTours);
-      } else {
-        cached = await this.cacheService.get<any[]>(cacheKeyLodging);
-      }
-
-      if (!cached) {
-        return {
-          locations: [],
-          isProcessing: true,
-          message: '해당 지역 데이터 캐싱 중. 잠시 후 다시 시도.',
-        };
-      }
-
-      // categories가 없거나 빈 배열이면 필터링 없이 전체 사용
-      let filtered = cached;
-      if (Array.isArray(categories) && categories.length > 0) {
-        filtered = cached.filter((place) =>
-          // place.category가 배열이면 some, 아니면 includes
-          Array.isArray(place.category)
-            ? place.category.some((cat: string) => categories.includes(cat))
-            : categories.includes(place.category),
+      const regionPlaces = placesData[address];
+      if (!regionPlaces) {
+        throw new HttpException(
+          '해당 지역을 찾을 수 없습니다.',
+          HttpStatus.NOT_FOUND,
         );
       }
 
-      // 페이지네이션 (20개씩)
-      const pageSize = page === 0 ? 20 : 10;
-      const paged = filtered.slice(page * pageSize, (page + 1) * pageSize);
+      // type에 따른 카테고리 필터링
+      let filtered = regionPlaces;
 
-      return { locations: paged };
+      if (type === 1) {
+        // type 1 → 명소, 식당, 카페
+        const allowedCategories = ['명소', '식당', '카페'];
+        filtered = filtered.filter((place) =>
+          allowedCategories.includes(place.category),
+        );
+      } else if (type === 2) {
+        // type 2 → 숙소만
+        filtered = filtered.filter((place) => place.category === '숙소');
+      }
+
+      // 추가로, body.categories 배열이 있으면 거기에 맞게 필터링
+      if (Array.isArray(categories) && categories.length > 0) {
+        filtered = filtered.filter((place) =>
+          categories.includes(place.category),
+        );
+      }
+
+      // 페이지 사이즈: page가 0일 때 20개, 이후 페이지는 10개씩
+      const pageSize = page === 0 ? 10 : 10;
+
+      const startIdx = page === 0 ? 0 : 20 + (page - 1) * 10;
+      const paged = filtered.slice(startIdx, startIdx + pageSize);
+      console.log('시작', paged, '끝');
+      // 셔플은 첫 페이지에서만 실행
+      const shuffled = page === 0 ? shuffleArray(paged) : paged;
+      return { locations: shuffled };
     } catch (error) {
-      console.error('searchNearby', error);
+      console.error('searchNearby error:', error);
       throw new HttpException('서버 오류.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  //구글 이미지 얻어오는 주소
+  @Get('photo-proxy')
+  @ApiOperation({ summary: 'Google Place 이미지 프록시' })
+  @ApiResponse({ status: 200, description: '이미지 스트림 반환' })
+  async proxyPhoto(@Query('ref') ref: string, @Res() res: Response) {
+    try {
+      const key = process.env.GOOGLE_MAP_KEY;
+      const url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${ref}&key=${key}`;
+      const response = await axios.get(url, { responseType: 'stream' });
+
+      res.setHeader('Content-Type', response.headers['content-type']);
+      response.data.pipe(res);
+    } catch (error) {
+      console.error('photo-proxy error:', error.message);
+      throw new HttpException('이미지 요청 실패', HttpStatus.BAD_GATEWAY);
     }
   }
 }
