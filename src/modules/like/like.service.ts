@@ -99,7 +99,7 @@ export class LikeService {
     });
   }
 
-  // ✅ 내가 찜한 소설 목록 조회
+  // ✅ 내가 찜한 게시글 목록 조회
   async findLikedPosts(userId: number): Promise<any[]> {
     const likes = await this.entityManager.find(Like, {
       where: {

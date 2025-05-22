@@ -10,8 +10,9 @@ import { Report } from 'src/modules/reports/entities/report.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
 import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
+import { Trip } from 'src/modules/trips/entities/trips.entity';
 
-export type NotificationType = 'NORMAL' | 'ALBUM' | 'REPORT';
+export type NotificationType = 'POST' | 'ALBUM' | 'REPORT' | 'TRIP';
 export type NotificationStatus = 'UNREAD' | 'READ';
 
 @Entity('notification')
@@ -24,13 +25,14 @@ export class Notification {
 
   @Column({
     type: 'enum',
-    enum: ['NORMAL', 'ALBUM', 'REPORT'],
-    default: 'NORMAL',
+    enum: ['POST', 'ALBUM', 'REPORT', 'TRIP'],
+    default: 'POST',
   })
   type: NotificationType;
-  // NORMAL: 댓글, 대댓글, 좋아요 등
-  // ALBUM: 그룹 초대, 앨범 등록 알림 등
+  // POST : 좋아요 알림
+  // ALBUM: 그룹 초대, 앨범 등록, 댓글, 대댓글, 좋아요 알림 등
   // REPORT: 신고 처리 알림
+  // TRIP : 일정 평점 알림
 
   @Column({ type: 'enum', enum: ['UNREAD', 'READ'], default: 'UNREAD' })
   status: NotificationStatus;
@@ -38,8 +40,12 @@ export class Notification {
   @CreateDateColumn()
   createdAt: Date;
 
+  // Trip 알림용
+  @Column({ type: 'timestamp', nullable: true })
+  notifyAt: Date | null;
+
   @Column({ default: false })
-  isRead: boolean;
+  isSent: boolean;
 
   // 📚 관계 설정
 
@@ -69,4 +75,10 @@ export class Notification {
     onDelete: 'CASCADE',
   })
   albumGroup: AlbumGroup | null;
+
+  @ManyToOne(() => Trip, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  trip: Trip | null;
 }

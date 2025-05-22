@@ -15,7 +15,6 @@ import { Post } from 'src/modules/posts/entities/post.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
 import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
-import { TripsNotification } from 'src/modules/tripsnotification/entities/tripsnotifications.entity';
 
 export enum LoginType {
   KAKAO = 'kakao',
@@ -84,7 +83,4 @@ export class User {
 
   @OneToMany(() => Trip, (trip) => trip.user)
   trips: Trip[];
-
-  @OneToMany(() => TripsNotification, (tn) => tn.user)
-  tripNotifications: TripsNotification[];
 }

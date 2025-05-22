@@ -17,7 +17,6 @@ import { MapModule } from 'src/modules/map/map.module';
 import { BannerModule } from 'src/modules/admin/banner/banner.module';
 import { ReportModule } from 'src/modules/reports/report.module';
 import { GeminiModule } from 'src/modules/gemini/gemini.module';
-import { TripsNotificationModule } from 'src/modules/tripsnotification/tripsnotification.module';
 import { SchedulerModule } from 'src/modules/scheduler/scheduler.module';
 
 import { Report } from 'src/modules/reports/entities/report.entity';
@@ -40,7 +39,6 @@ import { Place } from 'src/modules/trips/entities/place.entity';
 import { TripDay } from 'src/modules/trips/entities/tripday.entity';
 import { TripScheduleItem } from 'src/modules/trips/entities/tripscheduleitems.entity';
 import { Banner } from 'src/modules/admin/banner/entities/banner.entity';
-import { TripsNotification } from 'src/modules/tripsnotification/entities/tripsnotifications.entity';
 
 dotenv.config();
 
@@ -74,7 +72,6 @@ dotenv.config();
         TripDay,
         TripScheduleItem,
         Banner,
-        TripsNotification,
       ],
       synchronize: true,
       logging: false,
@@ -113,7 +110,6 @@ dotenv.config();
     BannerModule,
     ReportModule,
     GeminiModule,
-    TripsNotificationModule,
     SchedulerModule,
   ],
   exports: [TypeOrmModule],

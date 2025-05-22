@@ -1,16 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, LessThanOrEqual } from 'typeorm';
 import { Notification } from './entities/notification.entity';
 import { SendNotificationDto } from './dto/SendNotification.dto';
+import { Trip } from 'src/modules/trips/entities/trips.entity';
 
 @Injectable()
 export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private notificationRepository: Repository<Notification>,
+
+    @InjectRepository(Trip)
+    private readonly tripRepository: Repository<Trip>,
   ) {}
 
+  // ✅ 유저의 모든 알림 조회
   async getUserNotification(userId: number): Promise<Notification[]> {
     return this.notificationRepository.find({
       where: { user: { id: userId } },
@@ -18,24 +23,32 @@ export class NotificationService {
     });
   }
 
+  // ✅ 일반 알림 전송
   async sendNotification({
     user,
     content,
     post = null,
     report = null,
+    album = null,
+    albumGroup = null,
+    trip = null,
     type,
   }: SendNotificationDto) {
     const notification = this.notificationRepository.create({
-      user,
+      user: { id: user.id },
+      post: post ? { id: post.id } : null,
+      report: report ? { id: report.id } : null,
+      album: album ? { id: album.id } : null,
+      albumGroup: albumGroup ? { id: albumGroup.id } : null,
+      trip: trip ? { id: trip.id } : null,
       content,
-      post,
-      report,
       type,
     });
 
     return await this.notificationRepository.save(notification);
   }
 
+  // ✅ 알림 읽음 처리
   async markNoticeAsRead(
     noticeId: number,
     userId: number,
@@ -49,16 +62,78 @@ export class NotificationService {
     });
 
     if (!notification) {
-      console.log(`❌ 알림 ${noticeId} (user: ${userId}) 찾을 수 없음`);
       throw new Error('해당 유저의 알림을 찾을 수 없습니다.');
     }
 
-    // 읽음 상태 변경
-    notification.isRead = true;
-    const saved = await this.notificationRepository.save(notification);
+    notification.status = 'READ';
+    return await this.notificationRepository.save(notification);
+  }
 
-    console.log(`✅ 알림 ${noticeId} 읽음 처리 완료 (user: ${userId})`);
+  // ✅ 여행 종료 후 다음날 알림 예약
+  async createNotificationForTrip(
+    userId: number,
+    tripId: number,
+    endDate: Date,
+  ) {
+    const notifyAt = new Date(endDate);
+    notifyAt.setDate(notifyAt.getDate() + 1);
 
-    return saved;
+    const exists = await this.notificationRepository.findOne({
+      where: {
+        user: { id: userId },
+        trip: { id: tripId },
+      },
+    });
+
+    if (!exists) {
+      const notification = this.notificationRepository.create({
+        notifyAt,
+        user: { id: userId },
+        trip: { id: tripId },
+        type: 'TRIP',
+        content: '여행이 종료되었습니다. 평점을 남겨주세요.',
+      });
+      await this.notificationRepository.save(notification);
+    }
+  }
+
+  // ✅ 알림 발송 시점 도달한 여행 알림 처리
+  async sendTripNotifications(currentTime: Date) {
+    const notifications = await this.notificationRepository.find({
+      where: {
+        notifyAt: LessThanOrEqual(currentTime),
+        isSent: false,
+        type: 'TRIP',
+      },
+      relations: ['user', 'trip'],
+    });
+
+    for (const notification of notifications) {
+      // TODO: 알림 전송 로직 추가
+      notification.isSent = true;
+      await this.notificationRepository.save(notification);
+    }
+  }
+
+  // ✅ 평점 제출 후 여행 알림 제거
+  async submitTripRating(userId: number, tripId: number, rating: number) {
+    const trip = await this.tripRepository.findOne({
+      where: {
+        id: tripId,
+        user: { id: userId },
+      },
+    });
+
+    if (!trip) {
+      throw new NotFoundException('Trip not found');
+    }
+
+    trip.rating = rating;
+    await this.tripRepository.save(trip);
+
+    await this.notificationRepository.delete({
+      user: { id: userId },
+      trip: { id: tripId },
+    });
   }
 }

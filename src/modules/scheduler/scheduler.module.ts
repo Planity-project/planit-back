@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SchedulerService } from './scheduler.service';
-import { TripsNotificationModule } from 'src/modules/tripsnotification/tripsnotification.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), TripsNotificationModule],
+  imports: [ScheduleModule.forRoot(), NotificationModule],
   providers: [SchedulerService],
 })
 export class SchedulerModule {}

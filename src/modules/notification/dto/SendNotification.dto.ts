@@ -30,10 +30,31 @@ export class SendNotificationDto {
   report?: any | null;
 
   @ApiPropertyOptional({
-    example: 'REPORT',
-    description: '알림 유형 (NORMAL | ALBUM | REPORT)',
+    example: { id: 3, name: '가족여행 앨범' },
+    description: '관련 앨범 정보 (선택)',
   })
   @IsOptional()
-  @IsEnum(['NORMAL', 'ALBUM', 'REPORT'])
-  type?: 'NORMAL' | 'ALBUM' | 'REPORT';
+  album?: any | null;
+
+  @ApiPropertyOptional({
+    example: { id: 2, title: '가족 앨범 그룹' },
+    description: '관련 앨범 그룹 정보 (선택)',
+  })
+  @IsOptional()
+  albumGroup?: any | null;
+
+  @ApiPropertyOptional({
+    example: { id: 7, title: '제주도 여행' },
+    description: '관련 여행 정보 (선택)',
+  })
+  @IsOptional()
+  trip?: any | null;
+
+  @ApiPropertyOptional({
+    example: 'REPORT',
+    description: '알림 유형 (NORMAL | ALBUM | REPORT | POST | TRIP)',
+  })
+  @IsOptional()
+  @IsEnum(['ALBUM', 'REPORT', 'POST', 'TRIP'])
+  type?: 'ALBUM' | 'REPORT' | 'POST' | 'TRIP';
 }
