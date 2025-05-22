@@ -88,6 +88,8 @@ export class TripService {
             주소: address,
             타입: category,
             image,
+            rating,
+            reviewCount,
           } = item;
           console.log(
             todayOrder,
@@ -111,6 +113,8 @@ export class TripService {
             trip: trip,
             tripDay: savedDay,
             image: image,
+            rating: rating,
+            reviewCount: reviewCount,
           });
 
           // 📌 일정 저장

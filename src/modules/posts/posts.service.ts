@@ -138,6 +138,8 @@ export class PostsService {
         endTime: result.trip.tripDays[result.trip.tripDays.length - 1].date,
         lat: place.lat,
         lng: place.lng,
+        rating: place.rating,
+        reviewCount: place.reviewCount,
       }));
     }
 

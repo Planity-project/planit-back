@@ -36,6 +36,11 @@ export class Place {
   @Column({ type: 'longtext', nullable: true })
   image: string;
 
+  @Column({ type: 'longtext', nullable: true })
+  rating: number;
+
+  @Column({ type: 'longtext', nullable: true })
+  reviewCount: number;
   // 📚 관계 설정
   @ManyToOne(() => Trip, (trip) => trip.place)
   trip: Trip;
