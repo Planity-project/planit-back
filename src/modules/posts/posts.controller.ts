@@ -24,10 +24,12 @@ import {
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiTags,
+  ApiExtraModels,
 } from '@nestjs/swagger';
 import { CreatePostDto } from './dto/create-post.dto';
 import { SERVER_DOMAIN } from 'util/api';
 @Controller('posts')
+@ApiExtraModels()
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
