@@ -29,8 +29,15 @@ import { FilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { AlbumImageSubmitDto } from './dto/albumImageSubmit.dto';
+import { UpdateAlbumDto } from './dto/updateAlbum.dto';
+import { getDetailDataDto } from './dto/getDetailData.dto';
 @ApiTags('Album')
-@ApiExtraModels(SubmitAlbumDto, UserRoleDto, AlbumImageSubmitDto)
+@ApiExtraModels(
+  SubmitAlbumDto,
+  UserRoleDto,
+  AlbumImageSubmitDto,
+  getDetailDataDto,
+)
 @Controller('album')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
@@ -142,10 +149,10 @@ export class AlbumController {
     return { result: result };
   }
 
-  @Post('update/album')
+  @Post('update/title')
   @ApiOperation({
-    summary: '해당 앨범 타이틀 수정',
-    description: '',
+    summary: '해당 앨범 타이틀 및 이미지 수정',
+    description: '타이틀 또는 대표 이미지 중 하나만 수정도 가능',
   })
   @UseInterceptors(
     FileInterceptor('file', {
@@ -165,31 +172,44 @@ export class AlbumController {
   @ApiBody({ type: AlbumImageSubmitDto })
   @ApiResponse({
     status: 201,
-    description: '업로드 결과 반환',
+    description: '업데이트 결과 반환',
     schema: {
       example: {
         result: true,
+        message: '앨범이 성공적으로 업데이트되었습니다.',
       },
     },
   })
   async albumHeadUpdate(
-    @UploadedFile() file: Express.Multer.File,
     @Body()
-    body: {
-      albumId: number;
-      userId: number;
-      title: string;
-    },
+    body: UpdateAlbumDto,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     const { albumId, userId, title } = body;
-    const fileUrl = `/uploads/albums/head/${file.filename}`;
+
+    // file이 있을 때만 URL 설정
+    const fileUrl = file ? `/uploads/albums/head/${file.filename}` : null;
 
     const result = await this.albumService.albumUpdateHead(
       albumId,
       userId,
-      fileUrl, // 서비스가 배열로 받는다면 여전히 배열로 넘겨야 함
+      fileUrl,
       title,
     );
     return result;
+  }
+
+  @Get('photoinfo')
+  @ApiResponse({
+    status: 200,
+    description: '앨범 이미지 상세 정보',
+    type: getDetailDataDto,
+  })
+  @ApiOperation({
+    summary: '앨범 상세 조회',
+    description: '특정 앨범의 상세 정보를 조회합니다.',
+  })
+  async getAlbumPhotoData(@Param('AlbumId') albumId: number) {
+    return await this.albumService.findDetailData(albumId);
   }
 }

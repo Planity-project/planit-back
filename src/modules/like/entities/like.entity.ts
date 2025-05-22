@@ -8,6 +8,7 @@ import {
 import { User } from 'src/modules/user/entities/user.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
+import { AlbumImage } from 'src/modules/album/entities/albumImage';
 
 @Entity('likes')
 export class Like {
@@ -36,4 +37,10 @@ export class Like {
     nullable: true,
   })
   comment: Comment | null;
+
+  @ManyToOne(() => AlbumImage, (albumImage) => albumImage.likes, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  albumImage: AlbumImage | null;
 }

@@ -8,6 +8,7 @@ import { AlbumGroup } from './entities/albumGroup.entity';
 import { AlbumImage } from './entities/albumImage';
 import { User } from '../user/entities/user.entity';
 import { Comment } from '../comment/entities/comment.entity';
+import { Like } from '../like/entities/like.entity';
 
 @Module({
   imports: [

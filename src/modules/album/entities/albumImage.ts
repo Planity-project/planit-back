@@ -10,7 +10,7 @@ import {
 import { User } from 'src/modules/user/entities/user.entity';
 import { Album } from './album.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
-
+import { Like } from 'src/modules/like/entities/like.entity';
 @Entity('album_images')
 export class AlbumImage {
   @PrimaryGeneratedColumn()
@@ -40,4 +40,7 @@ export class AlbumImage {
 
   @OneToMany(() => Comment, (comment) => comment.albumImage)
   comments: Comment[];
+
+  @OneToMany(() => Like, (like) => like.albumImage)
+  likes: Like[];
 }
