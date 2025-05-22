@@ -160,6 +160,7 @@ export class PostsService {
       like: likeCheck ? true : false,
       likeCnt: result.likes.length,
       image: result.images,
+      type: result.type,
       ...dayData,
     };
 
