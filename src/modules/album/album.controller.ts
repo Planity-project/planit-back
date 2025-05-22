@@ -7,6 +7,9 @@ import {
   Param,
   Query,
   Delete,
+  UseInterceptors,
+  UploadedFiles,
+  UploadedFile,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import {
@@ -22,8 +25,12 @@ import {
 import { SubmitAlbumDto, SubmitAlbumResponseDto } from './dto/submitAlbum.dto';
 import { UserRoleDto } from './dto/userrole.dto';
 import { findAllAlbumDto } from './dto/findAllAlbum.dto';
+import { FilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { AlbumImageSubmitDto } from './dto/albumImageSubmit.dto';
 @ApiTags('Album')
-@ApiExtraModels(SubmitAlbumDto, UserRoleDto)
+@ApiExtraModels(SubmitAlbumDto, UserRoleDto, AlbumImageSubmitDto)
 @Controller('album')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
@@ -82,5 +89,107 @@ export class AlbumController {
   ) {
     const role = await this.albumService.getAlbumRole(albumId, userId);
     return { role }; // { role: 'OWNER' } 또는 { role: 'MEMBER' }
+  }
+
+  @Post('submitImage')
+  @ApiOperation({
+    summary: '해당 앨범 이미지 등록',
+    description: '',
+  })
+  @UseInterceptors(
+    FilesInterceptor('files', 5, {
+      storage: diskStorage({
+        destination: './uploads/albums/images', // 저장할 경로 지정
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `album-${uniqueSuffix}${ext}`; // 파일명 설정
+          callback(null, filename);
+        },
+      }),
+      limits: { fileSize: 1024 * 1024 * 5 }, // 5MB 제한
+    }),
+  )
+  @ApiBody({ type: AlbumImageSubmitDto })
+  @ApiResponse({
+    status: 201,
+    description: '업로드 결과 반환',
+    schema: {
+      example: {
+        result: true,
+      },
+    },
+  })
+  async albumImageSubmit(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body()
+    body: {
+      albumId: number;
+      userId: number;
+    },
+  ) {
+    const { albumId, userId } = body;
+    const fileUrls = files.map((file) => {
+      // 서버 URL이 있다면 http://localhost:3000/uploads/albums/filename 이런 식으로 가능
+      return `/uploads/albums/images/${file.filename}`;
+    });
+    const result = await this.albumService.albumSubmitImage(
+      albumId,
+      userId,
+      fileUrls,
+    );
+    return { result: result };
+  }
+
+  @Post('update/album')
+  @ApiOperation({
+    summary: '해당 앨범 타이틀 수정',
+    description: '',
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/albums/head',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `album-${uniqueSuffix}${ext}`;
+          callback(null, filename);
+        },
+      }),
+      limits: { fileSize: 1024 * 1024 * 5 }, // 5MB 제한
+    }),
+  )
+  @ApiBody({ type: AlbumImageSubmitDto })
+  @ApiResponse({
+    status: 201,
+    description: '업로드 결과 반환',
+    schema: {
+      example: {
+        result: true,
+      },
+    },
+  })
+  async albumHeadUpdate(
+    @UploadedFile() file: Express.Multer.File,
+    @Body()
+    body: {
+      albumId: number;
+      userId: number;
+      title: string;
+    },
+  ) {
+    const { albumId, userId, title } = body;
+    const fileUrl = `/uploads/albums/head/${file.filename}`;
+
+    const result = await this.albumService.albumUpdateHead(
+      albumId,
+      userId,
+      fileUrl, // 서비스가 배열로 받는다면 여전히 배열로 넘겨야 함
+      title,
+    );
+    return result;
   }
 }

@@ -125,4 +125,48 @@ export class AlbumService {
 
     return { items, total };
   }
+
+  async albumSubmitImage(
+    albumId: number,
+    userId: number,
+    fileArr: string[],
+  ): Promise<boolean> {
+    const albumImage = this.albumImageRepository.create({
+      images: fileArr,
+      album: { id: albumId }, // 관계만 연결
+      user: { id: userId },
+      likeCnt: 0,
+      commentCnt: 0,
+    });
+
+    await this.albumImageRepository.save(albumImage);
+    return true;
+  }
+
+  async albumUpdateHead(
+    albumId: number,
+    userId: number,
+    fileUrl: string | null,
+    title: string,
+  ): Promise<{ result: boolean; message: string }> {
+    const album = await this.albumRepository.findOne({
+      where: { id: albumId, user: { id: userId } },
+    });
+
+    if (!album) {
+      return { result: false, message: '앨범을 찾을 수 없습니다.' };
+    }
+    if (title.length <= 0) {
+      return { result: false, message: '앨범 제목을 입력해주세요.' };
+    }
+    album.title = title;
+
+    // fileUrl이 전달되었으면 titleImg 수정, 아니면 그대로 유지
+    if (fileUrl) {
+      album.titleImg = fileUrl;
+    }
+
+    await this.albumRepository.save(album);
+    return { result: true, message: '앨범 업데이트 성공' };
+  }
 }

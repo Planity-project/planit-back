@@ -12,11 +12,12 @@ import {
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentDto } from './dto/payment.dto';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiExtraModels } from '@nestjs/swagger';
 import { Response } from 'express';
 import { REDIRECT_URL } from 'util/api';
 
 @ApiTags('Payments')
+@ApiExtraModels(PaymentDto)
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
@@ -48,6 +49,7 @@ export class PaymentsController {
   @ApiResponse({
     status: 200,
     description: '사용자의 결제 내역 조회',
+    type: PaymentDto,
   })
   async getUserPayments(@Param('userId') userId: string) {
     const payments = await this.paymentsService.getPaymentsByUserId(userId);

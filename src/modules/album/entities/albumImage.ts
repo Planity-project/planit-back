@@ -16,8 +16,8 @@ export class AlbumImage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
-  image: string;
+  @Column('simple-array', { nullable: true })
+  images: string[];
 
   @Column({ nullable: true })
   likeCnt: number;
