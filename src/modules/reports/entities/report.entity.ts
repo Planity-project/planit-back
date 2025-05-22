@@ -8,10 +8,8 @@ import {
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Notification } from 'src/modules/notification/entities/notification.entity';
-import { Post } from 'src/modules/posts/entities/post.entity';
 
 export enum TargetType {
-  POST = 'post',
   COMMENT = 'comment',
   USER = 'user',
 }
@@ -51,9 +49,4 @@ export class Report {
     cascade: true,
   })
   notification: Notification[];
-
-  @ManyToOne(() => Post, (post) => post.reports, {
-    onDelete: 'CASCADE',
-  })
-  post: Post;
 }

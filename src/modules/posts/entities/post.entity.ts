@@ -53,9 +53,6 @@ export class Post {
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
 
-  @OneToMany(() => Report, (report) => report.post)
-  reports: Report[];
-
   @OneToOne(() => Trip, (trip) => trip.post, { onDelete: 'CASCADE' })
   @JoinColumn()
   trip: Trip;
