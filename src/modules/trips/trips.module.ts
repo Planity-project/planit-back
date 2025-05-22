@@ -25,5 +25,6 @@ import { PostHashtag } from '../posts/entities/postHashtags.entity';
   ],
   controllers: [TripController],
   providers: [TripService],
+  exports: [TripService],
 })
-export class TravelModule {}
+export class TripsModule {}

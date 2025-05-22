@@ -19,6 +19,7 @@ export class CommentService {
     private readonly reportRepository: Repository<Report>,
   ) {}
 
+  // 대댓글 (대댓글 닉네임 추가하기)
   // 댓글 생성
   async createComment({
     userId,

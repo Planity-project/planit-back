@@ -56,6 +56,7 @@ export class Place {
   reviewCount: number;
 
   // 📚 관계 설정
+
   @ApiProperty({ type: () => Trip })
   @ManyToOne(() => Trip, (trip) => trip.place, { onDelete: 'CASCADE' })
   trip: Trip;

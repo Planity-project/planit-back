@@ -10,7 +10,7 @@ import { LikeModule } from 'src/modules/like/like.module';
 import { LocationModule } from 'src/modules/location/location.module';
 import { NotificationModule } from 'src/modules/notification/notification.module';
 import { PaymentsModule } from 'src/modules/payments/payments.module';
-import { TravelModule } from 'src/modules/trips/trips.module';
+import { TripsModule } from 'src/modules/trips/trips.module';
 import { PostsModule } from 'src/modules/posts/posts.module';
 import { UserModule } from 'src/modules/user/user.module';
 import { MapModule } from 'src/modules/map/map.module';
@@ -105,7 +105,7 @@ dotenv.config();
     NotificationModule,
     PaymentsModule,
     PostsModule,
-    TravelModule,
+    TripsModule,
     MapModule,
     BannerModule,
     ReportModule,

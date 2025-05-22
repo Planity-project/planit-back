@@ -4,6 +4,7 @@ import { Repository, LessThanOrEqual } from 'typeorm';
 import { Notification } from './entities/notification.entity';
 import { SendNotificationDto } from './dto/SendNotification.dto';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 
 @Injectable()
 export class NotificationService {
@@ -13,6 +14,9 @@ export class NotificationService {
 
     @InjectRepository(Trip)
     private readonly tripRepository: Repository<Trip>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   // ✅ 유저의 모든 알림 조회
@@ -70,11 +74,7 @@ export class NotificationService {
   }
 
   // ✅ 여행 종료 후 다음날 알림 예약
-  async createNotificationForTrip(
-    userId: number,
-    tripId: number,
-    endDate: Date,
-  ) {
+  async createNotificationTrip(userId: number, tripId: number, endDate: Date) {
     const notifyAt = new Date(endDate);
     notifyAt.setDate(notifyAt.getDate() + 1);
 
@@ -135,5 +135,36 @@ export class NotificationService {
       user: { id: userId },
       trip: { id: tripId },
     });
+  }
+
+  // ✅ 여행 종료일이 오늘인 사용자들에게 다음날 알림 예약
+  async createNotificationsEndTrips(today: Date) {
+    const trips = await this.tripRepository.find({
+      where: { endDate: today },
+      relations: ['user'],
+    });
+
+    for (const trip of trips) {
+      await this.createNotificationTrip(trip.user.id, trip.id, trip.endDate);
+    }
+  }
+
+  // ✅ 알림 일정 보내기
+  async sendShareTripNotification(
+    userId: number,
+    tripId: number,
+    tripTitle: string,
+  ) {
+    const content = `여행 "${tripTitle}"을(를) 공유하시겠습니까?`;
+
+    const notification = this.notificationRepository.create({
+      user: { id: userId },
+      trip: { id: tripId },
+      content,
+      type: 'TRIP',
+      notifyAt: new Date(),
+    });
+
+    await this.notificationRepository.save(notification);
   }
 }

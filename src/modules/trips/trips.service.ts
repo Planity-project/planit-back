@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 
 import { Place } from './entities/place.entity';
 import { TripDay } from './entities/tripday.entity';
@@ -206,5 +206,34 @@ export class TripService {
 
     console.log(data[0].tripDays[0].places, 'data');
     return data;
+  }
+
+  // 여행 일정 비교해서 끝난 유저, 일정 찾기
+  async getTripsEndYesterday(currentDate: Date): Promise<
+    {
+      userId: number;
+      tripId: number;
+      tripTitle: string;
+    }[]
+  > {
+    const startOfYesterday = new Date(currentDate);
+    startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+    startOfYesterday.setHours(0, 0, 0, 0);
+
+    const endOfYesterday = new Date(startOfYesterday);
+    endOfYesterday.setHours(23, 59, 59, 999);
+
+    const trips = await this.tripRepository.find({
+      where: {
+        endDate: Between(startOfYesterday, endOfYesterday),
+      },
+      relations: ['user'],
+    });
+
+    return trips.map((trip) => ({
+      userId: trip.user.id,
+      tripId: trip.id,
+      tripTitle: trip.title,
+    }));
   }
 }
