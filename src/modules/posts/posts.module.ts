@@ -9,6 +9,7 @@ import { PostImage } from './entities/postImage.entity';
 import { Trip } from '../trips/entities/trips.entity';
 import { User } from '../user/entities/user.entity';
 import { Location } from '../location/entities/location.entity';
+import { Like } from '../like/entities/like.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -18,6 +19,7 @@ import { Location } from '../location/entities/location.entity';
       Trip,
       User,
       Location,
+      Like,
     ]),
   ],
   controllers: [PostsController],

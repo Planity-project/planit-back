@@ -12,7 +12,14 @@ import { Like } from '../like/entities/like.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Album, AlbumGroup, AlbumImage, User, Comment]),
+    TypeOrmModule.forFeature([
+      Album,
+      AlbumGroup,
+      AlbumImage,
+      User,
+      Comment,
+      Like,
+    ]),
   ],
   controllers: [AlbumController],
   providers: [AlbumService],

@@ -7,6 +7,10 @@ import { PostImage } from './entities/postImage.entity';
 import { Trip } from '../trips/entities/trips.entity';
 import { User } from '../user/entities/user.entity';
 import { Location } from '../location/entities/location.entity';
+import { Like } from '../like/entities/like.entity';
+
+import { GetMyPostDto } from './dto/getMyPost.dto';
+import { GetLikePostDto } from './dto/getLikesPost.dto';
 @Injectable()
 export class PostsService {
   constructor(
@@ -21,6 +25,8 @@ export class PostsService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Location)
     private readonly locationRepository: Repository<Location>,
+    @InjectRepository(Like)
+    private readonly likeRepository: Repository<Like>,
   ) {}
 
   async getPosts(id: number): Promise<Post[]> {
@@ -233,5 +239,39 @@ export class PostsService {
     const updatedPost = await this.postRepository.save(existingPost);
 
     return updatedPost;
+  }
+
+  async likePosts(userId: number): Promise<GetLikePostDto[]> {
+    const likes = await this.likeRepository.find({
+      where: {
+        user: { id: userId },
+        type: 'POST',
+      },
+      relations: ['post', 'post.user'],
+    });
+
+    return likes
+      .filter((like): like is Like & { post: Post } => like.post !== null)
+      .map((like) => ({
+        userId: userId,
+        postId: like.post.id,
+        title: like.post.title,
+        nickname: like.post.user.nickname,
+      }));
+  }
+
+  async myPosts(userId: number): Promise<GetMyPostDto[]> {
+    const posts = await this.postRepository.find({
+      where: { user: { id: userId } },
+      relations: ['trip'], // trip 정보 같이 조회
+      order: { createdAt: 'DESC' },
+    });
+
+    return posts.map((post) => ({
+      userId,
+      postId: post.id,
+      title: post.trip.title,
+      endDate: post.trip.endDate ? post.trip.endDate : null,
+    }));
   }
 }

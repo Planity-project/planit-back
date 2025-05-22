@@ -38,6 +38,7 @@ export class TripService {
     console.log(body, 'body');
     let data = await requestGemini(str);
     console.log(data, 'geminiData');
+    console.log(body, 'body');
     try {
       // ✨ 혹시 JSON 앞뒤에 설명 텍스트가 붙어 있는 경우 제거
       const jsonStart = data.indexOf('{');
@@ -49,14 +50,14 @@ export class TripService {
       console.log(parseData, '객체 데이터');
 
       const userData = await this.userRepository.findOne({
-        where: { id: body.userId },
+        where: { id: body.schedule.userId },
       });
       if (!userData) {
         throw new Error('유저를 찾을 수 없습니다');
       }
       //   const data = await this.tripRepository.create()
       const createTripData: Partial<Trip> = {
-        title: body.location,
+        title: body.schedule.location,
         startDate: new Date(dates[0]),
         endDate: new Date(dates[dates.length - 1]),
         user: userData,

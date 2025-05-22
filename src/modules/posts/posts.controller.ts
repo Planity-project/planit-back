@@ -27,6 +27,8 @@ import {
   ApiExtraModels,
 } from '@nestjs/swagger';
 import { CreatePostDto } from './dto/create-post.dto';
+import { GetMyPostDto } from './dto/getMyPost.dto';
+import { GetLikePostDto } from './dto/getLikesPost.dto';
 import { SERVER_DOMAIN } from 'util/api';
 @Controller('posts')
 @ApiExtraModels()
@@ -124,5 +126,15 @@ export class PostsController {
   ) {
     console.log(postId, userId, 'detailData');
     return await this.postsService.getOnePosts(Number(postId), Number(userId));
+  }
+
+  @Get('likePosts')
+  async getLikePost(@Query('userId') userId: string) {
+    return await this.postsService.likePosts(Number(userId));
+  }
+
+  @Get('myPosts')
+  async getMyPost(@Query('userId') userId: string) {
+    return await this.postsService.myPosts(Number(userId));
   }
 }
