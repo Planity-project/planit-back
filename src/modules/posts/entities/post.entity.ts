@@ -33,6 +33,8 @@ export class Post {
   @Column({ default: 0 })
   likeCount: number;
 
+  @Column({ default: false })
+  type: boolean; //공유 된 포스트인지 아닌지 체크
   @CreateDateColumn()
   createdAt: Date;
 
