@@ -69,44 +69,6 @@ export class ReportController {
     return this.reportService.create(report);
   }
 
-  // ✅ 게시글 신고 생성
-  @Post('post/:postId')
-  @ApiOperation({ summary: '게시글 신고 생성' })
-  @ApiParam({
-    name: 'postId',
-    type: 'number',
-    description: '신고할 게시글 ID',
-  })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        reason: { type: 'string', description: '신고 사유' },
-      },
-      required: ['reason'],
-    },
-  })
-  @ApiResponse({ status: 201, description: '게시글 신고 완료' })
-  @ApiResponse({ status: 400, description: '잘못된 요청' })
-  @ApiResponse({ status: 404, description: '해당 게시글을 찾을 수 없음' })
-  async reportPost(
-    @Param('postId', ParseIntPipe) postId: number,
-    @Body() reportData: { reason: string },
-    @Req() req: any,
-  ): Promise<Report> {
-    if (!reportData.reason) {
-      throw new BadRequestException('신고 사유를 입력해주세요.');
-    }
-
-    const report = new Report();
-    report.reporter = req.user;
-    report.target_type = TargetType.POST;
-    report.target_id = postId;
-    report.reason = reportData.reason;
-
-    return this.reportService.create(report);
-  }
-
   // ✅ 모든 신고 목록 조회 (관리자 권한 필요)
   @Get()
   @ApiOperation({ summary: '모든 신고 목록 조회 (관리자)' })

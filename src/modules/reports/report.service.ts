@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Report, TargetType } from './entities/report.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
-import { Post } from 'src/modules/posts/entities/post.entity';
 import { User, UserStatus } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
 import { NotificationService } from '../notification/notification.service';
@@ -19,8 +18,6 @@ export class ReportService {
     private readonly reportRepository: Repository<Report>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
     private readonly userService: UserService,
     private readonly notificationeService: NotificationService,
   ) {}
@@ -41,17 +38,6 @@ export class ReportService {
 
     if (!report) {
       throw new NotFoundException(`Report with ID ${id} not found`);
-    }
-
-    if (report.target_type === TargetType.POST) {
-      const post = await this.postRepository.findOne({
-        where: { id: report.target_id },
-      });
-      if (!post) {
-        throw new NotFoundException(
-          `Post not found for ID ${report.target_id}`,
-        );
-      }
     }
 
     if (report.target_type === TargetType.COMMENT) {
@@ -101,21 +87,14 @@ export class ReportService {
 
       report.reported_content = comment.content;
       report.reported_user_id = comment.user?.id;
-    } else if (report.target_type === TargetType.POST) {
-      const post = await this.postRepository.findOne({
-        where: { id: report.target_id },
-        relations: ['author', 'post'],
-      });
-
-      if (!post) throw new NotFoundException('게시글을 찾을 수 없습니다.');
-      report.reported_content = post.content;
-      report.reported_user_id = post.user?.id;
     } else if (report.target_type === TargetType.USER) {
       const user = await this.userService.findById(report.target_id);
       if (!user) throw new NotFoundException('유저를 찾을 수 없습니다.');
 
       report.reported_content = `${user.nickname} 유저 신고`;
       report.reported_user_id = user.id;
+    } else {
+      throw new BadRequestException('지원하지 않는 신고 유형입니다.');
     }
 
     return this.reportRepository.save(report);
@@ -139,14 +118,6 @@ export class ReportService {
         relations: ['user'],
       });
       return comment?.user ?? null;
-    }
-
-    if (report.target_type === TargetType.POST) {
-      const post = await this.postRepository.findOne({
-        where: { id: report.target_id },
-        relations: ['user'],
-      });
-      return post?.user ?? null;
     }
 
     if (report.target_type === TargetType.USER) {

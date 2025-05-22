@@ -51,20 +51,6 @@ export class CommentController {
     });
   }
 
-  // ✅ 게시글 댓글 조회
-  @Get('/post/:postId')
-  @ApiOperation({
-    summary: '게시글 댓글 조회 (좋아요 여부 포함)',
-    description:
-      '게시글 ID 기준으로 게시글 댓글을 조회합니다. 로그인한 유저가 좋아요 누른 댓글은 isLiked=true로 표시됩니다.',
-  })
-  @ApiParam({ name: 'postId', type: Number, description: '게시글 ID' })
-  @ApiResponse({ status: 200, description: '게시글 댓글 목록 반환 성공' })
-  async getPostComments(@Req() req, @Param('postId') postId: number) {
-    const loginUserId = req.user.id;
-    return this.commentsService.getComments(postId, loginUserId);
-  }
-
   // ✅ 댓글 삭제
   @Delete(':id')
   @ApiOperation({
@@ -76,27 +62,5 @@ export class CommentController {
   async deleteComment(@Req() req, @Param('id') id: number) {
     const loginUserId = req.user.id;
     return this.commentsService.deleteComment(id, loginUserId);
-  }
-
-  // ✅ 댓글 신고
-  @Post('/declare/:id')
-  @ApiOperation({
-    summary: '댓글 신고',
-    description: '댓글 ID와 신고 사유를 제출하여 해당 댓글을 신고합니다.',
-  })
-  @ApiParam({ name: 'id', type: Number, description: '댓글 ID' })
-  @ApiResponse({ status: 201, description: '댓글 신고 접수 완료' })
-  @ApiBody({ type: ReportCommentDto })
-  async reportComment(
-    @Req() req,
-    @Param('id') commentId: number,
-    @Body() dto: ReportCommentDto,
-  ) {
-    const loginUserId = req.user.id;
-    return this.commentsService.reportComment(
-      commentId,
-      loginUserId,
-      dto.reason,
-    );
   }
 }
