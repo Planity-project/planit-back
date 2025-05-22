@@ -5,6 +5,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   OneToMany,
+  JoinColumn,
   OneToOne,
 } from 'typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
@@ -55,7 +56,8 @@ export class Post {
   @OneToMany(() => Report, (report) => report.post)
   reports: Report[];
 
-  @OneToOne(() => Trip, (trip) => trip.post)
+  @OneToOne(() => Trip, (trip) => trip.post, { onDelete: 'CASCADE' })
+  @JoinColumn()
   trip: Trip;
 
   @OneToMany(() => PostHashtag, (hashtag) => hashtag.post, { cascade: true })

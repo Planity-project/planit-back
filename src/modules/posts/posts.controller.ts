@@ -89,6 +89,7 @@ export class PostsController {
     console.log('content:', content);
     console.log('hashtags:', parsedHashtags);
     console.log('tripId:', tripId);
+    console.log('userId:', userId);
     console.log('files:', files);
 
     // 여기에 DB 저장
@@ -97,13 +98,13 @@ export class PostsController {
     );
 
     // 2. 서비스 호출
-    const savedPost = await this.postsService.createPostWithDetails(
+    const savedPost = await this.postsService.updatePostWithDetails(
       title,
       content,
-      tripId,
+      Number(tripId),
       parsedHashtags,
       fileUrls,
-      userId,
+      Number(userId),
     );
 
     return { result: true, postId: savedPost.id };

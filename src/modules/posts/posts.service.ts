@@ -61,6 +61,7 @@ export class PostsService {
     const skip = (page - 1) * limit;
 
     const [items, total] = await this.postRepository.findAndCount({
+      where: { type: true }, // 🔥 type === true 조건 추가
       relations: ['user', 'trip', 'location', 'images', 'hashtags'],
       order: { createdAt: 'DESC' },
       skip,
@@ -157,51 +158,78 @@ export class PostsService {
     return { dayData: data, postData: postData };
   }
 
-  async createPostWithDetails(
+  async updatePostWithDetails(
     title: string,
     content: string,
     tripId: number,
-    hashtags: string[],
+    parsedHashtags: string[],
     fileUrls: string[], // 예: 파일 저장 후 URL 배열
     userId: number,
   ): Promise<Post> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    const trip = await this.tripRepository.findOneBy({ id: tripId });
-    const location = await this.locationRepository.findOne({
-      where: { name: trip?.title },
+
+    const trip = await this.tripRepository.findOne({
+      where: { id: tripId },
+      relations: ['post'],
     });
-    const post = new Post();
-    if (!trip || !user || !location) {
+
+    if (!trip || !user) {
+      console.error('❌ trip 또는 user가 존재하지 않음');
+      throw new BadRequestException('해당 trip 또는 user가 존재하지 않습니다.');
+    }
+
+    const location = await this.locationRepository.findOne({
+      where: { name: trip.title },
+    });
+
+    if (!location) {
+      console.error('❌ location 찾을 수 없음');
+      throw new BadRequestException('해당 location이 존재하지 않습니다.');
+    }
+
+    const existingPost = await this.postRepository.findOne({
+      where: { trip: { id: tripId } },
+      relations: ['hashtags', 'images'],
+    });
+
+    if (!existingPost) {
+      console.error('❌ post를 찾을 수 없음');
       throw new BadRequestException(
-        '해당 trip 혹은 user,location이 존재하지 않습니다.',
+        '해당 trip에 연결된 post가 존재하지 않습니다.',
       );
     }
-    post.title = title;
-    post.content = content;
-    post.user = user;
-    post.trip = trip;
-    post.location = location;
-    // Post 저장 (id 확보)
-    const savedPost = await this.postRepository.save(post);
 
-    // 해시태그 저장
-    const tags = hashtags.map((tag) => {
+    // ✏️ 업데이트
+    existingPost.title = title;
+    existingPost.content = content;
+    existingPost.user = user;
+    existingPost.trip = trip;
+    existingPost.location = location;
+    existingPost.type = true;
+
+    await this.postHashtagRepository.remove(existingPost.hashtags || []);
+    await this.postImageRepository.remove(existingPost.images || []);
+
+    const newHashtags = parsedHashtags.map((tag) => {
       const h = new PostHashtag();
       h.hashtag = tag;
-      h.post = savedPost;
+      h.post = existingPost;
       return h;
     });
-    await this.postHashtagRepository.save(tags);
 
-    // 이미지 저장
-    const images = fileUrls.map((url) => {
+    const newImages = fileUrls.map((url) => {
       const i = new PostImage();
       i.url = url;
-      i.post = savedPost;
+      i.post = existingPost;
       return i;
     });
-    await this.postImageRepository.save(images);
 
-    return savedPost;
+    await this.postHashtagRepository.save(newHashtags);
+
+    await this.postImageRepository.save(newImages);
+
+    const updatedPost = await this.postRepository.save(existingPost);
+
+    return updatedPost;
   }
 }

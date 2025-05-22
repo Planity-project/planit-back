@@ -48,6 +48,5 @@ export class Trip {
   tripItems: TripScheduleItem[];
 
   @OneToOne(() => Post, (post) => post.trip, { onDelete: 'CASCADE' })
-  @JoinColumn()
   post: Post;
 }
