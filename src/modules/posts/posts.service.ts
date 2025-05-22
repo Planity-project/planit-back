@@ -275,4 +275,26 @@ export class PostsService {
       endDate: post.trip.endDate ? post.trip.endDate : null,
     }));
   }
+
+  async deletePosts(id: number): Promise<boolean> {
+    await this.postRepository.delete(id);
+    return true;
+  }
+
+  async statePost(postId: number, userId: number): Promise<boolean> {
+    const likes = await this.likeRepository.find({
+      where: {
+        user: { id: userId },
+        type: 'POST',
+      },
+      relations: ['post', 'post.user'],
+    });
+
+    const postCheck = likes.find((i) => i.post?.id === postId);
+
+    if (postCheck) {
+      return true;
+    }
+    return false;
+  }
 }

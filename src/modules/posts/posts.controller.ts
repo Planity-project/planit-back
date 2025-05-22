@@ -137,4 +137,17 @@ export class PostsController {
   async getMyPost(@Query('userId') userId: string) {
     return await this.postsService.myPosts(Number(userId));
   }
+
+  // @Delete('delete/post')
+  // async deletePost(@Query('id')postId:string){
+  //   retrun await this.postsService.deletePosts(Number(postId))
+  // }
+
+  @Get('like/state')
+  async stateLike(
+    @Query('postId') postId: string,
+    @Query('userId') userId: string,
+  ) {
+    return await this.postsService.statePost(Number(postId), Number(userId));
+  }
 }
