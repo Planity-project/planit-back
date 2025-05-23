@@ -242,4 +242,12 @@ export class AlbumController {
       targetId,
     );
   }
+
+  @Get('likeAlbum')
+  async likeAlbumType(
+    @Query('userId') userId: number,
+    @Query('albumId') albumId: number,
+  ) {
+    return await this.albumService.albumLikesImage(userId, albumId);
+  }
 }
