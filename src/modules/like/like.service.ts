@@ -8,10 +8,14 @@ import { Like } from './entities/like.entity';
 import { User } from '../user/entities/user.entity';
 import { Post } from '../posts/entities/post.entity';
 import { Comment } from '../comment/entities/comment.entity';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class LikeService {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(
+    private readonly entityManager: EntityManager,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   // ✅ 게시글 좋아요 토글
   async togglePostLike(
@@ -31,6 +35,13 @@ export class LikeService {
     } else {
       const user = await this.findUserById(userId);
       const post = await this.findPostById(postId);
+      const postUser = await this.entityManager.findOne(Post, {
+        where: { id: postId },
+        relations: ['user'], // ✅ 작성자 정보 포함
+      });
+      if (!postUser) {
+        throw new NotFoundException('게시글을 찾을 수 없습니다.');
+      }
       const like = this.entityManager.create(Like, {
         user,
         post,
@@ -39,6 +50,10 @@ export class LikeService {
 
       try {
         await this.entityManager.save(like);
+        await this.notificationService.createPostLikeNotification(
+          user,
+          postUser,
+        );
         return { liked: true };
       } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {

@@ -5,6 +5,7 @@ import { Notification } from './entities/notification.entity';
 import { SendNotificationDto } from './dto/SendNotification.dto';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
 import { User } from 'src/modules/user/entities/user.entity';
+import { Post } from 'src/modules/posts/entities/post.entity';
 
 @Injectable()
 export class NotificationService {
@@ -163,6 +164,22 @@ export class NotificationService {
       content,
       type: 'TRIP',
       notifyAt: new Date(),
+    });
+
+    await this.notificationRepository.save(notification);
+  }
+  // ✅ 게시글 좋아요 시 알림 생성
+  async createPostLikeNotification(sender: User, post: Post): Promise<void> {
+    if (post.user.id === sender.id) return; // 자기 글이면 알림 제외
+
+    const notification = this.notificationRepository.create({
+      user: post.user, // 알림 받을 사람
+      content: `${sender.nickname}님이 "${post.title}" 게시글에 좋아요를 눌렀습니다.`,
+      type: 'POST',
+      status: 'UNREAD',
+      post: post,
+      notifyAt: null,
+      isSent: false,
     });
 
     await this.notificationRepository.save(notification);
