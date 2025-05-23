@@ -271,7 +271,7 @@ export class PostsService {
     return posts.map((post) => ({
       userId,
       postId: post.id,
-      title: post.trip.title,
+      title: post.trip?.title,
       endDate: post.trip.endDate ? post.trip.endDate : null,
     }));
   }
