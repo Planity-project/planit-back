@@ -135,8 +135,8 @@ export class AuthController {
       sameSite: isProd ? 'none' : 'lax',
       secure: isProd,
     });
-    console.log(user.redirect, 'redirect');
-    if (user.redirect === null) {
+    console.log(user.redirect, typeof user.redirect, typeof null, 'redirect');
+    if (user.redirect === 'null') {
       return res.redirect(REDIRECT_URL);
     } else {
       res.redirect(REDIRECT_URL + '/' + user.redirect);
