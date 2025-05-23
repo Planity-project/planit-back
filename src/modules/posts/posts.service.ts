@@ -221,25 +221,24 @@ export class PostsService {
     await this.postHashtagRepository.remove(PostData.hashtags || []);
     await this.postImageRepository.remove(PostData.images || []);
 
+    const updatedPost = await this.postRepository.save(PostData);
     const newHashtags = parsedHashtags.map((tag) => {
       const h = new PostHashtag();
       h.hashtag = tag;
-      h.post = PostData;
+      h.post = updatedPost;
       return h;
     });
 
     const newImages = fileUrls.map((url) => {
       const i = new PostImage();
       i.url = url;
-      i.post = PostData;
+      i.post = updatedPost;
       return i;
     });
 
     await this.postHashtagRepository.save(newHashtags);
 
     await this.postImageRepository.save(newImages);
-
-    const updatedPost = await this.postRepository.save(PostData);
 
     return updatedPost;
   }
