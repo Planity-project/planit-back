@@ -13,7 +13,7 @@ import { Payment } from '../payments/entities/payment.entity';
 import { Album } from '../album/entities/album.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AlbumGroup } from '../album/entities/albumGroup.entity';
-
+import { SERVER_DOMAIN } from 'util/api';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -115,7 +115,7 @@ export class UserService {
   // ✅ 프로필 이미지 변경
   async updateProfileImage(userId: number, filename: string): Promise<void> {
     const user = await this.findOne(userId);
-    user.profile_img = 'uploads/profiles/' + filename;
+    user.profile_img = SERVER_DOMAIN + 'uploads/profiles/' + filename;
     await this.userRepository.save(user);
   }
 
