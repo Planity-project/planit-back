@@ -244,13 +244,17 @@ export class AlbumService {
       id: image.id,
       titleImg: image.images,
       user: image.user.nickname,
-      userImg: image.user.profile_img ? image.user.profile_img : null,
+      userImg: image.user.profile_img
+        ? image.user.profile_img
+        : '/defaultImage.png',
       like: !!isLiked,
       likeCnt: image.likes?.length || 0,
       comment: comments.map((c) => ({
         id: c.id,
         userId: c.user.id,
-        profileImg: c.user.profile_img,
+        profileImg: c.user.profile_img
+          ? c.user.profile_img
+          : '/defaultImage.png',
         nickname: c.user.nickname,
         chat: c.content,
         likeCnt: c.likes?.length || 0,
@@ -258,7 +262,9 @@ export class AlbumService {
         miniComment:
           c.childComments?.map((m) => ({
             userId: m.user.id,
-            profileImg: m.user.profile_img,
+            profileImg: m.user.profile_img
+              ? m.user.profile_img
+              : '/defaultImage.png',
             nickname: m.user.nickname,
             chat: m.content,
           })) || [],
