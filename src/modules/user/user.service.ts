@@ -115,7 +115,7 @@ export class UserService {
   // ✅ 프로필 이미지 변경
   async updateProfileImage(userId: number, filename: string): Promise<void> {
     const user = await this.findOne(userId);
-    user.profile_img = SERVER_DOMAIN + 'uploads/profiles/' + filename;
+    user.profile_img = SERVER_DOMAIN + '/uploads/profiles/' + filename;
     await this.userRepository.save(user);
   }
 

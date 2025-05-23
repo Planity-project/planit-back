@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import * as dotenv from 'dotenv';
 import { LoginType } from '../user/entities/user.entity';
-
+import { Request } from 'express';
 dotenv.config();
 
 type VerifyCallback = (error: any, user?: any, info?: any) => void;
@@ -27,15 +27,18 @@ export class KakaoStrategy extends PassportStrategy(
       clientSecret: process.env.KAKAO_SECRET_KEY!,
       callbackURL: process.env.KAKAO_CALLBACK!,
       scope: ['account_email'],
+      passReqToCallback: true,
     } as StrategyOption);
   }
 
   async validate(
+    req: Request,
     accessToken: string,
     refreshToken: string,
     profile: any,
     done: VerifyCallback,
   ) {
+    const redirect = req.query.state as string;
     const kakaoData = profile._json || JSON.parse(profile._raw || '{}');
     const email = profile._json.kakao_account.email;
     const user = await this.authService.findUser(email);
@@ -56,7 +59,12 @@ export class KakaoStrategy extends PassportStrategy(
         nickname: userData?.nickname,
       };
       const jwt = this.jwtService.sign(payload);
-      done(null, { email: email, token: jwt, result: false });
+      done(null, {
+        email: email,
+        token: jwt,
+        result: false,
+        redirect: redirect ? redirect : null,
+      });
     } else {
       const payload = {
         id: user.id,
@@ -64,7 +72,12 @@ export class KakaoStrategy extends PassportStrategy(
         nickname: user.nickname,
       };
       const jwt = this.jwtService.sign(payload);
-      done(null, { email: email, token: jwt, result: true });
+      done(null, {
+        email: email,
+        token: jwt,
+        result: true,
+        redirect: redirect ? redirect : null,
+      });
     }
   }
 }
