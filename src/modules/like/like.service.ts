@@ -34,7 +34,7 @@ export class LikeService {
       const like = this.entityManager.create(Like, {
         user,
         post,
-        target_type: 'post',
+        type: 'POST',
       });
 
       try {
@@ -70,7 +70,7 @@ export class LikeService {
       const like = this.entityManager.create(Like, {
         user,
         comment,
-        target_type: 'comment',
+        type: 'COMMENT',
       });
 
       try {
