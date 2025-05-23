@@ -116,7 +116,7 @@ export class PostsController {
 
   @Get('list')
   async getPostList(@Query('page') page = 1, @Query('limit') limit = 4) {
-    return await this.postsService.getAllPosts(page, limit);
+    return await this.postsService.getAllPostsTransformed(page, limit);
   }
 
   @Get('detailTrip')

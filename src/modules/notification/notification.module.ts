@@ -11,7 +11,14 @@ import { AlbumImage } from '../album/entities/albumImage';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Notification, User, Trip, Album, AlbumGroup]),
+    TypeOrmModule.forFeature([
+      Notification,
+      User,
+      Trip,
+      Album,
+      AlbumGroup,
+      AlbumImage,
+    ]),
   ],
   providers: [NotificationService],
   controllers: [NotificationController],
