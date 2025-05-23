@@ -15,7 +15,7 @@ export class Like {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'enum', enum: ['POST', 'COMMENT'] })
+  @Column({ type: 'enum', enum: ['POST', 'COMMENT', 'ALBUMIMAGE'] })
   type: string;
 
   @CreateDateColumn()

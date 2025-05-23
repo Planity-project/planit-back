@@ -221,4 +221,25 @@ export class AlbumController {
     console.log(albumId, userId, 'Dfsdfs');
     return await this.albumService.albumPhotoDetail(albumId, userId);
   }
+
+  @Get('destroy')
+  async destroyAlbumGroups(
+    @Query('userId') userId: number,
+    @Query('albumId') albumId: number,
+  ) {
+    return await this.albumService.albumGroupDestroy(userId, albumId);
+  }
+
+  @Get('delegation')
+  async delegationAlbumRole(
+    @Query('userId') userId: number,
+    @Query('albumId') albumId: number,
+    @Query('targetId') targetId: number,
+  ) {
+    return await this.albumService.albumDelegationRole(
+      userId,
+      albumId,
+      targetId,
+    );
+  }
 }

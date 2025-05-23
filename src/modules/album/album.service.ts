@@ -219,7 +219,7 @@ export class AlbumService {
   ): Promise<AlbumPhotoDetailResponseDto> {
     const image = await this.albumImageRepository.findOne({
       where: { id: albumImageId },
-      relations: ['user'],
+      relations: ['user', 'likes'],
     });
 
     if (!image) throw new NotFoundException('이미지를 찾을 수 없습니다.');
@@ -229,7 +229,13 @@ export class AlbumService {
         albumImage: { id: albumImageId },
         parentComments: IsNull(), // ✅ null 비교는 이렇게 해야 함
       },
-      relations: ['user', 'childComments', 'childComments.user', 'likes'],
+      relations: [
+        'user',
+        'childComments',
+        'childComments.user',
+        'likes',
+        'likes.user',
+      ],
     });
 
     // 로그인한 유저가 이미지에 좋아요 눌렀는지
@@ -270,5 +276,80 @@ export class AlbumService {
           })) || [],
       })),
     };
+  }
+
+  async albumGroupDestroy(
+    albumId: number,
+    userId: number,
+  ): Promise<{ result: boolean; message: string }> {
+    const album = await this.albumRepository.findOne({
+      where: { id: albumId },
+      relations: ['groups', 'groups.user'], // 👈 유저까지 불러옴
+    });
+
+    if (!album) {
+      return { result: false, message: '앨범을 찾을 수 없습니다.' };
+    }
+
+    const targetGroup = album.groups.find((group) => group.user.id === userId);
+
+    if (!targetGroup) {
+      return {
+        result: false,
+        message: '해당 유저는 이 앨범에 속해 있지 않습니다.',
+      };
+    }
+
+    if (targetGroup.role === 'OWNER') {
+      return { result: false, message: '그룹장은 강퇴할 수 없습니다.' };
+    }
+
+    await this.albumGroupRepository.remove(targetGroup);
+
+    return { result: true, message: '유저를 성공적으로 강퇴했습니다.' };
+  }
+
+  async albumDelegationRole(
+    currentOwnerId: number,
+    albumId: number,
+    newOwnerId: number,
+  ): Promise<{ result: boolean; message: string }> {
+    const album = await this.albumRepository.findOne({
+      where: { id: albumId },
+      relations: ['groups', 'groups.user'],
+    });
+
+    if (!album) {
+      return { result: false, message: '앨범을 찾을 수 없습니다.' };
+    }
+
+    const currentOwnerGroup = album.groups.find(
+      (group) => group.user.id === currentOwnerId && group.role === 'OWNER',
+    );
+
+    if (!currentOwnerGroup) {
+      return {
+        result: false,
+        message: '현재 유저는 이 앨범의 OWNER가 아닙니다.',
+      };
+    }
+
+    const newOwnerGroup = album.groups.find(
+      (group) => group.user.id === newOwnerId,
+    );
+
+    if (!newOwnerGroup) {
+      return {
+        result: false,
+        message: '새로운 유저가 이 앨범에 속해 있지 않습니다.',
+      };
+    }
+
+    currentOwnerGroup.role = 'MEMBER';
+    newOwnerGroup.role = 'OWNER';
+
+    await this.albumGroupRepository.save([currentOwnerGroup, newOwnerGroup]);
+
+    return { result: true, message: 'OWNER 권한이 성공적으로 위임되었습니다.' };
   }
 }
