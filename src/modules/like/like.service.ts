@@ -35,13 +35,7 @@ export class LikeService {
     } else {
       const user = await this.findUserById(userId);
       const post = await this.findPostById(postId);
-      const postUser = await this.entityManager.findOne(Post, {
-        where: { id: postId },
-        relations: ['user'], // ✅ 작성자 정보 포함
-      });
-      if (!postUser) {
-        throw new NotFoundException('게시글을 찾을 수 없습니다.');
-      }
+
       const like = this.entityManager.create(Like, {
         user,
         post,
@@ -50,10 +44,15 @@ export class LikeService {
 
       try {
         await this.entityManager.save(like);
-        await this.notificationService.createPostLikeNotification(
-          user,
-          postUser,
+
+        // 알림 생성
+        const notificationText = `${user.nickname}님이 회원님의 게시글을 좋아합니다.`;
+        await this.notificationService.createNotification(
+          user, // sender: 좋아요 누른 사람
+          notificationText,
+          post, // post: 좋아요 받은 게시글
         );
+
         return { liked: true };
       } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
@@ -81,7 +80,8 @@ export class LikeService {
       return { liked: false };
     } else {
       const user = await this.findUserById(userId);
-      const comment = await this.findCommentById(commentId);
+      const comment = await this.findCommentById(commentId); // 댓글 + 연관된 albumImage도 로드해야 함
+
       const like = this.entityManager.create(Like, {
         user,
         comment,
@@ -90,6 +90,19 @@ export class LikeService {
 
       try {
         await this.entityManager.save(like);
+
+        // 알림 생성: 좋아요 누른 사람(user), 댓글(comment) 정보 넘기기
+        // 알림 생성 함수에서 본인이 좋아요한 경우 알림 제외하도록 처리 필요
+        await this.notificationService.createNotification(
+          user,
+          `${user.nickname}님이 회원님의 댓글을 좋아합니다.`,
+          undefined, // post
+          undefined, // album
+          undefined, // albumGroup
+          comment.albumImage!, // albumImage
+          // comment
+        );
+
         return { liked: true };
       } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
@@ -166,6 +179,7 @@ export class LikeService {
   private async findCommentById(commentId: number): Promise<Comment> {
     const comment = await this.entityManager.findOne(Comment, {
       where: { id: commentId },
+      relations: ['albumImage'],
     });
     if (!comment) {
       throw new NotFoundException('댓글을 찾을 수 없습니다.');

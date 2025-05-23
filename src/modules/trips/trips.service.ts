@@ -9,7 +9,11 @@ import { Trip } from './entities/trips.entity';
 import { Post } from '../posts/entities/post.entity';
 import { User } from '../user/entities/user.entity';
 
-import { requestGemini, generateSchedulePrompt } from 'util/generator';
+import {
+  requestGemini,
+  generateSchedulePrompt,
+  generateSchedulePromptEn,
+} from 'util/generator';
 @Injectable()
 export class TripService {
   constructor(
@@ -35,16 +39,19 @@ export class TripService {
   //최종 일정 생성
   async generateWithGemini(body: any) {
     const str = generateSchedulePrompt(body.schedule);
-    console.log(body, 'body');
     let data = await requestGemini(str);
-    console.log(data, 'geminiData');
-    console.log(body, 'body');
+    console.log(data, 'gemini응답');
     try {
       // ✨ 혹시 JSON 앞뒤에 설명 텍스트가 붙어 있는 경우 제거
       const jsonStart = data.indexOf('{');
       const jsonEnd = data.lastIndexOf('}');
-      const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
 
+      if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
+        throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
+      }
+
+      const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
+      console.log('추출된 JSON:', jsonSubstring);
       const parseData = JSON.parse(jsonSubstring);
       const dates = Object.keys(parseData);
       console.log(parseData, '객체 데이터');

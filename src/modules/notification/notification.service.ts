@@ -6,7 +6,9 @@ import { SendNotificationDto } from './dto/SendNotification.dto';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
-
+import { Album } from '../album/entities/album.entity';
+import { AlbumGroup } from '../album/entities/albumGroup.entity';
+import { AlbumImage } from '../album/entities/albumImage';
 @Injectable()
 export class NotificationService {
   constructor(
@@ -18,6 +20,15 @@ export class NotificationService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Album)
+    private readonly albumRepository: Repository<Album>,
+
+    @InjectRepository(AlbumGroup)
+    private readonly albumGroupRepository: Repository<AlbumGroup>,
+
+    @InjectRepository(AlbumImage)
+    private readonly albumImageRepository: Repository<AlbumImage>,
   ) {}
 
   // ✅ 유저의 모든 알림 조회
@@ -183,5 +194,71 @@ export class NotificationService {
     });
 
     await this.notificationRepository.save(notification);
+  }
+
+  async createNotification(
+    sender: User,
+    text: string,
+    post?: Post,
+    album?: Album,
+    albumGroup?: AlbumGroup,
+    albumImage?: AlbumImage,
+  ): Promise<void> {
+    // 1) post가 있을 때
+    if (post) {
+      if (post.user.id === sender.id) return; // 자기 자신 제외
+
+      const notification = this.notificationRepository.create({
+        user: post.user,
+        content: text,
+        type: 'POST',
+        status: 'UNREAD',
+        post,
+        notifyAt: null,
+        isSent: false,
+      });
+
+      await this.notificationRepository.save(notification);
+      return;
+    }
+
+    // 2) album이 있을 때 (album에 속한 모든 사용자에게 알림)
+    if (album) {
+      for (const user of album.groups) {
+        // album.users: 앨범에 속한 사용자 배열
+        if (user.id === sender.id) continue;
+
+        const notification = this.notificationRepository.create({
+          user: user.user,
+          content: text,
+          type: 'ALBUM',
+          status: 'UNREAD',
+          album,
+          notifyAt: null,
+          isSent: false,
+        });
+
+        await this.notificationRepository.save(notification);
+      }
+      return;
+    }
+
+    // 4) albumImage가 있을 때 (작성자에게만 알림)
+    if (albumImage) {
+      if (albumImage.user.id === sender.id) return; // 자기 자신 제외
+
+      const notification = this.notificationRepository.create({
+        user: albumImage.user,
+        content: text,
+        type: 'ALBUM',
+        status: 'UNREAD',
+        albumImage,
+        notifyAt: null,
+        isSent: false,
+      });
+
+      await this.notificationRepository.save(notification);
+      return;
+    }
   }
 }

@@ -5,9 +5,14 @@ import { NotificationController } from './notification.controller';
 import { Notification } from './entities/notification.entity';
 import { User } from '../user/entities/user.entity';
 import { Trip } from '../trips/entities/trips.entity';
+import { Album } from '../album/entities/album.entity';
+import { AlbumGroup } from '../album/entities/albumGroup.entity';
+import { AlbumImage } from '../album/entities/albumImage';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Notification, User, Trip])],
+  imports: [
+    TypeOrmModule.forFeature([Notification, User, Trip, Album, AlbumGroup]),
+  ],
   providers: [NotificationService],
   controllers: [NotificationController],
   exports: [NotificationService],

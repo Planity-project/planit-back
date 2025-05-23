@@ -10,6 +10,7 @@ import { Report } from 'src/modules/reports/entities/report.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
 import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
+import { AlbumImage } from 'src/modules/album/entities/albumImage';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
 
 export type NotificationType = 'POST' | 'ALBUM' | 'REPORT' | 'TRIP';
@@ -75,6 +76,12 @@ export class Notification {
     onDelete: 'CASCADE',
   })
   albumGroup: AlbumGroup | null;
+
+  @ManyToOne(() => AlbumImage, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  albumImage: AlbumGroup | null;
 
   @ManyToOne(() => Trip, {
     nullable: true,

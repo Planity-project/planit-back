@@ -219,15 +219,121 @@ export function generateSchedulePrompt(body: any): string {
   prompt += `- 장소 간 동선을 고려해줘.\n`;
   prompt += `- 결과는 **JSON 형태**로 날짜별 일정 배열로 구성해줘.\n`;
   prompt += `- 형식 예시:\n`;
-  prompt += `  {\n    "2025-05-13 (화)": [\n      {\n        "순서": 1,\n        "start": "09:00",\n        "end": "11:00",\n        
-  "장소": "경주 탈해왕릉",\n        "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "관광지",\n       
-   "image": "..." \n      },\n      {\n        "순서": 2,\n        "start": "11:00",\n        "end": "13:00",\n        "장소": "오누이",\n      
+  prompt += `  {\n    "2025-05-13 (화)": [\n      {\n        "순서": 1,\n        "start": "09:00",\n        "end": "11:00",\n
+  "장소": "경주 탈해왕릉",\n        "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "관광지",\n
+   "image": "..." \n      },\n      {\n        "순서": 2,\n        "start": "11:00",\n        "end": "13:00",\n        "장소": "오누이",\n
      "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "음식점",\n        "image": "..." \n    "rating": 평점, "reviewCount": 리뷰수  }\n    ]\n  }\n`;
 
   prompt += `- 숙소도 각 일차에 포함시켜줘 (1박마다).\n`;
   prompt += `- 가능한 일정을 최대한 꽉 채워서 구성해줘.\n`;
   prompt += `- 비는 시간은 인근 장소를 넣어 채워줘.\n`;
-  prompt += `- 위도 경도, 리뷰수와 평점은 무조건 포함하고 image도 무조건 포함하고 장소, 주소도 무조건 포함해야해 모든 데이터는 null값이 없어야 함`;
+  prompt += `- 위도 경도, 리뷰수와 평점, image, 장소, 주소는 무조건 포함해야해 모든 데이터는 null값이 없어야 함 JSON파일 형태로 줘`;
+
+  return prompt;
+}
+
+// export function generateSchedulePrompt(body: any): string {
+//   const { dataTime, dataPlace, dataStay } = body;
+
+//   const formatTime = (time: any) => {
+//     const hour =
+//       time.hour + (time.meridiem === '오후' && time.hour !== 12 ? 12 : 0);
+//     const minute = time.minute.toString().padStart(2, '0');
+//     return `${hour}:${minute}`;
+//   };
+
+//   let prompt = `📅 여행 일정 작성 요청\n`;
+
+//   // 날짜별 정보 구성
+//   dataTime.forEach((day) => {
+//     const date = day.date;
+//     const start = formatTime(day.start);
+//     const end = formatTime(day.end);
+//     const stay = dataStay.find((s) => s.date === date.slice(0, 10));
+//     const stayTitle = stay?.place?.title || '없음';
+
+//     prompt += `\n🗓️ ${date}\n`;
+//     prompt += `- 이용 가능 시간: ${start} ~ ${end}\n`;
+//     prompt += `- 숙소: ${stayTitle}\n`;
+//   });
+
+//   // 장소 정보 구성
+//   prompt += `\n\n📍 사용 가능한 장소 목록:\n`;
+//   dataPlace.forEach((place, idx) => {
+//     prompt += `${idx + 1}. ${place.title} (${place.category})\n`;
+//     prompt += `   - 예상 소요시간: ${place.minutes}분\n`;
+//     prompt += `   - 주소: ${place.address}\n`;
+//     prompt += `   - 위도: ${place.latitude}, 경도: ${place.longitude}\n`;
+//     prompt += `   - 평점: ${place.rating}, 리뷰수: ${place.reviewCount}\n`;
+//     prompt += `   - 이미지: ${place.imageSrc || '없음'}\n`;
+//   });
+
+//   // 요청 조건
+//   prompt += `\n\n📌 작성 규칙:\n`;
+//   prompt += `- 위 장소들을 날짜별로 효율적으로 나눠서 일정 구성해줘.\n`;
+//   prompt += `- 장소 간 동선을 고려해줘.\n`;
+//   prompt += `- 숙소도 각 날짜에 포함시켜줘.\n`;
+//   prompt += `- 하루에 최대 5개 장소까지만.\n`;
+//   prompt += `- 장소마다 시간대, 카테고리, 주소, 위도/경도, 평점, 리뷰수, 이미지 포함해줘.\n`;
+//   prompt += `- 텍스트로 정리해줘.\n`;
+//   prompt += `- 형식 예시:\n`;
+//   prompt += `[2025-05-14 (수)]\n`;
+//   prompt += `1. 스타벅스 논현역점 (09:00 ~ 10:00)\n`;
+//   prompt += `   - 카페 / 서울 강남구 논현로 123 / 37.511596, 127.020654\n`;
+//   prompt += `   - 평점: 4.2 / 리뷰: 123\n`;
+//   prompt += `   - 이미지: https://image-url.com\n`;
+//   prompt += `2. 다이도코로 (10:30 ~ 12:00)\n`;
+//   prompt += `   - 식당 / 서울 강남구 신사동 111 / 37.53412, 127.009821\n`;
+//   prompt += `   - 평점: 4.6 / 리뷰: 84\n`;
+//   prompt += `   - 이미지: https://image-url.com\n`;
+//   prompt += `데이터는 무조건 null값이 없어야하고 일정은 생략 없이 끝까지 다 적어줘야해`;
+
+//   return prompt;
+// }
+
+export function generateSchedulePromptEn(body: any): string {
+  const { dataTime, dataPlace, dataStay } = body;
+
+  const formatTime = (time: any) => {
+    const hour =
+      time.hour + (time.meridiem === 'PM' && time.hour !== 12 ? 12 : 0);
+    const minute = time.minute.toString().padStart(2, '0');
+    return `${hour}:${minute}`;
+  };
+
+  let prompt = `📅 Travel Schedule Request\n`;
+
+  // Daily schedule
+  dataTime.forEach((day) => {
+    const date = day.date;
+    const start = formatTime(day.start);
+    const end = formatTime(day.end);
+    const stay = dataStay.find((s) => s.date === date.slice(0, 10));
+    const stayTitle = stay?.place?.title || 'None';
+
+    prompt += `\n🗓️ ${date}\n`;
+    prompt += `- Available time: ${start} ~ ${end}\n`;
+    prompt += `- Accommodation: ${stayTitle}\n`;
+  });
+
+  // Place information
+  prompt += `\n\n📍 List of visitable places:\n`;
+  dataPlace.forEach((place, idx) => {
+    prompt += `${idx + 1}. ${place.title} (${place.category})\n   - Estimated duration: ${place.minutes} minutes\n   - Address: ${place.address}\n   - Image: ${place.imageSrc || 'None'}\n`;
+  });
+
+  // Request instructions
+  prompt += `\n\n📌 Instructions:\n`;
+  prompt += `- Distribute the above places efficiently across the available days and times.\n`;
+  prompt += `- Consider travel distance between locations.\n`;
+  prompt += `- Return the result in **JSON format**, organized as an array of schedules per day.\n`;
+  prompt += `- Format example:\n`;
+  prompt += `  {\n    "2025-05-13 (Tue)": [\n      {\n        "order": 1,\n        "start": "09:00",\n        "end": "11:00",\n        "place": "Tomb of King Talhae",\n        "latitude": lat,\n        "longitude": lon,\n        "address": "...",\n        "type": "Tourist Spot",\n        "image": "...",\n        "rating": score,\n        "reviewCount": count\n      },\n      {\n        "order": 2,\n        "start": "11:00",\n        "end": "13:00",\n        "place": "Onui",\n        "latitude": lat,\n        "longitude": lon,\n        "address": "...",\n        "type": "Restaurant",\n        "image": "...",\n        "rating": score,\n        "reviewCount": count\n      }\n    ]\n  }\n`;
+
+  prompt += `- Be sure to include the accommodation for each night.\n`;
+  prompt += `- Fill the schedule as fully as possible.\n`;
+  prompt += `- Use nearby places to fill any gaps.\n`;
+  prompt += `- Every item in the JSON must include: latitude, longitude, review count, rating, image, place, and address. No values should be null.\n`;
 
   return prompt;
 }
