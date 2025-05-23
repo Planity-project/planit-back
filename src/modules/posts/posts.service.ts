@@ -174,6 +174,7 @@ export class PostsService {
     parsedHashtags: string[],
     fileUrls: string[], // 예: 파일 저장 후 URL 배열
     userId: number,
+    rating: number,
   ): Promise<Post> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
@@ -196,12 +197,12 @@ export class PostsService {
       throw new BadRequestException('해당 location이 존재하지 않습니다.');
     }
 
-    const existingPost = await this.postRepository.findOne({
+    const PostData = await this.postRepository.findOne({
       where: { trip: { id: tripId } },
       relations: ['hashtags', 'images'],
     });
 
-    if (!existingPost) {
+    if (!PostData) {
       console.error('❌ post를 찾을 수 없음');
       throw new BadRequestException(
         '해당 trip에 연결된 post가 존재하지 않습니다.',
@@ -209,27 +210,28 @@ export class PostsService {
     }
 
     // ✏️ 업데이트
-    existingPost.title = title;
-    existingPost.content = content;
-    existingPost.user = user;
-    existingPost.trip = trip;
-    existingPost.location = location;
-    existingPost.type = true;
+    PostData.title = title;
+    PostData.content = content;
+    PostData.user = user;
+    PostData.trip = trip;
+    PostData.location = location;
+    PostData.type = true;
+    PostData.rating = rating;
 
-    await this.postHashtagRepository.remove(existingPost.hashtags || []);
-    await this.postImageRepository.remove(existingPost.images || []);
+    await this.postHashtagRepository.remove(PostData.hashtags || []);
+    await this.postImageRepository.remove(PostData.images || []);
 
     const newHashtags = parsedHashtags.map((tag) => {
       const h = new PostHashtag();
       h.hashtag = tag;
-      h.post = existingPost;
+      h.post = PostData;
       return h;
     });
 
     const newImages = fileUrls.map((url) => {
       const i = new PostImage();
       i.url = url;
-      i.post = existingPost;
+      i.post = PostData;
       return i;
     });
 
@@ -237,7 +239,7 @@ export class PostsService {
 
     await this.postImageRepository.save(newImages);
 
-    const updatedPost = await this.postRepository.save(existingPost);
+    const updatedPost = await this.postRepository.save(PostData);
 
     return updatedPost;
   }

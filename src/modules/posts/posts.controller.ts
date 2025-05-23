@@ -83,10 +83,11 @@ export class PostsController {
       hashtags: string;
       tripId: number;
       userId: number;
+      rating: number;
     },
   ) {
     // hashtags는 JSON.stringify된 문자열 형태로 옴
-    const { title, content, hashtags, tripId, userId } = body;
+    const { title, content, hashtags, tripId, userId, rating } = body;
     const parsedHashtags = JSON.parse(hashtags);
 
     console.log('title:', title);
@@ -109,6 +110,7 @@ export class PostsController {
       parsedHashtags,
       fileUrls,
       Number(userId),
+      rating,
     );
 
     return { result: true, postId: savedPost.id };

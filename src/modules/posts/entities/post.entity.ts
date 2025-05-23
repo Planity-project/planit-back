@@ -36,6 +36,10 @@ export class Post {
 
   @Column({ default: false })
   type: boolean; //공유 된 포스트인지 아닌지 체크
+
+  @Column({ nullable: true })
+  rating: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
