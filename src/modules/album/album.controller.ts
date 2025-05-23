@@ -32,6 +32,7 @@ import { AlbumImageSubmitDto } from './dto/albumImageSubmit.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 import { getDetailDataDto } from './dto/getDetailData.dto';
 import { QueryFailedError } from 'typeorm';
+import { SERVER_DOMAIN } from 'util/api';
 @ApiTags('Album')
 @ApiExtraModels(
   SubmitAlbumDto,
@@ -141,7 +142,7 @@ export class AlbumController {
     const { albumId, userId } = body;
     const fileUrls = files.map((file) => {
       // 서버 URL이 있다면 http://localhost:3000/uploads/albums/filename 이런 식으로 가능
-      return `/uploads/albums/images/${file.filename}`;
+      return `${SERVER_DOMAIN}/uploads/albums/images/${file.filename}`;
     });
     const result = await this.albumService.albumSubmitImage(
       albumId,
@@ -190,7 +191,9 @@ export class AlbumController {
     const { albumId, userId, title } = body;
 
     // file이 있을 때만 URL 설정
-    const fileUrl = file ? `/uploads/albums/head/${file.filename}` : null;
+    const fileUrl = file
+      ? `${SERVER_DOMAIN}/uploads/albums/head/${file.filename}`
+      : null;
 
     const result = await this.albumService.albumUpdateHead(
       albumId,
