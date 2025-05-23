@@ -89,7 +89,13 @@ export class AlbumService {
   }> {
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
-      relations: ['groups', 'groups.user', 'images'],
+      relations: [
+        'groups',
+        'groups.user',
+        'images',
+        'images.likes',
+        'images.comments',
+      ],
     });
 
     if (!album) throw new NotFoundException('앨범을 찾을 수 없습니다');
@@ -105,8 +111,8 @@ export class AlbumService {
     const image = album.images.map((img) => ({
       id: img.id,
       img: img.images[0] || '/defaultImage.png', // 첫 번째 이미지 또는 기본값
-      likeCnt: img.likeCnt ?? 0,
-      commentCnt: img.commentCnt ?? 0,
+      likeCnt: img.likes.filter((l) => l.type === 'ALBUM').length ?? 0,
+      commentCnt: img.comments.filter((c) => c.type === 'ALBUM').length ?? 0,
     }));
 
     return {
@@ -351,5 +357,32 @@ export class AlbumService {
     await this.albumGroupRepository.save([currentOwnerGroup, newOwnerGroup]);
 
     return { result: true, message: 'OWNER 권한이 성공적으로 위임되었습니다.' };
+  }
+
+  async albumLikesImage(
+    userId: number,
+    albumImageId: number,
+  ): Promise<{ result: boolean; message: string }> {
+    const albumImage = await this.albumImageRepository.findOne({
+      where: { id: albumImageId },
+    });
+    if (!albumImage) {
+      return { result: false, message: '앨범 이미지를 찾을 수 없습니다.' };
+    }
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      return { result: false, message: '유저를 찾을 수 없습니다.' };
+    }
+
+    const like = this.likeRepository.create({
+      type: 'ALBUM',
+      user,
+      albumImage,
+    });
+
+    await this.likeRepository.save(like);
+
+    return { result: true, message: '좋아요가 추가되었습니다.' };
   }
 }
