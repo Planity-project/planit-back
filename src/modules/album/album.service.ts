@@ -219,64 +219,59 @@ export class AlbumService {
     return { result: true, message: '앨범이 성공적으로 업데이트되었습니다.' };
   }
 
+  //앨범 이미지 상세 데이터
   async albumPhotoDetail(
     albumImageId: number,
     userId: number,
   ): Promise<AlbumPhotoDetailResponseDto> {
     const image = await this.albumImageRepository.findOne({
       where: { id: albumImageId },
-      relations: ['user', 'likes'],
-    });
-
-    if (!image) throw new NotFoundException('이미지를 찾을 수 없습니다.');
-
-    const comments = await this.commentRepository.find({
-      where: {
-        albumImage: { id: albumImageId },
-        parentComments: IsNull(), // ✅ null 비교는 이렇게 해야 함
-      },
       relations: [
         'user',
-        'childComments',
-        'childComments.user',
         'likes',
         'likes.user',
+        'comments',
+        'comments.user',
+        'comments.likes',
+        'comments.likes.user',
+        'comments.childComments',
+        'comments.childComments.user',
+        'comments.parentComments',
       ],
     });
 
-    // 로그인한 유저가 이미지에 좋아요 눌렀는지
-    const isLiked = await this.likeRepository.findOne({
-      where: {
-        user: { id: userId },
-        albumImage: { id: albumImageId },
-      },
-    });
+    if (!image) {
+      throw new NotFoundException('이미지를 찾을 수 없습니다.');
+    }
+
+    const isLiked =
+      image.likes?.some((l) => Number(l.user.id) === Number(userId)) || false;
+
+    const parentComments =
+      image.comments?.filter((c) => c.parentComments === null) || [];
 
     return {
       id: image.id,
-      titleImg: image.images,
+      titleImg: image.images ?? [],
       user: image.user.nickname,
-      userImg: image.user.profile_img
-        ? image.user.profile_img
-        : '/defaultImage.png',
-      like: !!isLiked,
+      userImg: image.user.profile_img ?? '/defaultImage.png',
+      like: isLiked,
       likeCnt: image.likes?.length || 0,
-      comment: comments.map((c) => ({
+      comment: parentComments.map((c) => ({
         id: c.id,
         userId: c.user.id,
-        profileImg: c.user.profile_img
-          ? c.user.profile_img
-          : '/defaultImage.png',
+        profileImg: c.user.profile_img ?? '/defaultImage.png',
         nickname: c.user.nickname,
         chat: c.content,
         likeCnt: c.likes?.length || 0,
-        like: c.likes?.some((l) => l.user.id === userId) || false,
+        like:
+          c.likes?.some(
+            (l) => Number(l.user.id) === Number(userId) && l.type === 'COMMENT',
+          ) || false,
         miniComment:
           c.childComments?.map((m) => ({
             userId: m.user.id,
-            profileImg: m.user.profile_img
-              ? m.user.profile_img
-              : '/defaultImage.png',
+            profileImg: m.user.profile_img ?? '/defaultImage.png',
             nickname: m.user.nickname,
             chat: m.content,
           })) || [],
@@ -284,6 +279,7 @@ export class AlbumService {
     };
   }
 
+  //앨범 그룹 강퇴
   async albumGroupDestroy(
     albumId: number,
     userId: number,
@@ -315,6 +311,7 @@ export class AlbumService {
     return { result: true, message: '유저를 성공적으로 강퇴했습니다.' };
   }
 
+  //앨범 그룹 사용자 권한 변경
   async albumDelegationRole(
     currentOwnerId: number,
     albumId: number,
@@ -359,30 +356,58 @@ export class AlbumService {
     return { result: true, message: 'OWNER 권한이 성공적으로 위임되었습니다.' };
   }
 
+  // 앨범 이미지 좋아요
   async albumLikesImage(
     userId: number,
     albumImageId: number,
-  ): Promise<{ result: boolean; message: string }> {
+  ): Promise<{ result: boolean; liked: boolean; message: string }> {
     const albumImage = await this.albumImageRepository.findOne({
       where: { id: albumImageId },
     });
     if (!albumImage) {
-      return { result: false, message: '앨범 이미지를 찾을 수 없습니다.' };
+      return {
+        result: false,
+        liked: false,
+        message: '앨범 이미지를 찾을 수 없습니다.',
+      };
     }
 
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      return { result: false, message: '유저를 찾을 수 없습니다.' };
+      return {
+        result: false,
+        liked: false,
+        message: '유저를 찾을 수 없습니다.',
+      };
     }
 
-    const like = this.likeRepository.create({
-      type: 'ALBUM',
-      user,
-      albumImage,
+    // 이미 좋아요 했는지 확인
+    const existingLike = await this.likeRepository.findOne({
+      where: {
+        user: { id: userId },
+        albumImage: { id: albumImageId },
+        type: 'ALBUM',
+      },
+      relations: ['user', 'albumImage'],
     });
 
-    await this.likeRepository.save(like);
-
-    return { result: true, message: '좋아요가 추가되었습니다.' };
+    if (existingLike) {
+      // 이미 좋아요 했다면 → 취소
+      await this.likeRepository.remove(existingLike);
+      return {
+        result: true,
+        liked: false,
+        message: '좋아요가 취소되었습니다.',
+      };
+    } else {
+      // 안했다면 → 좋아요 추가
+      const newLike = this.likeRepository.create({
+        type: 'ALBUM',
+        user,
+        albumImage,
+      });
+      await this.likeRepository.save(newLike);
+      return { result: true, liked: true, message: '좋아요가 추가되었습니다.' };
+    }
   }
 }

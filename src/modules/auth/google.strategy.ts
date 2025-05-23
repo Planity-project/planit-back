@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import * as dotenv from 'dotenv';
 import { LoginType } from '../user/entities/user.entity';
-
+import { Request } from 'express';
 dotenv.config();
 
 @Injectable()
@@ -19,16 +19,18 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientSecret: process.env.GOOGLE_SECRET_KEY!,
       callbackURL: process.env.GOOGLE_CALLBACK!,
       scope: ['email', 'profile'],
+      passReqToCallback: true,
     });
   }
 
   async validate(
+    req: Request,
     accessToken: string,
     refreshToken: string,
     profile: any,
     done: VerifyCallback,
   ) {
-    console.log(profile);
+    const redirect = req.query.state as string;
     const email = profile.emails[0].value;
 
     const user = await this.authService.findUser(email);
@@ -51,7 +53,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         nickname: userData?.nickname,
       };
       const jwt = this.jwtService.sign(payload);
-      done(null, { email: email, token: jwt, result: false });
+      done(null, {
+        email: email,
+        token: jwt,
+        result: false,
+        redirect: redirect ? redirect : null,
+      });
     } else {
       const payload = {
         id: user.id,
@@ -59,7 +66,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         nickname: user.nickname,
       };
       const jwt = this.jwtService.sign(payload);
-      done(null, { email: email, token: jwt, result: true });
+      done(null, {
+        email: email,
+        token: jwt,
+        result: true,
+        redirect: redirect ? redirect : null,
+      });
     }
   }
 }

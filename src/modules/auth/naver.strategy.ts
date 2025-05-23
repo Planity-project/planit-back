@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import * as dotenv from 'dotenv';
 import { LoginType } from '../user/entities/user.entity';
-
+import { Request } from 'express';
 dotenv.config();
 
 interface NaverProfile {
@@ -30,15 +30,18 @@ export class NaverStrategy extends PassportStrategy(
       clientID: process.env.NAVER_KEY!,
       clientSecret: process.env.NAVER_SECRET_KEY!,
       callbackURL: process.env.NAVER_CALLBACK!,
+      passReqToCallback: true,
     });
   }
 
   async validate(
+    req: Request,
     accessToken: string,
     refreshToken: string,
     profile: NaverProfile,
     done: VerifyCallback,
   ) {
+    const redirect = req.query.state as string;
     const nickname = profile._json.nickname;
     const email = profile._json.email;
     const userCreate = {
@@ -58,7 +61,12 @@ export class NaverStrategy extends PassportStrategy(
         nickname: userData?.nickname,
       };
       const jwt = this.jwtService.sign(payload);
-      done(null, { email: email, token: jwt, result: false });
+      done(null, {
+        email: email,
+        token: jwt,
+        result: false,
+        redirect: redirect ? redirect : null,
+      });
     } else {
       const payload = {
         id: user.id,
@@ -66,7 +74,12 @@ export class NaverStrategy extends PassportStrategy(
         nickname: user.nickname,
       };
       const jwt = this.jwtService.sign(payload);
-      done(null, { email: email, token: jwt, result: true });
+      done(null, {
+        email: email,
+        token: jwt,
+        result: true,
+        redirect: redirect ? redirect : null,
+      });
     }
   }
 }

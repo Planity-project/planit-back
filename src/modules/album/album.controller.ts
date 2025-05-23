@@ -250,4 +250,7 @@ export class AlbumController {
   ) {
     return await this.albumService.albumLikesImage(userId, albumId);
   }
+
+  // @Get('inviteData')
+  // async inviteAlbumGroup(@Query('inviteIink'))
 }

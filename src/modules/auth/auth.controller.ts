@@ -34,6 +34,7 @@ interface Userdata {
   email: string;
   token?: string;
   result: boolean;
+  redirect?: string | null;
 }
 
 @Controller('auth')
@@ -64,9 +65,14 @@ export class AuthController {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       sameSite: isProd ? 'none' : 'lax',
+
       secure: isProd,
     });
-    return res.redirect(REDIRECT_URL);
+    if (user.redirect === null) {
+      return res.redirect(REDIRECT_URL);
+    } else {
+      res.redirect(REDIRECT_URL + '/' + user.redirect);
+    }
   }
 
   @Get('google')
@@ -95,7 +101,12 @@ export class AuthController {
       sameSite: isProd ? 'none' : 'lax',
       secure: isProd,
     });
-    return res.redirect(REDIRECT_URL);
+    console.log(user.redirect, 'redirect');
+    if (user.redirect === null) {
+      return res.redirect(REDIRECT_URL);
+    } else {
+      res.redirect(REDIRECT_URL + '/' + user.redirect);
+    }
   }
 
   @Get('naver')
@@ -124,7 +135,12 @@ export class AuthController {
       sameSite: isProd ? 'none' : 'lax',
       secure: isProd,
     });
-    return res.redirect(REDIRECT_URL);
+    console.log(user.redirect, 'redirect');
+    if (user.redirect === null) {
+      return res.redirect(REDIRECT_URL);
+    } else {
+      res.redirect(REDIRECT_URL + '/' + user.redirect);
+    }
   }
 
   @Get('cookieCheck')

@@ -64,9 +64,11 @@ export class ReportService {
   }
 
   async create(report: Report): Promise<Report> {
+    console.log('신고 생성 요청:', report);
+
     const existingReport = await this.reportRepository.findOne({
       where: {
-        reporter: report.reporter,
+        reporter: { id: report.reporter.id },
         target_id: report.target_id,
         target_type: report.target_type,
       },
@@ -83,6 +85,7 @@ export class ReportService {
         where: { id: report.target_id },
         relations: ['user'],
       });
+
       if (!comment) throw new NotFoundException('댓글을 찾을 수 없습니다.');
 
       report.reported_content = comment.content;
