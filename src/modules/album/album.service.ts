@@ -244,9 +244,11 @@ export class AlbumService {
       id: image.id,
       titleImg: image.images,
       user: image.user.nickname,
-      userImg: image.user.profile_img ? image.user.profile_img : null,
+      userImg: image.user.profile_img
+        ? image.user.profile_img
+        : '/defaultImage.png',
       like: !!isLiked,
-      likeCnt: image.likes.length || 0,
+      likeCnt: image.likes?.length || 0,
       comment: comments.map((c) => ({
         id: c.id,
         userId: c.user.id,

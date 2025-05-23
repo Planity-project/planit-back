@@ -31,6 +31,7 @@ import { extname } from 'path';
 import { AlbumImageSubmitDto } from './dto/albumImageSubmit.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 import { getDetailDataDto } from './dto/getDetailData.dto';
+import { QueryFailedError } from 'typeorm';
 @ApiTags('Album')
 @ApiExtraModels(
   SubmitAlbumDto,
@@ -211,9 +212,10 @@ export class AlbumController {
     description: '특정 앨범의 상세 정보를 조회합니다.',
   })
   async getAlbumPhotoData(
-    @Param('albumId') albumId: number,
-    @Param('userId') userId: number,
+    @Query('albumId') albumId: number,
+    @Query('userId') userId: number,
   ) {
+    console.log(albumId, userId, 'Dfsdfs');
     return await this.albumService.albumPhotoDetail(albumId, userId);
   }
 }
