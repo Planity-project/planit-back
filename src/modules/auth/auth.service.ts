@@ -6,7 +6,7 @@ import { User } from '../user/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { nicknameMaker } from 'util/generator';
 import { Admin } from '../admin/entities/admin.entity';
-
+import { LoginType } from '../user/entities/user.entity';
 // ✅ 타입 선언 추가
 type LoginResponse = {
   accessToken: string;
@@ -66,5 +66,13 @@ export class AuthService {
     await this.userRepository.save(newUser);
 
     return { result: true };
+  }
+
+  async findVelidate(email: string, Provider: LoginType): Promise<User | null> {
+    const users = await this.userRepository.findOne({
+      where: { email: email, type: Provider },
+    });
+
+    return users;
   }
 }

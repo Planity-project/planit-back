@@ -33,7 +33,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const redirect = req.query.state as string;
     const email = profile.emails[0].value;
 
-    const user = await this.authService.findUser(email);
+    const user = await this.authService.findVelidate(email, LoginType.GOOGLE);
     const nickname =
       profile.displayName || profile._json?.name || email?.split('@')[0];
 

@@ -49,7 +49,7 @@ export class NaverStrategy extends PassportStrategy(
       type: LoginType.NAVER,
       nickname: nickname,
     };
-    const user = await this.authService.findUser(email);
+    const user = await this.authService.findVelidate(email, LoginType.NAVER);
 
     console.log(userCreate);
     if (!user) {
