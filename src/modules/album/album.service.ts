@@ -246,7 +246,7 @@ export class AlbumService {
       user: image.user.nickname,
       userImg: image.user.profile_img ? image.user.profile_img : null,
       like: !!isLiked,
-      likeCnt: image.likeCnt || 0,
+      likeCnt: image.likes.length || 0,
       comment: comments.map((c) => ({
         id: c.id,
         userId: c.user.id,

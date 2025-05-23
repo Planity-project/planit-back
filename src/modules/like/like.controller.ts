@@ -6,6 +6,7 @@ import {
   Post,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { JwtAuthGuard } from '../auth/jwtauth.gurad';
@@ -22,13 +23,13 @@ export class LikeController {
   constructor(private readonly likeService: LikeService) {}
 
   // ✅ 게시글 좋아요 토글
-  @Post('post/:postId/toggle')
+  @Post('post')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '소설 좋아요 토글 (추가/취소)' })
   async togglePostLike(
     @Req() req,
-    @Param('postId', ParseIntPipe) postId: number,
+    @Query('postId', ParseIntPipe) postId: number,
   ): Promise<{ liked: boolean }> {
     return this.likeService.togglePostLike(req.user.id, postId);
   }

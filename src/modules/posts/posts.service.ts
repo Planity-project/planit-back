@@ -277,8 +277,8 @@ export class PostsService {
   }
 
   async deletePosts(id: number): Promise<boolean> {
-    await this.postRepository.delete(id);
-    return true;
+    const result = await this.postRepository.delete(id);
+    return result.affected !== 0; // 삭제된 row가 있다면 true
   }
 
   async statePost(postId: number, userId: number): Promise<boolean> {

@@ -209,7 +209,10 @@ export class AlbumController {
     summary: '앨범 상세 조회',
     description: '특정 앨범의 상세 정보를 조회합니다.',
   })
-  async getAlbumPhotoData(@Param('AlbumId') albumId: number) {
-    return await this.albumService.findDetailData(albumId);
+  async getAlbumPhotoData(
+    @Param('albumId') albumId: number,
+    @Param('userId') userId: number,
+  ) {
+    return await this.albumService.albumPhotoDetail(albumId, userId);
   }
 }
