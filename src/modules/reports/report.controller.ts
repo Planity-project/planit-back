@@ -23,13 +23,17 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwtauth.gurad';
+import { UserService } from '../user/user.service';
 
 @ApiTags('Reports')
 @Controller('reports')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class ReportController {
-  constructor(private readonly reportService: ReportService) {}
+  constructor(
+    private readonly reportService: ReportService,
+    private readonly userService: UserService,
+  ) {}
 
   // ✅ 댓글 신고 생성
   @Post('comments/:commentId')
@@ -64,6 +68,50 @@ export class ReportController {
     report.reporter = req.user;
     report.target_type = TargetType.COMMENT;
     report.target_id = commentId;
+    report.reason = reportData.reason;
+
+    return this.reportService.create(report);
+  }
+
+  // ✅ 유저 신고 생성
+  @Post('users/:userId')
+  @ApiOperation({ summary: '유저 신고 생성' })
+  @ApiParam({
+    name: 'userId',
+    type: 'number',
+    description: '신고할 유저 ID',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        reason: { type: 'string', description: '신고 사유' },
+      },
+      required: ['reason'],
+    },
+  })
+  @ApiResponse({ status: 201, description: '유저 신고 완료' })
+  @ApiResponse({ status: 400, description: '잘못된 요청' })
+  @ApiResponse({ status: 404, description: '해당 유저를 찾을 수 없음' })
+  async reportUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() reportData: { reason: string },
+    @Req() req: any,
+  ): Promise<Report> {
+    console.log('req.user:', req.user);
+    if (!reportData.reason || reportData.reason.trim() === '') {
+      throw new BadRequestException('신고 사유를 입력해주세요.');
+    }
+
+    const targetUser = await this.userService.findById(userId);
+    if (!targetUser) {
+      throw new NotFoundException('해당 유저를 찾을 수 없습니다.');
+    }
+
+    const report = new Report();
+    report.reporter = req.user;
+    report.target_type = TargetType.USER;
+    report.target_id = userId;
     report.reason = reportData.reason;
 
     return this.reportService.create(report);

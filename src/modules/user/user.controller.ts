@@ -15,6 +15,7 @@ import {
   HttpStatus,
   Query,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiOperation,
@@ -63,6 +64,13 @@ export class UserController {
     return this.albumService.getAlbumList();
   }
 
+  // 📌 앨범 유저 전체 목록 조회
+  @Get('/albumusers')
+  @ApiOperation({ summary: '앨범 그룹에 속한 회원 조회 (alias)' })
+  async getUsersInAlbumAlias(@Query('albumId') albumId: number) {
+    return this.userService.getUsersInAlbum(albumId);
+  }
+
   // 📌 앨범 회원 조회
   @Get('/albumUser')
   @ApiOperation({ summary: '앨범 그룹에 속한 회원 조회' })
@@ -76,6 +84,16 @@ export class UserController {
   @ApiParam({ name: 'id', description: '유저 ID' })
   findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.userService.findOne(id);
+  }
+
+  // ✅ 관리자 유저 수정
+  @Patch(':id')
+  @ApiOperation({ summary: '유저 닉네임 및 상태 수정' })
+  async updateUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.update(id, updateUserDto);
   }
 
   // ✅ 닉네임 업데이트
