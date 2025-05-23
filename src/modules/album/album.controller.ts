@@ -81,7 +81,8 @@ export class AlbumController {
     summary: '앨범 상세 조회',
     description: '특정 앨범의 상세 정보를 조회합니다.',
   })
-  async getDetailData(@Param('AlbumId') albumId: number) {
+  async getDetailData(@Query('albumId') albumId: number) {
+    console.log(albumId, 'detailData');
     return await this.albumService.findDetailData(albumId);
   }
 
