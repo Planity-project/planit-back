@@ -86,6 +86,7 @@ export class PostsService {
       nickName: post.user.nickname,
       title: post.title,
       img: post.images?.map((img) => img.url) ?? [],
+      content: post.content,
       hashtag: [
         `#${post.trip?.title ?? '위치없음'}`,
         ...(post.hashtags?.map((tag) =>
