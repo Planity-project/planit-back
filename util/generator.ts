@@ -182,55 +182,55 @@ export async function requestGemini(prompt: string): Promise<string> {
 }
 
 //프롬포트
-export function generateSchedulePrompt(body: any): string {
-  const { dataTime, dataPlace, dataStay } = body;
+// export function generateSchedulePrompt(body: any): string {
+//   const { dataTime, dataPlace, dataStay } = body;
 
-  const formatTime = (time: any) => {
-    const hour =
-      time.hour + (time.meridiem === '오후' && time.hour !== 12 ? 12 : 0);
-    const minute = time.minute.toString().padStart(2, '0');
-    return `${hour}:${minute}`;
-  };
+//   const formatTime = (time: any) => {
+//     const hour =
+//       time.hour + (time.meridiem === '오후' && time.hour !== 12 ? 12 : 0);
+//     const minute = time.minute.toString().padStart(2, '0');
+//     return `${hour}:${minute}`;
+//   };
 
-  let prompt = `📅 여행 일정 요청\n`;
+//   let prompt = `📅 여행 일정 요청\n`;
 
-  // 날짜별 정보 구성
-  dataTime.forEach((day) => {
-    const date = day.date;
-    const start = formatTime(day.start);
-    const end = formatTime(day.end);
-    const stay = dataStay.find((s) => s.date === date.slice(0, 10));
-    const stayTitle = stay?.place?.title || '없음';
+//   // 날짜별 정보 구성
+//   dataTime.forEach((day) => {
+//     const date = day.date;
+//     const start = formatTime(day.start);
+//     const end = formatTime(day.end);
+//     const stay = dataStay.find((s) => s.date === date.slice(0, 10));
+//     const stayTitle = stay?.place?.title || '없음';
 
-    prompt += `\n🗓️ ${date}\n`;
-    prompt += `- 이용 가능 시간: ${start} ~ ${end}\n`;
-    prompt += `- 숙소: ${stayTitle}\n`;
-  });
+//     prompt += `\n🗓️ ${date}\n`;
+//     prompt += `- 이용 가능 시간: ${start} ~ ${end}\n`;
+//     prompt += `- 숙소: ${stayTitle}\n`;
+//   });
 
-  // 장소 정보 구성
-  prompt += `\n\n📍 방문 가능한 장소 목록:\n`;
-  dataPlace.forEach((place, idx) => {
-    prompt += `${idx + 1}. ${place.title} (${place.category})\n   - 예상 소요시간: ${place.minutes}분\n   - 주소: ${place.address}\n   - 이미지: ${place.imageSrc || '없음'}\n`;
-  });
+//   // 장소 정보 구성
+//   prompt += `\n\n📍 방문 가능한 장소 목록:\n`;
+//   dataPlace.forEach((place, idx) => {
+//     prompt += `${idx + 1}. ${place.title} (${place.category})\n   - 예상 소요시간: ${place.minutes}분\n   - 주소: ${place.address}\n   - 이미지: ${place.imageSrc || '없음'}\n`;
+//   });
 
-  // 요청 조건
-  prompt += `\n\n📌 요청 사항:\n`;
-  prompt += `- 위 장소들을 날짜별로 시간 내에서 효율적으로 나눠서 일정 구성해줘.\n`;
-  prompt += `- 장소 간 동선을 고려해줘.\n`;
-  prompt += `- 결과는 **JSON 형태**로 날짜별 일정 배열로 구성해줘.\n`;
-  prompt += `- 형식 예시:\n`;
-  prompt += `  {\n    "2025-05-13 (화)": [\n      {\n        "순서": 1,\n        "start": "09:00",\n        "end": "11:00",\n
-  "장소": "경주 탈해왕릉",\n        "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "관광지",\n
-   "image": "..." \n      },\n      {\n        "순서": 2,\n        "start": "11:00",\n        "end": "13:00",\n        "장소": "오누이",\n
-     "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "음식점",\n        "image": "..." \n    "rating": 평점, "reviewCount": 리뷰수  }\n    ]\n  }\n`;
+//   // 요청 조건
+//   prompt += `\n\n📌 요청 사항:\n`;
+//   prompt += `- 위 장소들을 날짜별로 시간 내에서 효율적으로 나눠서 일정 구성해줘.\n`;
+//   prompt += `- 장소 간 동선을 고려해줘.\n`;
+//   prompt += `- 결과는 **JSON 형태**로 날짜별 일정 배열로 구성해줘.\n`;
+//   prompt += `- 형식 예시:\n`;
+//   prompt += `  {\n    "2025-05-13 (화)": [\n      {\n        "순서": 1,\n        "start": "09:00",\n        "end": "11:00",\n
+//   "장소": "경주 탈해왕릉",\n        "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "관광지",\n
+//    "image": "..." \n      },\n      {\n        "순서": 2,\n        "start": "11:00",\n        "end": "13:00",\n        "장소": "오누이",\n
+//      "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "음식점",\n        "image": "..." \n    "rating": 평점, "reviewCount": 리뷰수  }\n    ]\n  }\n`;
 
-  prompt += `- 숙소도 각 일차에 포함시켜줘 (1박마다).\n`;
-  prompt += `- 가능한 일정을 최대한 꽉 채워서 구성해줘.\n`;
-  prompt += `- 비는 시간은 인근 장소를 넣어 채워줘.\n`;
-  prompt += `- 위도 경도, 리뷰수와 평점, image, 장소, 주소는 무조건 포함해야해 모든 데이터는 null값이 없어야 함 JSON파일 형태로 줘`;
+//   prompt += `- 숙소도 각 일차에 포함시켜줘 (1박마다).\n`;
+//   prompt += `- 가능한 일정을 최대한 꽉 채워서 구성해줘.\n`;
+//   prompt += `- 비는 시간은 인근 장소를 넣어 채워줘.\n`;
+//   prompt += `- 위도 경도, 리뷰수와 평점, image, 장소, 주소는 무조건 포함해야해 모든 데이터는 null값이 없어야 함 JSON파일 형태로 줘`;
 
-  return prompt;
-}
+//   return prompt;
+// }
 
 // export function generateSchedulePrompt(body: any): string {
 //   const { dataTime, dataPlace, dataStay } = body;
@@ -290,6 +290,45 @@ export function generateSchedulePrompt(body: any): string {
 
 //   return prompt;
 // }
+export function generateSchedulePrompts(
+  body: any,
+): { date: string; prompt: string }[] {
+  const { dataTime, dataPlace, dataStay } = body;
+
+  const formatTime = (time: any) => {
+    const hour =
+      time.hour + (time.meridiem === '오후' && time.hour !== 12 ? 12 : 0);
+    const minute = time.minute.toString().padStart(2, '0');
+    return `${hour}:${minute}`;
+  };
+
+  return dataTime.map((day) => {
+    const date = day.date;
+    const start = formatTime(day.start);
+    const end = formatTime(day.end);
+    const stay = dataStay.find((s) => s.date === date.slice(0, 10));
+    const stayTitle = stay?.place?.title || '없음';
+
+    let prompt = `📅 여행 일정 요청\n\n`;
+    prompt += `🗓️ ${date}\n`;
+    prompt += `- 이용 가능 시간: ${start} ~ ${end}\n`;
+    prompt += `- 숙소: ${stayTitle}\n`;
+
+    prompt += `\n📍 방문 가능한 장소 목록:\n`;
+    dataPlace.forEach((place, idx) => {
+      prompt += `${idx + 1}. ${place.title} (${place.category})\n   - 예상 소요시간: ${place.minutes}분\n   - 주소: ${place.address}\n   - 이미지: ${place.imageSrc || '없음'}\n`;
+    });
+
+    prompt += `\n📌 요청 사항:\n`;
+    prompt += `- 위 장소들을 위 날짜에 맞춰 효율적으로 일정 구성해줘.\n`;
+    prompt += `- 장소 간 동선을 고려해줘.\n`;
+    prompt += `- 결과는 **JSON 형태**로 구성해줘. 형식은:\n`;
+    prompt += `  {\n    "${date}": [\n      {\n        "순서": 1,\n        "start": "09:00",\n        "end": "11:00",\n        "장소": "경주 탈해왕릉",\n        "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "관광지",\n        "image": "...",\n        "rating": 평점,\n        "reviewCount": 리뷰수\n      }\n    ]\n  }\n`;
+    prompt += `- 모든 데이터는 반드시 null값이 들어가있으면 안 돼:\n`;
+
+    return { date, prompt };
+  });
+}
 
 export function generateSchedulePromptEn(body: any): string {
   const { dataTime, dataPlace, dataStay } = body;

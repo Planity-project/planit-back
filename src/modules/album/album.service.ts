@@ -227,6 +227,7 @@ export class AlbumService {
     const image = await this.albumImageRepository.findOne({
       where: { id: albumImageId },
       relations: [
+        'album',
         'user',
         'likes',
         'likes.user',
@@ -243,6 +244,7 @@ export class AlbumService {
     if (!image) {
       throw new NotFoundException('이미지를 찾을 수 없습니다.');
     }
+    const payState = image.album.type === 'FREE' ? false : true;
 
     const isLiked =
       image.likes?.some((l) => Number(l.user.id) === Number(userId)) || false;
@@ -257,6 +259,7 @@ export class AlbumService {
       userImg: image.user.profile_img ?? '/defaultImage.png',
       like: isLiked,
       likeCnt: image.likes?.length || 0,
+      state: payState,
       comment: parentComments.map((c) => ({
         id: c.id,
         userId: c.user.id,
