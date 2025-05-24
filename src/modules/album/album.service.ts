@@ -469,4 +469,49 @@ export class AlbumService {
       };
     }
   }
+
+  async albumGroupJoinUser(
+    userId: number,
+    albumId: number,
+  ): Promise<{ result: boolean; message: string }> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const album = await this.albumRepository.findOne({
+      where: { id: albumId },
+      relations: ['groups'],
+    });
+
+    if (!user || !album) {
+      return {
+        result: false,
+        message: '유저 또는 앨범을 찾을 수 없습니다.',
+      };
+    }
+
+    // 이미 가입된 경우 확인
+    const alreadyJoined = album.groups.some(
+      (group) => group.user?.id === user.id,
+    );
+
+    if (alreadyJoined) {
+      return {
+        result: false,
+        message: '이미 그룹에 참여한 사용자입니다.',
+      };
+    }
+
+    // 새 그룹 멤버 생성
+    const newGroup = this.albumGroupRepository.create({
+      user,
+      albums: album,
+      role: 'MEMBER',
+      type: album.type,
+    });
+
+    await this.albumGroupRepository.save(newGroup);
+
+    return {
+      result: true,
+      message: '그룹에 성공적으로 참여했습니다.',
+    };
+  }
 }

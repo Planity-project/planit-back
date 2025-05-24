@@ -152,6 +152,7 @@ export class PostsService {
 
     const data = {
       id: result.id,
+      userId: result.user.id,
       createdAt: result.createdAt,
       startDate: result.trip.startDate,
       endDate: result.trip.endDate,

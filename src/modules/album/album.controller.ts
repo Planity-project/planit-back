@@ -255,10 +255,12 @@ export class AlbumController {
   async albumInviteFine(@Query('invite') inviteLink: string) {
     return await this.albumService.inviteAlbumFind(inviteLink);
   }
-  // @Get('inviteData')
-  // async inviteAlbumGroup(@Query('inviteIink'))
 
-  // @Post('groupjoin')
+  @Post('groupjoin')
+  async albumGroupJoin(@Body() body: any) {
+    const { userId, albumId } = body;
+    return await this.albumService.albumGroupJoinUser(userId, albumId);
+  }
 
   @Delete('delImage')
   async albumImageDelete(@Query('imageId') imageId: number) {
