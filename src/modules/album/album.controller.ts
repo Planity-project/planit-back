@@ -264,7 +264,7 @@ export class AlbumController {
 
   @Delete('delImage')
   async albumImageDelete(@Query('imageId') imageId: number) {
-    return await this.albumImageDelete(Number(imageId));
+    return await this.albumService.albumImageDelete(Number(imageId));
   }
 
   @Delete('delAlbum')
