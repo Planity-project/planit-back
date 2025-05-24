@@ -47,9 +47,9 @@ export class TripController {
     return await this.tripService.findAll();
   }
 
-  @Post('preview')
-  async previewDate(@Body() body: any[]) {
-    const result = await this.tripService.previewGeneratedTrip(body);
-    return result;
-  }
+  // @Post('preview')
+  // async previewDate(@Body() body: any[]) {
+  //   const result = await this.tripService.previewGeneratedTrip(body);
+  //   return result;
+  // }
 }

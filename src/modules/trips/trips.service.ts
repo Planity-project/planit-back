@@ -11,7 +11,7 @@ import { User } from '../user/entities/user.entity';
 
 import {
   requestGemini,
-  generateSchedulePrompt,
+  generateSchedulePrompts,
   generateSchedulePromptEn,
 } from 'util/generator';
 @Injectable()
@@ -38,169 +38,150 @@ export class TripService {
 
   //최종 일정 생성
   async generateWithGemini(body: any) {
-    const str = generateSchedulePrompt(body.schedule);
-    let data = await requestGemini(str);
-    console.log(data, 'gemini응답');
-    try {
-      // ✨ 혹시 JSON 앞뒤에 설명 텍스트가 붙어 있는 경우 제거
+    const prompts = generateSchedulePrompts(body.schedule);
+    const fullResult: Record<string, any[]> = {};
+
+    for (const { prompt } of prompts) {
+      const data = await requestGemini(prompt);
       const jsonStart = data.indexOf('{');
       const jsonEnd = data.lastIndexOf('}');
-
       if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
         throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
       }
-
       const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
-      console.log('추출된 JSON:', jsonSubstring);
-      const parseData = JSON.parse(jsonSubstring);
-      const dates = Object.keys(parseData);
-      console.log(parseData, '객체 데이터');
+      const parsed = JSON.parse(jsonSubstring);
+      Object.assign(fullResult, parsed); // 날짜 키로 합침
+    }
 
-      const userData = await this.userRepository.findOne({
-        where: { id: body.schedule.userId },
-      });
-      if (!userData) {
-        throw new Error('유저를 찾을 수 없습니다');
-      }
-      //   const data = await this.tripRepository.create()
-      const createTripData: Partial<Trip> = {
-        title: body.schedule.location,
-        startDate: new Date(dates[0]),
-        endDate: new Date(dates[dates.length - 1]),
-        user: userData,
-      };
+    // 이후 코드는 기존과 동일하게 진행
+    const dates = Object.keys(fullResult);
+    const userData = await this.userRepository.findOne({
+      where: { id: body.schedule.userId },
+    });
+    if (!userData) {
+      throw new Error('유저를 찾을 수 없습니다');
+    }
 
-      const trip = await this.tripRepository.save(createTripData);
+    const createTripData: Partial<Trip> = {
+      title: body.schedule.location,
+      startDate: new Date(dates[0]),
+      endDate: new Date(dates[dates.length - 1]),
+      user: userData,
+    };
 
-      const entries = Object.entries(parseData); // [['2025-05-14 (수)', [...]], ['2025-05-15 (목)', [...]]]
+    const trip = await this.tripRepository.save(createTripData);
 
-      for (let i = 0; i < entries.length; i++) {
-        const [dateStr, schedules] = entries[i];
-        console.log(dateStr, schedules, '내부 데이터');
-        const dayData = {
-          date: `${dateStr}`,
-          todayOrder: Number(i + 1),
-          trip: trip,
-        };
-
-        const savedDay = await this.tripDayRepository.save(dayData);
-        console.log(savedDay, 'savedDay');
-        for (const item of schedules as any) {
-          const {
-            순서: todayOrder,
-            start,
-            end,
-            장소: placeName,
-            위도: lat,
-            경도: lng,
-            주소: address,
-            타입: category,
-            image,
-            rating,
-            reviewCount,
-          } = item;
-          console.log(
-            todayOrder,
-            start,
-            end,
-            placeName,
-            lat,
-            lng,
-            address,
-            category,
-            'item',
-          );
-          // 📌 장소 저장
-          const savedPlace = await this.placeRepository.save({
-            name: placeName,
-            category,
-            address,
-            lat,
-            lng,
-            todayOrder: todayOrder,
-            trip: trip,
-            tripDay: savedDay,
-            image: image,
-            rating: rating,
-            reviewCount: reviewCount,
-          });
-
-          // 📌 일정 저장
-          await this.tripScheduleItemRepository.save({
-            startTime: start,
-            endTime: end,
-            title: placeName,
-            todayOrder: todayOrder,
-            trip: trip,
-            tripDay: savedDay,
-            place: savedPlace,
-          });
-        }
-      }
-      const post = this.postRepository.create({
-        user: userData,
+    const entries = Object.entries(fullResult);
+    for (let i = 0; i < entries.length; i++) {
+      const [dateStr, schedules] = entries[i];
+      const dayData = {
+        date: dateStr,
+        todayOrder: i + 1,
         trip: trip,
-      });
-      const savedPost = await this.postRepository.save(post);
-      return savedPost.id;
-    } catch (error) {
-      console.error(error, 'error message');
-    }
-  }
-
-  //일정 생성하기 전 프리뷰
-  async previewGeneratedTrip(body: any) {
-    const str = generateSchedulePrompt(body);
-    const data = await requestGemini(str);
-
-    try {
-      //  JSON 부분만 추출
-      const jsonStart = data.indexOf('{');
-      const jsonEnd = data.lastIndexOf('}');
-      const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
-
-      const parsedData = JSON.parse(jsonSubstring);
-      const entries: [string, any[]][] = Object.entries(parsedData); // [['2025-05-14 (수)', [...]], ...]
-
-      const previewTrip = {
-        title: body.location,
-        startDate: new Date(Object.keys(parsedData)[0]),
-        endDate: new Date(Object.keys(parsedData).slice(-1)[0]),
-        tripDays: entries.map(([date, schedules], index) => {
-          const dayOrder = index + 1;
-
-          const places = schedules.map((item: any) => ({
-            name: item.장소,
-            category: item.타입,
-            address: item.주소,
-            lat: item.위도,
-            lng: item.경도,
-            todayOrder: item.순서,
-            image: item.image,
-          }));
-
-          const scheduleItems = schedules.map((item: any) => ({
-            title: item.장소,
-            startTime: item.start,
-            endTime: item.end,
-            todayOrder: item.순서,
-          }));
-
-          return {
-            date,
-            todayOrder: dayOrder,
-            places,
-            scheduleItems,
-          };
-        }),
       };
+      const savedDay = await this.tripDayRepository.save(dayData);
 
-      return previewTrip;
-    } catch (error) {
-      console.error('프리뷰 생성 중 오류 발생:', error);
-      throw new Error('프리뷰 생성 실패');
+      for (const item of schedules as any) {
+        const {
+          순서: todayOrder,
+          start,
+          end,
+          장소: placeName,
+          위도: lat,
+          경도: lng,
+          주소: address,
+          타입: category,
+          image,
+          rating,
+          reviewCount,
+        } = item;
+
+        const savedPlace = await this.placeRepository.save({
+          name: placeName,
+          category,
+          address,
+          lat,
+          lng,
+          todayOrder,
+          trip,
+          tripDay: savedDay,
+          image,
+          rating,
+          reviewCount,
+        });
+
+        await this.tripScheduleItemRepository.save({
+          startTime: start,
+          endTime: end,
+          title: placeName,
+          todayOrder,
+          trip,
+          tripDay: savedDay,
+          place: savedPlace,
+        });
+      }
     }
+
+    const post = this.postRepository.create({
+      user: userData,
+      trip,
+    });
+    const savedPost = await this.postRepository.save(post);
+    return savedPost.id;
   }
+  //일정 생성하기 전 프리뷰
+  // async previewGeneratedTrip(body: any) {
+  //   const str = generateSchedulePrompt(body);
+  //   const data = await requestGemini(str);
+
+  //   try {
+  //     //  JSON 부분만 추출
+  //     const jsonStart = data.indexOf('{');
+  //     const jsonEnd = data.lastIndexOf('}');
+  //     const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
+
+  //     const parsedData = JSON.parse(jsonSubstring);
+  //     const entries: [string, any[]][] = Object.entries(parsedData); // [['2025-05-14 (수)', [...]], ...]
+
+  //     const previewTrip = {
+  //       title: body.location,
+  //       startDate: new Date(Object.keys(parsedData)[0]),
+  //       endDate: new Date(Object.keys(parsedData).slice(-1)[0]),
+  //       tripDays: entries.map(([date, schedules], index) => {
+  //         const dayOrder = index + 1;
+
+  //         const places = schedules.map((item: any) => ({
+  //           name: item.장소,
+  //           category: item.타입,
+  //           address: item.주소,
+  //           lat: item.위도,
+  //           lng: item.경도,
+  //           todayOrder: item.순서,
+  //           image: item.image,
+  //         }));
+
+  //         const scheduleItems = schedules.map((item: any) => ({
+  //           title: item.장소,
+  //           startTime: item.start,
+  //           endTime: item.end,
+  //           todayOrder: item.순서,
+  //         }));
+
+  //         return {
+  //           date,
+  //           todayOrder: dayOrder,
+  //           places,
+  //           scheduleItems,
+  //         };
+  //       }),
+  //     };
+
+  //     return previewTrip;
+  //   } catch (error) {
+  //     console.error('프리뷰 생성 중 오류 발생:', error);
+  //     throw new Error('프리뷰 생성 실패');
+  //   }
+  // }
 
   async findAll() {
     const data: any = await this.tripRepository.find({
