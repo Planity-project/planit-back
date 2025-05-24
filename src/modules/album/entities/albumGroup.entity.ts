@@ -42,7 +42,7 @@ export class AlbumGroup {
   @ManyToOne(() => User, (user) => user.albumGroups, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Album, (album) => album.groups)
+  @ManyToOne(() => Album, (album) => album.groups, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'albumId' })
   albums: Album;
 

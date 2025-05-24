@@ -30,11 +30,11 @@ export class AlbumImage {
 
   // 📚 관계 설정
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => Album)
+  @ManyToOne(() => Album, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'albumId' })
   album: Album;
 
