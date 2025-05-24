@@ -9,34 +9,49 @@ import { Post } from 'src/modules/posts/entities/post.entity';
 import { Album } from '../album/entities/album.entity';
 import { AlbumGroup } from '../album/entities/albumGroup.entity';
 import { AlbumImage } from '../album/entities/albumImage';
+
 @Injectable()
 export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private notificationRepository: Repository<Notification>,
-
     @InjectRepository(Trip)
     private readonly tripRepository: Repository<Trip>,
-
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
     @InjectRepository(Album)
     private readonly albumRepository: Repository<Album>,
-
     @InjectRepository(AlbumGroup)
     private readonly albumGroupRepository: Repository<AlbumGroup>,
-
     @InjectRepository(AlbumImage)
     private readonly albumImageRepository: Repository<AlbumImage>,
   ) {}
 
   // ✅ 유저의 모든 알림 조회
-  async getUserNotification(userId: number): Promise<Notification[]> {
-    return this.notificationRepository.find({
+  async getUserNotification(userId: number): Promise<any[]> {
+    const notifications = await this.notificationRepository.find({
       where: { user: { id: userId } },
       order: { createdAt: 'DESC' },
+      relations: ['post', 'album', 'report', 'trip'],
     });
+
+    return notifications.map((n) => ({
+      id: n.id,
+      type: n.type,
+      targetId:
+        n.type === 'POST'
+          ? n.post?.id
+          : n.type === 'ALBUM'
+            ? n.album?.id
+            : n.type === 'REPORT'
+              ? n.report?.id
+              : n.type === 'TRIP'
+                ? n.trip?.id
+                : null,
+      content: n.content,
+      createdAt: n.createdAt,
+      isRead: n.status === 'READ',
+    }));
   }
 
   // ✅ 일반 알림 전송
@@ -59,6 +74,8 @@ export class NotificationService {
       trip: trip ? { id: trip.id } : null,
       content,
       type,
+      status: 'UNREAD',
+      isSent: false,
     });
 
     return await this.notificationRepository.save(notification);
@@ -70,10 +87,7 @@ export class NotificationService {
     userId: number,
   ): Promise<Notification> {
     const notification = await this.notificationRepository.findOne({
-      where: {
-        id: noticeId,
-        user: { id: userId },
-      },
+      where: { id: noticeId, user: { id: userId } },
       relations: ['user'],
     });
 
@@ -91,10 +105,7 @@ export class NotificationService {
     notifyAt.setDate(notifyAt.getDate() + 1);
 
     const exists = await this.notificationRepository.findOne({
-      where: {
-        user: { id: userId },
-        trip: { id: tripId },
-      },
+      where: { user: { id: userId }, trip: { id: tripId } },
     });
 
     if (!exists) {
@@ -121,7 +132,7 @@ export class NotificationService {
     });
 
     for (const notification of notifications) {
-      // TODO: 알림 전송 로직 추가
+      // 실제 알림 전송 로직 필요
       notification.isSent = true;
       await this.notificationRepository.save(notification);
     }
@@ -130,15 +141,10 @@ export class NotificationService {
   // ✅ 평점 제출 후 여행 알림 제거
   async submitTripRating(userId: number, tripId: number, rating: number) {
     const trip = await this.tripRepository.findOne({
-      where: {
-        id: tripId,
-        user: { id: userId },
-      },
+      where: { id: tripId, user: { id: userId } },
     });
 
-    if (!trip) {
-      throw new NotFoundException('Trip not found');
-    }
+    if (!trip) throw new NotFoundException('Trip not found');
 
     trip.rating = rating;
     await this.tripRepository.save(trip);
@@ -161,7 +167,7 @@ export class NotificationService {
     }
   }
 
-  // ✅ 알림 일정 보내기
+  // ✅ 여행 공유 알림
   async sendShareTripNotification(
     userId: number,
     tripId: number,
@@ -179,16 +185,17 @@ export class NotificationService {
 
     await this.notificationRepository.save(notification);
   }
-  // ✅ 게시글 좋아요 시 알림 생성
+
+  // ✅ 게시글 좋아요 시 알림
   async createPostLikeNotification(sender: User, post: Post): Promise<void> {
-    if (post.user.id === sender.id) return; // 자기 글이면 알림 제외
+    if (post.user.id === sender.id) return;
 
     const notification = this.notificationRepository.create({
-      user: post.user, // 알림 받을 사람
+      user: post.user,
       content: `${sender.nickname}님이 "${post.title}" 게시글에 좋아요를 눌렀습니다.`,
       type: 'POST',
       status: 'UNREAD',
-      post: post,
+      post,
       notifyAt: null,
       isSent: false,
     });
@@ -196,6 +203,7 @@ export class NotificationService {
     await this.notificationRepository.save(notification);
   }
 
+  // ✅ 다양한 상황에서 알림 생성
   async createNotification(
     sender: User,
     text: string,
@@ -204,9 +212,8 @@ export class NotificationService {
     albumGroup?: AlbumGroup,
     albumImage?: AlbumImage,
   ): Promise<void> {
-    // 1) post가 있을 때
     if (post) {
-      if (post.user.id === sender.id) return; // 자기 자신 제외
+      if (post.user.id === sender.id) return;
 
       const notification = this.notificationRepository.create({
         user: post.user,
@@ -222,10 +229,8 @@ export class NotificationService {
       return;
     }
 
-    // 2) album이 있을 때 (album에 속한 모든 사용자에게 알림)
     if (album) {
       for (const user of album.groups) {
-        // album.users: 앨범에 속한 사용자 배열
         if (user.id === sender.id) continue;
 
         const notification = this.notificationRepository.create({
@@ -243,9 +248,8 @@ export class NotificationService {
       return;
     }
 
-    // 4) albumImage가 있을 때 (작성자에게만 알림)
     if (albumImage) {
-      if (albumImage.user.id === sender.id) return; // 자기 자신 제외
+      if (albumImage.user.id === sender.id) return;
 
       const notification = this.notificationRepository.create({
         user: albumImage.user,
@@ -258,7 +262,6 @@ export class NotificationService {
       });
 
       await this.notificationRepository.save(notification);
-      return;
     }
   }
 }

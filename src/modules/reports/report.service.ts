@@ -170,6 +170,8 @@ export class ReportService {
     await this.notificationeService.sendNotification({
       user: reportedUser,
       content: message,
+      report,
+      type: 'REPORT',
     });
 
     console.log(`📢 알림 전송 완료 → ${reportedUser.nickname}: ${message}`);
