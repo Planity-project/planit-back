@@ -27,7 +27,6 @@ export class Notification {
   @Column({
     type: 'enum',
     enum: ['POST', 'ALBUM', 'REPORT', 'TRIP'],
-    default: 'POST',
   })
   type: NotificationType;
   // POST : 좋아요 알림

@@ -52,7 +52,7 @@ export class SendNotificationDto {
 
   @ApiPropertyOptional({
     example: 'REPORT',
-    description: '알림 유형 (NORMAL | ALBUM | REPORT | POST | TRIP)',
+    description: '알림 유형 (ALBUM | REPORT | POST | TRIP)',
   })
   @IsOptional()
   @IsEnum(['ALBUM', 'REPORT', 'POST', 'TRIP'])
