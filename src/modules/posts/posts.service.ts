@@ -141,8 +141,8 @@ export class PostsService {
         name: place.name,
         category: place.category,
         image: place.image ?? '/defaultImage.png',
-        startTime: result.trip.tripDays[0].date, // 만약 Place에 시간 정보가 있다면
-        endTime: result.trip.tripDays[result.trip.tripDays.length - 1].date,
+        startTime: tripDay.scheduleItems[i].startTime, // 만약 Place에 시간 정보가 있다면
+        endTime: tripDay.scheduleItems[i].endTime,
         lat: place.lat,
         lng: place.lng,
         rating: place.rating,

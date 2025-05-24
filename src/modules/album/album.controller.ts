@@ -251,6 +251,22 @@ export class AlbumController {
     return await this.albumService.albumLikesImage(userId, albumId);
   }
 
+  @Get('inviteFind')
+  async albumInviteFine(@Query('invite') inviteLink: string) {
+    return await this.albumService.inviteAlbumFind(inviteLink);
+  }
   // @Get('inviteData')
   // async inviteAlbumGroup(@Query('inviteIink'))
+
+  // @Post('groupjoin')
+
+  @Delete('delImage')
+  async albumImageDelete(@Query('imageId') imageId: number) {
+    return await this.albumImageDelete(Number(imageId));
+  }
+
+  @Delete('delAlbum')
+  async albumDelete(@Query('albumId') albumId: number) {
+    return await this.albumService.albumDelete(albumId);
+  }
 }

@@ -44,9 +44,6 @@ export class AlbumPhotoDetailResponseDto {
   @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({ example: '결제 정보' })
-  state: boolean;
-
   @ApiProperty({ example: ['Travel.jpg'], type: [String] })
   titleImg: string[];
 

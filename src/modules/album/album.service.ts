@@ -73,6 +73,7 @@ export class AlbumService {
     link: string[];
     title: string;
     titleImg: string;
+    state: boolean;
     group: {
       id: number;
       userId: number;
@@ -119,6 +120,7 @@ export class AlbumService {
       link: [album.inviteLink],
       title: album.title,
       titleImg: album.titleImg || '/defaultImage.png',
+      state: album.type === 'FREE' ? false : true,
       group,
       image,
     };
@@ -244,7 +246,6 @@ export class AlbumService {
     if (!image) {
       throw new NotFoundException('이미지를 찾을 수 없습니다.');
     }
-    const payState = image.album.type === 'FREE' ? false : true;
 
     const isLiked =
       image.likes?.some((l) => Number(l.user.id) === Number(userId)) || false;
@@ -259,7 +260,6 @@ export class AlbumService {
       userImg: image.user.profile_img ?? '/defaultImage.png',
       like: isLiked,
       likeCnt: image.likes?.length || 0,
-      state: payState,
       comment: parentComments.map((c) => ({
         id: c.id,
         userId: c.user.id,
@@ -411,6 +411,62 @@ export class AlbumService {
       });
       await this.likeRepository.save(newLike);
       return { result: true, liked: true, message: '좋아요가 추가되었습니다.' };
+    }
+  }
+
+  async inviteAlbumFind(invite: string): Promise<{
+    id: number | undefined;
+    title: string | undefined;
+    titleImg: string | undefined;
+    owner: string | undefined;
+  }> {
+    const data = await this.albumRepository.findOne({
+      where: { inviteLink: invite },
+      relations: ['user'],
+    });
+    const result = {
+      id: data?.id,
+      title: data?.title,
+      titleImg: data?.titleImg,
+      owner: data?.user.nickname,
+    };
+    return result;
+  }
+
+  async albumImageDelete(
+    imageId: number,
+  ): Promise<{ result: boolean; message: string }> {
+    const deleteResult = await this.albumImageRepository.delete(imageId);
+
+    if (deleteResult.affected && deleteResult.affected > 0) {
+      return {
+        result: true,
+        message: '이미지가 성공적으로 삭제되었습니다.',
+      };
+    } else {
+      return {
+        result: false,
+        message:
+          '이미지 삭제에 실패했습니다. 해당 ID의 이미지가 존재하지 않습니다.',
+      };
+    }
+  }
+
+  async albumDelete(
+    albumId: number,
+  ): Promise<{ result: boolean; message: string }> {
+    const deleteResult = await this.albumRepository.delete(albumId);
+
+    if (deleteResult.affected && deleteResult.affected > 0) {
+      return {
+        result: true,
+        message: '앨범이 성공적으로 삭제되었습니다.',
+      };
+    } else {
+      return {
+        result: false,
+        message: '앨범 삭제에 실패했습니다. 해당 앨범ID가 존재하지 않습니다.',
+      };
     }
   }
 }
