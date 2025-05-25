@@ -53,9 +53,30 @@ export class AlbumController {
     description: '성공적으로 생성됨',
     type: SubmitAlbumResponseDto,
   })
-  submitAlbum(@Body() body: { userId: number; title: string; url: string }) {
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/albums/head',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `album-${uniqueSuffix}${ext}`;
+          callback(null, filename);
+        },
+      }),
+      limits: { fileSize: 1024 * 1024 * 5 }, // 5MB 제한
+    }),
+  )
+  submitAlbum(
+    @Body() body: { userId: number; title: string; url: string },
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
     const { userId, title, url } = body;
-    return this.albumService.submitAlbum(userId, title, url);
+    const fileUrl = file
+      ? `${SERVER_DOMAIN}/uploads/albums/head/${file.filename}`
+      : undefined;
+    return this.albumService.submitAlbum(userId, title, url, fileUrl);
   }
 
   // 전체 앨범 데이터 가져오기
