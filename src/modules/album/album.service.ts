@@ -37,7 +37,7 @@ export class AlbumService {
     userId: number,
     title: string,
     inviteLink: string,
-    fileUrl: string | undefined,
+    fileUrl: string,
   ): Promise<{ result: boolean; id: number }> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
