@@ -71,6 +71,6 @@ export class Trip {
     nullable: true,
     description: '연관된 게시글',
   })
-  @OneToOne(() => Post, (post) => post.trip)
+  @OneToOne(() => Post, (post) => post.trip, { onDelete: 'CASCADE' })
   post: Post;
 }

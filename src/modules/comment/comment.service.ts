@@ -5,6 +5,7 @@ import { Comment } from './entities/comment.entity';
 import { User } from '../user/entities/user.entity';
 import { Report, TargetType } from '../reports/entities/report.entity';
 import { AlbumImage } from '../album/entities/albumImage';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class CommentService {
@@ -17,6 +18,8 @@ export class CommentService {
     private readonly albumImageRepository: Repository<AlbumImage>,
     @InjectRepository(Report)
     private readonly reportRepository: Repository<Report>,
+
+    private readonly notificationService: NotificationService,
   ) {}
 
   // 댓글 생성 + 총 댓글 수 반환
@@ -53,6 +56,46 @@ export class CommentService {
     const totalCount = await this.commentRepository.count({
       where: { albumImage: { id: albumImageId } },
     });
+
+    const type = 'ALBUM';
+
+    if (parent) {
+      // 부모 댓글 작성자에게 알림 (본인 제외)
+      if (user.id !== parent.user.id) {
+        await this.notificationService.createNotification(
+          user,
+          `${user.nickname}님이 회원님의 댓글에 답글을 남겼습니다.`,
+          type,
+          parent.user.id,
+          savedComment,
+        );
+      }
+
+      //게시글 작성자에게 알림 (본인 제외, 부모 댓글 작성자와 다를 때만)
+      if (
+        albumImage.user.id !== user.id &&
+        albumImage.user.id !== parent.user.id
+      ) {
+        await this.notificationService.createNotification(
+          user,
+          `${user.nickname}님이 회원님의 게시글에 댓글을 남겼습니다.`,
+          type,
+          albumImage.user.id,
+          savedComment,
+        );
+      }
+    } else {
+      // 일반 댓글일 경우 게시글 작성자에게 알림 (본인 제외)
+      if (user.id !== albumImage.user.id) {
+        await this.notificationService.createNotification(
+          user,
+          `${user.nickname}님이 회원님의 게시글에 댓글을 남겼습니다.`,
+          type,
+          albumImage.user.id,
+          savedComment,
+        );
+      }
+    }
 
     return {
       comment: savedComment,

@@ -141,7 +141,7 @@ export class PostsController {
   }
 
   @Delete('delete/post')
-  async deletePost(@Query('id') postId: string) {
+  async deletePost(@Query('postId') postId: string) {
     return await this.postsService.deletePosts(Number(postId));
   }
 

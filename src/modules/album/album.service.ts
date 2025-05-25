@@ -9,6 +9,9 @@ import { User } from '../user/entities/user.entity';
 import { Comment } from '../comment/entities/comment.entity';
 import { AlbumPhotoDetailResponseDto } from './dto/getAlbumPhotoData.dto';
 import { Like } from '../like/entities/like.entity';
+import { Notification } from '../notification/entities/notification.entity';
+
+import { NotificationService } from '../notification/notification.service';
 @Injectable()
 export class AlbumService {
   constructor(
@@ -24,6 +27,9 @@ export class AlbumService {
     private commentRepository: Repository<Comment>,
     @InjectRepository(Like)
     private likeRepository: Repository<Like>,
+    @InjectRepository(Notification)
+    private notificationRepository: Repository<Notification>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   // 앨범 등록
@@ -184,6 +190,7 @@ export class AlbumService {
     });
 
     await this.albumImageRepository.save(albumImage);
+
     return true;
   }
 
@@ -309,6 +316,14 @@ export class AlbumService {
       return { result: false, message: '그룹장은 강퇴할 수 없습니다.' };
     }
 
+    await this.notificationService.createNotification(
+      targetGroup.user,
+      `회원님은 앨범 "${album.title}"에서 강퇴되었습니다.`,
+      'ALBUM',
+      userId,
+      album,
+    );
+
     await this.albumGroupRepository.remove(targetGroup);
 
     return { result: true, message: '유저를 성공적으로 강퇴했습니다.' };
@@ -355,6 +370,19 @@ export class AlbumService {
     newOwnerGroup.role = 'OWNER';
 
     await this.albumGroupRepository.save([currentOwnerGroup, newOwnerGroup]);
+
+    const newOwnerNickname = newOwnerGroup.user.nickname;
+    const notifyText = `앨범 "${album.title}"의 소유자가 ${newOwnerNickname}님으로 변경되었습니다.`;
+
+    for (const group of album.groups) {
+      await this.notificationService.createNotification(
+        currentOwnerGroup.user, // sender: 현재 소유자
+        notifyText,
+        'ALBUM',
+        group.user.id, // 각 구성원에게 알림
+        album, // 관련 앨범 객체
+      );
+    }
 
     return { result: true, message: 'OWNER 권한이 성공적으로 위임되었습니다.' };
   }
@@ -410,6 +438,17 @@ export class AlbumService {
         albumImage,
       });
       await this.likeRepository.save(newLike);
+
+      if (albumImage.user.id !== user.id) {
+        await this.notificationService.createNotification(
+          user,
+          `${user.nickname}님이 회원님의 게시글을 좋아합니다.`,
+          'ALBUM',
+          albumImage.user.id,
+          albumImage,
+        );
+      }
+
       return { result: true, liked: true, message: '좋아요가 추가되었습니다.' };
     }
   }
@@ -508,6 +547,19 @@ export class AlbumService {
     });
 
     await this.albumGroupRepository.save(newGroup);
+
+    for (const group of album.groups) {
+      const targetUser = group.user;
+      if (targetUser.id !== user.id) {
+        await this.notificationService.createNotification(
+          user,
+          `${user.nickname}님이 앨범에 참여했습니다.`,
+          'ALBUM',
+          targetUser.id,
+          album,
+        );
+      }
+    }
 
     return {
       result: true,

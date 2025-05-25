@@ -50,6 +50,8 @@ export class LikeService {
         await this.notificationService.createNotification(
           user, // sender: 좋아요 누른 사람
           notificationText,
+          'POST',
+          post.user.id,
           post, // post: 좋아요 받은 게시글
         );
 
@@ -93,15 +95,16 @@ export class LikeService {
 
         // 알림 생성: 좋아요 누른 사람(user), 댓글(comment) 정보 넘기기
         // 알림 생성 함수에서 본인이 좋아요한 경우 알림 제외하도록 처리 필요
-        await this.notificationService.createNotification(
-          user,
-          `${user.nickname}님이 회원님의 댓글을 좋아합니다.`,
-          undefined, // post
-          undefined, // album
-          undefined, // albumGroup
-          comment.albumImage!, // albumImage
-          // comment
-        );
+        if (user.id !== comment.user.id) {
+          const type = 'ALBUM';
+          await this.notificationService.createNotification(
+            user,
+            `${user.nickname}님이 회원님의 댓글을 좋아합니다.`,
+            type,
+            Number(comment.user.id),
+            comment,
+          );
+        }
 
         return { liked: true };
       } catch (error) {
@@ -168,6 +171,7 @@ export class LikeService {
   private async findPostById(postId: number): Promise<Post> {
     const post = await this.entityManager.findOne(Post, {
       where: { id: postId },
+      relations: ['user'],
     });
     if (!post) {
       throw new NotFoundException('게시글을 찾을 수 없습니다.');
@@ -179,7 +183,7 @@ export class LikeService {
   private async findCommentById(commentId: number): Promise<Comment> {
     const comment = await this.entityManager.findOne(Comment, {
       where: { id: commentId },
-      relations: ['albumImage'],
+      relations: ['albumImage', 'user', 'albumImage.user'],
     });
     if (!comment) {
       throw new NotFoundException('댓글을 찾을 수 없습니다.');

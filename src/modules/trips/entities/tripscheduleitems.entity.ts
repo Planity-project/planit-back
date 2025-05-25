@@ -45,7 +45,7 @@ export class TripScheduleItem {
   todayOrder: number;
 
   @ApiProperty({ type: () => Place, nullable: true, description: '연관 장소' })
-  @ManyToOne(() => Place, { nullable: true })
+  @ManyToOne(() => Place, { nullable: true, onDelete: 'CASCADE' })
   place?: Place;
 
   @ApiProperty({ type: () => TripDay, description: '연관된 여행 날짜' })

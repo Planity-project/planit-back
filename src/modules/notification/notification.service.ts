@@ -207,61 +207,44 @@ export class NotificationService {
   async createNotification(
     sender: User,
     text: string,
-    post?: Post,
-    album?: Album,
-    albumGroup?: AlbumGroup,
-    albumImage?: AlbumImage,
+    type: string,
+    targetId: number,
+    obj: object,
   ): Promise<void> {
-    if (post) {
-      if (post.user.id === sender.id) return;
-
+    console.log(sender, text, type, targetId, obj, '알림');
+    const user = await this.userRepository.findOne({ where: { id: targetId } });
+    if (!user) {
+      console.error('유저 정보 찾을 수 없음(알림 데이터 생성 실패)');
+      return;
+    }
+    if (type === 'ALBUM') {
       const notification = this.notificationRepository.create({
-        user: post.user,
+        type: type,
         content: text,
-        type: 'POST',
+        user: user,
         status: 'UNREAD',
-        post,
+        album: obj,
+        notifyAt: null,
+        isSent: false,
+      });
+      await this.notificationRepository.save(notification);
+      return;
+    }
+
+    if (type === 'POST') {
+      const notification = this.notificationRepository.create({
+        type: type,
+        content: text,
+        user: user,
+        status: 'UNREAD',
+        post: obj,
         notifyAt: null,
         isSent: false,
       });
 
       await this.notificationRepository.save(notification);
+
       return;
-    }
-
-    if (album) {
-      for (const user of album.groups) {
-        if (user.id === sender.id) continue;
-
-        const notification = this.notificationRepository.create({
-          user: user.user,
-          content: text,
-          type: 'ALBUM',
-          status: 'UNREAD',
-          album,
-          notifyAt: null,
-          isSent: false,
-        });
-
-        await this.notificationRepository.save(notification);
-      }
-      return;
-    }
-
-    if (albumImage) {
-      if (albumImage.user.id === sender.id) return;
-
-      const notification = this.notificationRepository.create({
-        user: albumImage.user,
-        content: text,
-        type: 'ALBUM',
-        status: 'UNREAD',
-        albumImage,
-        notifyAt: null,
-        isSent: false,
-      });
-
-      await this.notificationRepository.save(notification);
     }
   }
 }

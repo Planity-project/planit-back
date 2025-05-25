@@ -9,6 +9,7 @@ import { Album } from '../album/entities/album.entity';
 import { AuthModule } from '../auth/auth.module';
 import { AlbumModule } from '../album/album.module';
 import { AlbumService } from '../album/album.service';
+import { NotificationModule } from '../notification/notification.module';
 
 console.log('UserModule loaded');
 @Module({
@@ -16,6 +17,7 @@ console.log('UserModule loaded');
     TypeOrmModule.forFeature([User, Payment, Album]),
     AuthModule,
     AlbumModule,
+    NotificationModule,
   ],
 
   controllers: [UserController],
