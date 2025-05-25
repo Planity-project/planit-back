@@ -20,7 +20,7 @@ export class Album {
 
   @ApiProperty({ example: 'https://example.com/image.jpg', nullable: true })
   @Column({ nullable: true })
-  titleImg: string;
+  titleImg: string | undefined;
 
   @ApiProperty({ example: '제주도 여행 앨범', nullable: true })
   @Column({ type: 'text', nullable: true })

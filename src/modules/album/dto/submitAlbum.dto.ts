@@ -11,6 +11,11 @@ export class SubmitAlbumDto {
   @IsNotEmpty()
   title: string;
 
+  @ApiProperty({ example: '대표 이미지', description: '대표 이미지' })
+  @IsString()
+  @IsNotEmpty()
+  titleImg: string | null;
+
   @ApiProperty({
     example: 'https://example.com/image.jpg',
     description: '앨범 대표 이미지 URL',

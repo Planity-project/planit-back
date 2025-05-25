@@ -37,6 +37,7 @@ export class AlbumService {
     userId: number,
     title: string,
     inviteLink: string,
+    fileUrl: string | undefined,
   ): Promise<{ result: boolean; id: number }> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
@@ -48,6 +49,7 @@ export class AlbumService {
         user,
         title,
         inviteLink,
+        titleImg: fileUrl,
       });
 
       const savedAlbum = await this.albumRepository.save(album);
