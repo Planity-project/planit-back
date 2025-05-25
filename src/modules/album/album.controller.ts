@@ -21,6 +21,7 @@ import {
   ApiResponse,
   ApiQuery,
   ApiExtraModels,
+  ApiOkResponse,
 } from '@nestjs/swagger';
 import { SubmitAlbumDto, SubmitAlbumResponseDto } from './dto/submitAlbum.dto';
 import { UserRoleDto } from './dto/userrole.dto';
@@ -31,6 +32,7 @@ import { extname } from 'path';
 import { AlbumImageSubmitDto } from './dto/albumImageSubmit.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 import { getDetailDataDto } from './dto/getDetailData.dto';
+import { AlbumPhotoDetailResponseDto } from './dto/getAlbumPhotoData.dto';
 import { QueryFailedError } from 'typeorm';
 import { SERVER_DOMAIN } from 'util/api';
 @ApiTags('Album')
@@ -235,6 +237,7 @@ export class AlbumController {
     summary: '앨범 상세 조회',
     description: '특정 앨범의 상세 정보를 조회합니다.',
   })
+  @ApiOkResponse({ type: AlbumPhotoDetailResponseDto })
   async getAlbumPhotoData(
     @Query('albumId') albumId: number,
     @Query('userId') userId: number,
@@ -244,6 +247,10 @@ export class AlbumController {
   }
 
   @Get('destroy')
+  @ApiOperation({ summary: '앨범 그룹에서 강퇴' })
+  @ApiQuery({ name: 'userId', type: Number, description: '유저 ID' })
+  @ApiQuery({ name: 'albumId', type: Number, description: '앨범 ID' })
+  @ApiResponse({ status: 200, description: '그룹 해체 성공 여부 반환' })
   async destroyAlbumGroups(
     @Query('userId') userId: number,
     @Query('albumId') albumId: number,
@@ -252,6 +259,15 @@ export class AlbumController {
   }
 
   @Get('delegation')
+  @ApiOperation({ summary: '앨범 관리자 권한 위임' })
+  @ApiQuery({ name: 'userId', type: Number, description: '기존 관리자 ID' })
+  @ApiQuery({ name: 'albumId', type: Number, description: '앨범 ID' })
+  @ApiQuery({
+    name: 'targetId',
+    type: Number,
+    description: '권한을 받을 유저 ID',
+  })
+  @ApiResponse({ status: 200, description: '권한 위임 성공 여부 반환' })
   async delegationAlbumRole(
     @Query('userId') userId: number,
     @Query('albumId') albumId: number,
@@ -265,6 +281,10 @@ export class AlbumController {
   }
 
   @Get('likeAlbum')
+  @ApiOperation({ summary: '앨범 이미지 좋아요 여부 확인' })
+  @ApiQuery({ name: 'userId', type: Number, description: '유저 ID' })
+  @ApiQuery({ name: 'albumId', type: Number, description: '앨범 ID' })
+  @ApiResponse({ status: 200, description: '좋아요한 이미지 목록 반환' })
   async likeAlbumType(
     @Query('userId') userId: number,
     @Query('albumId') albumId: number,
@@ -273,22 +293,43 @@ export class AlbumController {
   }
 
   @Get('inviteFind')
+  @ApiOperation({ summary: '초대 링크로 앨범 조회' })
+  @ApiQuery({ name: 'invite', type: String, description: '초대 링크 문자열' })
+  @ApiResponse({ status: 200, description: '앨범 정보 반환' })
   async albumInviteFine(@Query('invite') inviteLink: string) {
     return await this.albumService.inviteAlbumFind(inviteLink);
   }
 
   @Post('groupjoin')
+  @ApiOperation({ summary: '앨범 그룹 참여' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'number', example: 1 },
+        albumId: { type: 'number', example: 10 },
+      },
+      required: ['userId', 'albumId'],
+    },
+  })
+  @ApiResponse({ status: 200, description: '앨범 참여 완료 여부 반환' })
   async albumGroupJoin(@Body() body: any) {
     const { userId, albumId } = body;
     return await this.albumService.albumGroupJoinUser(userId, albumId);
   }
 
   @Delete('delImage')
+  @ApiOperation({ summary: '앨범 이미지 삭제' })
+  @ApiQuery({ name: 'imageId', type: Number, description: '삭제할 이미지 ID' })
+  @ApiResponse({ status: 200, description: '이미지 삭제 성공 여부 반환' })
   async albumImageDelete(@Query('imageId') imageId: number) {
     return await this.albumService.albumImageDelete(Number(imageId));
   }
 
   @Delete('delAlbum')
+  @ApiOperation({ summary: '앨범 삭제' })
+  @ApiQuery({ name: 'albumId', type: Number, description: '삭제할 앨범 ID' })
+  @ApiResponse({ status: 200, description: '앨범 삭제 성공 여부 반환' })
   async albumDelete(@Query('albumId') albumId: number) {
     return await this.albumService.albumDelete(albumId);
   }

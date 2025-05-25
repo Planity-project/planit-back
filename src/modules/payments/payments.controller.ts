@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -15,9 +16,11 @@ import { PaymentDto } from './dto/payment.dto';
 import { ApiTags, ApiResponse, ApiExtraModels } from '@nestjs/swagger';
 import { Response } from 'express';
 import { REDIRECT_URL } from 'util/api';
+import { JwtAuthGuard } from '../auth/jwtauth.gurad';
 
 @ApiTags('Payments')
 @ApiExtraModels(PaymentDto)
+@UseGuards(JwtAuthGuard)
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}

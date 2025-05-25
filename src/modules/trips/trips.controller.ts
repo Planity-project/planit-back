@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '../auth/jwtauth.gurad';
 import { UseGuards } from '@nestjs/common';
 @ApiTags('trip')
 @ApiExtraModels(GenerateDateDto)
+@UseGuards(JwtAuthGuard)
 @Controller('trip')
 export class TripController {
   constructor(private readonly tripService: TripService) {}

@@ -10,6 +10,7 @@ import * as redisStore from 'cache-manager-ioredis';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SchedulerModule } from './modules/scheduler/scheduler.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     DatabaseModule,
     SeederModule,
     MapModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

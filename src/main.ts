@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { webcrypto } from 'crypto';
+import { SchedulerService } from './modules/scheduler/scheduler.service';
 
 if (!globalThis.crypto) {
   globalThis.crypto = webcrypto as unknown as Crypto;
@@ -10,7 +11,7 @@ if (!globalThis.crypto) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  await app.get(SchedulerService).handleTripSharePrompts();
   app.use(cookieParser());
 
   const config = new DocumentBuilder()
