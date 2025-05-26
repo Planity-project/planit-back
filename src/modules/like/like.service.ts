@@ -47,14 +47,16 @@ export class LikeService {
         await this.entityManager.save(like);
 
         // 알림 생성
-        const notificationText = `${user.nickname}님이 회원님의 게시글을 좋아합니다.`;
-        await this.notificationService.createNotification(
-          user, // sender: 좋아요 누른 사람
-          notificationText,
-          'POST',
-          post.user.id,
-          post, // post: 좋아요 받은 게시글
-        );
+        if (user.id !== post.user.id) {
+          const notificationText = `${user.nickname}님이 회원님의 게시글을 좋아합니다.`;
+          await this.notificationService.createNotification(
+            user, // sender: 좋아요 누른 사람
+            notificationText,
+            'POST',
+            post.user.id,
+            post, // post: 좋아요 받은 게시글
+          );
+        }
 
         return { liked: true };
       } catch (error) {

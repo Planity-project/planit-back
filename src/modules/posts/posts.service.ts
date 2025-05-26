@@ -8,6 +8,7 @@ import { Trip } from '../trips/entities/trips.entity';
 import { User } from '../user/entities/user.entity';
 import { Location } from '../location/entities/location.entity';
 import { Like } from '../like/entities/like.entity';
+import { Notification } from '../notification/entities/notification.entity';
 
 import { GetMyPostDto } from './dto/getMyPost.dto';
 import { GetLikePostDto } from './dto/getLikesPost.dto';
@@ -27,6 +28,8 @@ export class PostsService {
     private readonly locationRepository: Repository<Location>,
     @InjectRepository(Like)
     private readonly likeRepository: Repository<Like>,
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
   ) {}
 
   async getPosts(id: number): Promise<Post[]> {
@@ -241,6 +244,8 @@ export class PostsService {
     await this.postHashtagRepository.save(newHashtags);
 
     await this.postImageRepository.save(newImages);
+
+    await this.notificationRepository.delete({ trip: { id: tripId } });
 
     return updatedPost;
   }

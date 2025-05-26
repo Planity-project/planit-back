@@ -52,11 +52,15 @@ export class KakaoStrategy extends PassportStrategy(
     console.log(userCreate);
     if (!user) {
       await this.authService.create(userCreate);
-      const userData = await this.authService.findUser(email);
+      const userData = await this.authService.findVelidate(
+        email,
+        LoginType.KAKAO,
+      );
       const payload = {
         id: userData?.id,
         email: userData?.email,
         nickname: userData?.nickname,
+        provider: userData?.type,
       };
       const jwt = this.jwtService.sign(payload);
       done(null, {
@@ -70,6 +74,7 @@ export class KakaoStrategy extends PassportStrategy(
         id: user.id,
         email: user.email,
         nickname: user.nickname,
+        provider: user.type,
       };
       const jwt = this.jwtService.sign(payload);
       done(null, {

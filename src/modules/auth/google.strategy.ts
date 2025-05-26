@@ -46,11 +46,15 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     console.log(userCreate);
     if (!user) {
       await this.authService.create(userCreate);
-      const userData = await this.authService.findUser(email);
+      const userData = await this.authService.findVelidate(
+        email,
+        LoginType.GOOGLE,
+      );
       const payload = {
         id: userData?.id,
         email: userData?.email,
         nickname: userData?.nickname,
+        provider: userData?.type,
       };
       const jwt = this.jwtService.sign(payload);
       done(null, {
@@ -64,6 +68,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         id: user.id,
         email: user.email,
         nickname: user.nickname,
+        provider: user.type,
       };
       const jwt = this.jwtService.sign(payload);
       done(null, {

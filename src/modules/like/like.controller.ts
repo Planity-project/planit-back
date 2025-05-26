@@ -26,7 +26,7 @@ export class LikeController {
   @Post('post')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: '소설 좋아요 토글 (추가/취소)' })
+  @ApiOperation({ summary: '일정 게시글 좋아요 토글 (추가/취소)' })
   async togglePostLike(
     @Req() req,
     @Query('postId', ParseIntPipe) postId: number,
@@ -52,14 +52,14 @@ export class LikeController {
   @Get('my-likes')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: '내가 찜한 소설 목록 조회' })
+  @ApiOperation({ summary: '내가 찜한 게시글 목록 조회' })
   async getMyLikes(@Req() req) {
     return this.likeService.findLikedPosts(req.user.id);
   }
 
   // ✅ 게시글 좋아요 수 조회
   @Get('post/:postId/count')
-  @ApiOperation({ summary: '소설 좋아요 수 조회' })
+  @ApiOperation({ summary: '게시글 좋아요 수 조회' })
   async countPostLikes(
     @Param('postId', ParseIntPipe) postId: number,
   ): Promise<number> {

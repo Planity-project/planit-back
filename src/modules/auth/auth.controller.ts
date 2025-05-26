@@ -153,7 +153,10 @@ export class AuthController {
 
     try {
       const user: any = jwt.verify(token, process.env.JWT_SECRET!);
-      const userData = await this.authService.findUser(user.email);
+      const userData = await this.authService.findVelidate(
+        user.email,
+        user.provider,
+      );
       return res.status(200).json({
         result: true,
         user: userData,

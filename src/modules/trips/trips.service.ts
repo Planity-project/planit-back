@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, Brackets } from 'typeorm';
 
 import { Place } from './entities/place.entity';
 import { TripDay } from './entities/tripday.entity';
@@ -212,12 +212,21 @@ export class TripService {
     const endOfYesterday = new Date(startOfYesterday);
     endOfYesterday.setHours(23, 59, 59, 999);
 
-    const trips = await this.tripRepository.find({
-      where: {
-        endDate: Between(startOfYesterday, endOfYesterday),
-      },
-      relations: ['user'],
-    });
+    const trips = await this.tripRepository
+      .createQueryBuilder('trip')
+      .leftJoinAndSelect('trip.user', 'user')
+      .leftJoinAndSelect('trip.post', 'post')
+      .where('trip.endDate BETWEEN :start AND :end', {
+        start: startOfYesterday.toISOString().slice(0, 10),
+        end: endOfYesterday.toISOString().slice(0, 10),
+      })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('post.type IS NULL') // post가 없는 경우 포함
+            .orWhere('post.type = :postType', { postType: false }); // post.type이 false인 경우 포함
+        }),
+      )
+      .getMany();
 
     return trips.map((trip) => ({
       userId: trip.user.id,
