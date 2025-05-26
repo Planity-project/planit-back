@@ -8,6 +8,7 @@ import * as path from 'path';
 import axios from 'axios';
 import { SERVER_DOMAIN } from 'util/api';
 import { shuffleArray } from 'util/generator';
+import { dedupePlaces } from 'util/caching';
 
 export const locationArr = [
   {
@@ -191,7 +192,7 @@ export class SeederService {
 
     for (const loc of locationArr) {
       const { name, lat, lng } = loc;
-      const results: any[] = [];
+      let results: any[] = [];
 
       for (const category of Object.values(categoryMap)) {
         const items = await this.searchToursGoogle(
@@ -206,6 +207,7 @@ export class SeederService {
         const percent = ((completedSteps / totalSteps) * 100).toFixed(1);
         console.log(`진행률: ${percent}% (${completedSteps} / ${totalSteps})`);
       }
+      results = dedupePlaces(results);
 
       data[name] = shuffleArray(results);
       console.log(`✅ ${name} 완료`, data[name]);
