@@ -52,6 +52,14 @@ export class User {
   @Column({ default: 0 })
   report_count: number;
 
+  @Column({ type: 'timestamp', nullable: true })
+  suspend_until?: Date;
+  // 언제까지 정지되었는지
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  suspend_reason?: string;
+  // 정지된 사유 (예: 신고 누적 3회 등)
+
   @CreateDateColumn()
   createdAt: Date;
 
