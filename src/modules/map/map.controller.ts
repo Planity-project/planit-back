@@ -190,7 +190,7 @@ export class MapController {
       }
 
       // 페이지 사이즈: page가 0일 때 20개, 이후 페이지는 10개씩
-      const pageSize = page === 0 ? 10 : 10;
+      const pageSize = 10;
 
       const startIdx = page === 0 ? 0 : 20 + (page - 1) * 10;
       const paged = filtered.slice(startIdx, startIdx + pageSize);

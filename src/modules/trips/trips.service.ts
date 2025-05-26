@@ -10,6 +10,7 @@ import { Post } from '../posts/entities/post.entity';
 import { User } from '../user/entities/user.entity';
 
 import {
+  addressToChange,
   requestGemini,
   generateSchedulePrompts,
   generateSchedulePromptEn,
@@ -95,13 +96,26 @@ export class TripService {
           rating,
           reviewCount,
         } = item;
+        let finalLat = lat;
+        let finalLng = lng;
+
+        // 위경도 누락 시 Kakao API로 보완
+        if (!finalLat || !finalLng) {
+          try {
+            const result = await addressToChange(address);
+            finalLat = result.latitude;
+            finalLng = result.longitude;
+          } catch (error) {
+            console.warn(`${placeName}의 위경도 검색 실패: ${error.message}`);
+          }
+        }
 
         const savedPlace = await this.placeRepository.save({
           name: placeName,
           category,
           address,
-          lat,
-          lng,
+          lat: finalLat,
+          lng: finalLng,
           todayOrder,
           trip,
           tripDay: savedDay,

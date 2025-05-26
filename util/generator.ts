@@ -316,7 +316,7 @@ export function generateSchedulePrompts(
 
     prompt += `\n📍 방문 가능한 장소 목록:\n`;
     dataPlace.forEach((place, idx) => {
-      prompt += `${idx + 1}. ${place.title} (${place.category})\n   - 예상 소요시간: ${place.minutes}분\n   - 주소: ${place.address}\n   - 이미지: ${place.imageSrc || '없음'}\n`;
+      prompt += `${idx + 1}. ${place.title} (${place.category})\n   - 예상 소요시간: ${place.minutes}분\n   - 주소: ${place.address}\n   - 이미지: ${place.imageSrc || '없음'} - 위도 : ${place.lat} - 경도 : ${place.lon} - rating : ${place.rating} - reviewCount : ${place.reviewCount} \n`;
     });
 
     prompt += `\n📌 요청 사항:\n`;
@@ -324,7 +324,7 @@ export function generateSchedulePrompts(
     prompt += `- 장소 간 동선을 고려해줘.\n`;
     prompt += `- 결과는 **JSON 형태**로 구성해줘. 형식은:\n`;
     prompt += `  {\n    "${date}": [\n      {\n        "순서": 1,\n        "start": "09:00",\n        "end": "11:00",\n        "장소": "경주 탈해왕릉",\n        "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "관광지",\n        "image": "...",\n        "rating": 평점,\n        "reviewCount": 리뷰수\n      }\n    ]\n  }\n`;
-    prompt += `- 모든 데이터는 반드시 값이 내가준 데이터를 기반으로 들어가야해 무조건\n`;
+    prompt += `- 모든 데이터는 반드시 값을 얻어와야해 무조건 \n`;
 
     return { date, prompt };
   });
