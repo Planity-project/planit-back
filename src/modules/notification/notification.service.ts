@@ -175,6 +175,21 @@ export class NotificationService {
   ) {
     const content = `여행 "${tripTitle}"을(를) 공유하시겠습니까?`;
 
+    // 동일한 알림이 이미 존재하는지 확인
+    const existing = await this.notificationRepository.findOne({
+      where: {
+        user: { id: userId },
+        trip: { id: tripId },
+        content,
+        type: 'TRIP',
+      },
+    });
+
+    if (existing) {
+      console.log('[알림] 이미 존재하는 알림이므로 저장하지 않음');
+      return;
+    }
+
     const notification = this.notificationRepository.create({
       user: { id: userId },
       trip: { id: tripId },
