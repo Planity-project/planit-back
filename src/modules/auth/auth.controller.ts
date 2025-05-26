@@ -146,7 +146,6 @@ export class AuthController {
   @Get('cookieCheck')
   async cookieCheck(@Req() req: Request, @Res() res: Response) {
     const token = req.cookies?.accessToken;
-    console.log(token, 'token 확인');
     if (!token) {
       return res.status(200).json({ result: false });
     }

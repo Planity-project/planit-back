@@ -461,6 +461,7 @@ export class AlbumService {
     titleImg: string | undefined;
     owner: string | undefined;
   }> {
+    console.log(invite, '링크');
     const data = await this.albumRepository.findOne({
       where: { inviteLink: invite },
       relations: ['user'],
@@ -514,11 +515,12 @@ export class AlbumService {
   async albumGroupJoinUser(
     userId: number,
     albumId: number,
-  ): Promise<{ result: boolean; message: string }> {
+  ): Promise<{ result: boolean; message: string; albumId?: number }> {
+    // 1. 유저, 앨범 조회 (groups + groups.user 포함)
     const user = await this.userRepository.findOne({ where: { id: userId } });
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
-      relations: ['groups'],
+      relations: ['groups', 'groups.user'],
     });
 
     if (!user || !album) {
@@ -528,19 +530,22 @@ export class AlbumService {
       };
     }
 
-    // 이미 가입된 경우 확인
-    const alreadyJoined = album.groups.some(
-      (group) => group.user?.id === user.id,
-    );
+    // 2. 이미 그룹에 가입했는지 확인
+    const existingGroup = await this.albumGroupRepository.findOne({
+      where: {
+        user: { id: userId },
+        albums: { id: albumId },
+      },
+    });
 
-    if (alreadyJoined) {
+    if (existingGroup) {
       return {
         result: false,
-        message: '이미 그룹에 참여한 사용자입니다.',
+        message: '이미 그룹에 참여되어 있는 사용자입니다.',
       };
     }
 
-    // 새 그룹 멤버 생성
+    // 3. 새 그룹 멤버 생성 및 저장
     const newGroup = this.albumGroupRepository.create({
       user,
       albums: album,
@@ -550,12 +555,26 @@ export class AlbumService {
 
     await this.albumGroupRepository.save(newGroup);
 
-    for (const group of album.groups) {
+    // 4. 저장 후, 최신 그룹 멤버 목록 다시 조회
+    const updatedAlbum = await this.albumRepository.findOne({
+      where: { id: albumId },
+      relations: ['groups', 'groups.user'],
+    });
+
+    if (!updatedAlbum) {
+      return {
+        result: false,
+        message: '앨범 정보를 불러오는 데 실패했습니다.',
+      };
+    }
+
+    // 5. 기존 그룹 멤버(가입한 사용자 제외)에게 알림 전송
+    for (const group of updatedAlbum.groups) {
       const targetUser = group.user;
-      if (targetUser.id !== user.id) {
+      if (targetUser && targetUser.id !== user.id) {
         await this.notificationService.createNotification(
           user,
-          `${user.nickname}님이 앨범에 참여했습니다.`,
+          `${user.nickname}님이 ${album.title} 앨범에 참여했습니다.`,
           'ALBUM',
           targetUser.id,
           album,
@@ -563,9 +582,11 @@ export class AlbumService {
       }
     }
 
+    // 6. 성공 응답 반환
     return {
       result: true,
       message: '그룹에 성공적으로 참여했습니다.',
+      albumId: album.id,
     };
   }
 }
