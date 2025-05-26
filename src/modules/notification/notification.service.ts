@@ -109,6 +109,22 @@ export class NotificationService {
     return await this.notificationRepository.save(notification);
   }
 
+  async markNoticeAsReadAll(userId: number): Promise<Notification[]> {
+    const notifications = await this.notificationRepository.find({
+      where: { user: { id: userId } },
+      relations: ['user'],
+    });
+
+    if (!notifications.length) {
+      return []; // 아무것도 없으면 그냥 빈 배열
+    }
+
+    for (const noti of notifications) {
+      noti.status = 'READ';
+    }
+    return await this.notificationRepository.save(notifications);
+  }
+
   // ✅ 여행 종료 후 다음날 알림 예약
   async createNotificationTrip(userId: number, tripId: number, endDate: Date) {
     const notifyAt = new Date(endDate);

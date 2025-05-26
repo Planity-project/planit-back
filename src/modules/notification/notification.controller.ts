@@ -59,6 +59,18 @@ export class NotificationController {
     return this.notificationService.markNoticeAsRead(notificationId, user.id);
   }
 
+  @Patch('read-all')
+  @ApiOperation({
+    summary: '알림 읽음 처리',
+    description: '특정 알림을 읽음 상태로 변경합니다.',
+  })
+  @ApiParam({ name: 'notificationId', type: Number, description: '알림 ID' })
+  @ApiResponse({ status: 200, description: '읽음 처리된 알림 반환' })
+  async markAsReadAll(@Req() req: Request) {
+    const user = req.user as User;
+    return this.notificationService.markNoticeAsReadAll(user.id);
+  }
+
   // ✅ 여행 종료 후 알림 예약 (개발자용 또는 테스트용으로 호출)
   @Post('trip/reminder')
   @ApiOperation({
