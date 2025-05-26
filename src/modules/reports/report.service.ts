@@ -154,9 +154,25 @@ export class ReportService {
     reportedUser.report_count = (reportedUser.report_count || 0) + 1;
     console.log(`⚠️ 신고 횟수: ${reportedUser.report_count}`);
 
-    if (reportedUser.report_count >= 2) {
+    // --- 신고 누적별 정지 처리 로직 ---
+    const now = new Date();
+
+    if (reportedUser.report_count >= 5) {
+      // 5회 이상 신고 → 2주 정지
       reportedUser.status = UserStatus.STOP;
-      console.log(`🚫 유저 상태 STOP으로 변경됨`);
+      reportedUser.suspend_until = new Date(
+        now.getTime() + 14 * 24 * 60 * 60 * 1000,
+      ); // 2주 후
+      reportedUser.suspend_reason = '신고 누적 5회로 2주 정지됨';
+      console.log(`🚫 유저 상태 STOP (2주 정지)`);
+    } else if (reportedUser.report_count >= 3) {
+      // 3회 이상 신고 → 5일 정지
+      reportedUser.status = UserStatus.STOP;
+      reportedUser.suspend_until = new Date(
+        now.getTime() + 5 * 24 * 60 * 60 * 1000,
+      ); // 5일 후
+      reportedUser.suspend_reason = '신고 누적 3회로 5일 정지됨';
+      console.log(`🚫 유저 상태 STOP (5일 정지)`);
     }
 
     await this.userService.save(reportedUser);
@@ -164,7 +180,9 @@ export class ReportService {
 
     const message =
       reportedUser.status === UserStatus.STOP
-        ? '🚨 신고가 누적되어 계정이 정지되었습니다!'
+        ? `🚨 신고가 누적되어 계정이 정지되었습니다! 기간: ${
+            reportedUser.suspend_until?.toLocaleDateString() ?? '알 수 없음'
+          }`
         : '⚠️ 신고가 접수되었습니다. 주의해 주세요!';
 
     await this.notificationeService.sendNotification({
@@ -181,6 +199,8 @@ export class ReportService {
 
     return true;
   }
+
+  // 신고 3번부터 블랙리스트
 
   async markHandled(report: Report): Promise<void> {
     report.handled = true;

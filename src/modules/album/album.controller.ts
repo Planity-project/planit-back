@@ -71,11 +71,11 @@ export class AlbumController {
     }),
   )
   submitAlbum(
-    @Body() body: { userId: number; title: string; url: string },
+    @Body() body: SubmitAlbumDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     console.log(body);
-    const { userId, title, url } = body;
+    const { userId, title, url, titleImg } = body;
     const fileUrl = `${SERVER_DOMAIN}/uploads/albums/head/${file.filename}`;
 
     return this.albumService.submitAlbum(userId, title, url, fileUrl);
