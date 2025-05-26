@@ -12,7 +12,7 @@ export class BannerService {
 
   // 모든 배너 가져오기 (최신순 정렬)
   async findAll(): Promise<Banner[]> {
-    return this.bannerRepo.find({ order: { created_at: 'DESC' } });
+    return this.bannerRepo.find({ order: { createdAt: 'DESC' } });
   }
 
   // 특정 배너 조회

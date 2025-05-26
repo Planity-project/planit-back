@@ -18,12 +18,13 @@ import { BannerModule } from 'src/modules/admin/banner/banner.module';
 import { ReportModule } from 'src/modules/reports/report.module';
 import { GeminiModule } from 'src/modules/gemini/gemini.module';
 import { SchedulerModule } from 'src/modules/scheduler/scheduler.module';
+import { DashboardModule } from 'src/modules/admin/Dashboard/dashboard.module';
+import { LoginHistoryModule } from 'src/modules/auth/loginhistory/loginhistory.module';
 
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
 import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
 import { AlbumImage } from 'src/modules/album/entities/albumImage';
-import { UserLogin } from 'src/modules/auth/entities/auth.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Like } from 'src/modules/like/entities/like.entity';
@@ -39,6 +40,7 @@ import { Place } from 'src/modules/trips/entities/place.entity';
 import { TripDay } from 'src/modules/trips/entities/tripday.entity';
 import { TripScheduleItem } from 'src/modules/trips/entities/tripscheduleitems.entity';
 import { Banner } from 'src/modules/admin/banner/entities/banner.entity';
+import { UserLoginLog } from 'src/modules/auth/loginhistory/entities/userlogin.entity';
 
 dotenv.config();
 
@@ -57,7 +59,6 @@ dotenv.config();
         Album,
         AlbumGroup,
         AlbumImage,
-        UserLogin,
         User,
         Comment,
         Like,
@@ -72,6 +73,7 @@ dotenv.config();
         TripDay,
         TripScheduleItem,
         Banner,
+        UserLoginLog,
       ],
       synchronize: true,
       logging: false,
@@ -82,7 +84,6 @@ dotenv.config();
       Album,
       AlbumGroup,
       AlbumImage,
-      UserLogin,
       User,
       Comment,
       Like,
@@ -111,6 +112,8 @@ dotenv.config();
     ReportModule,
     GeminiModule,
     SchedulerModule,
+    DashboardModule,
+    LoginHistoryModule,
   ],
   exports: [TypeOrmModule],
 })

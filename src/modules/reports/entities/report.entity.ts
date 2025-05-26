@@ -38,7 +38,7 @@ export class Report {
   handled: boolean;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   // 📚 관계 설정
 

@@ -26,7 +26,7 @@ export class ReportService {
     return this.reportRepository.find({
       where: { handled: false },
       relations: ['reporter'],
-      order: { created_at: 'DESC' },
+      order: { createdAt: 'DESC' },
     });
   }
 

@@ -3,9 +3,9 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-} from "typeorm";
+} from 'typeorm';
 
-@Entity("banners")
+@Entity('banners')
 export class Banner {
   @PrimaryGeneratedColumn()
   id: number;
@@ -17,5 +17,5 @@ export class Banner {
   image_path: string;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 }

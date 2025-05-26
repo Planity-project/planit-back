@@ -18,8 +18,8 @@ export class Comment {
   @Column('text')
   content: string;
 
-  @Column({ type: 'enum', enum: ['POST', 'ALBUM'] })
-  type: 'POST' | 'ALBUM';
+  @Column({ type: 'enum', enum: ['ALBUM'] })
+  type: 'ALBUM';
 
   @CreateDateColumn()
   createdAt: Date;

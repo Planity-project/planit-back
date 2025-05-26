@@ -5,7 +5,6 @@ import { CommentService } from './comment.service';
 import { CommentController } from './comment.controller';
 
 import { User } from 'src/modules/user/entities/user.entity';
-import { Post } from 'src/modules/posts/entities/post.entity';
 import { AlbumImage } from '../album/entities/albumImage';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { UserModule } from 'src/modules/user/user.module';

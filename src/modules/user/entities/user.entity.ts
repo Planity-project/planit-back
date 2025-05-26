@@ -15,6 +15,7 @@ import { Post } from 'src/modules/posts/entities/post.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
 import { AlbumGroup } from 'src/modules/album/entities/albumGroup.entity';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
+import { UserLoginLog } from 'src/modules/auth/loginhistory/entities/userlogin.entity';
 
 export enum LoginType {
   KAKAO = 'kakao',
@@ -91,4 +92,7 @@ export class User {
 
   @OneToMany(() => Trip, (trip) => trip.user)
   trips: Trip[];
+
+  @OneToMany(() => UserLoginLog, (log) => log.user)
+  loginLogs: UserLoginLog[];
 }
