@@ -126,8 +126,6 @@ export class PostsController {
     const { title, content, hashtags, tripId, userId, rating } = body;
     const parsedHashtags = JSON.parse(hashtags);
 
-    const SERVER_DOMAIN = 'http://localhost:3000'; // 실제 서버 주소에 맞게 변경
-
     // 파일 URL 생성
     const fileUrls = files.map(
       (file) => `${SERVER_DOMAIN}/uploads/posts/${file.filename}`,
@@ -141,7 +139,7 @@ export class PostsController {
       parsedHashtags,
       fileUrls,
       Number(userId),
-      rating,
+      Number(rating),
     );
 
     return { result: true, postId: savedPost.id };

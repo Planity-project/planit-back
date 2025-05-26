@@ -22,6 +22,7 @@ export class LikeService {
     userId: number,
     postId: number,
   ): Promise<{ liked: boolean }> {
+    console.log(userId, postId, 'service');
     const existing = await this.entityManager.findOne(Like, {
       where: {
         user: { id: userId },
@@ -58,7 +59,7 @@ export class LikeService {
         return { liked: true };
       } catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
-          throw new ConflictException('이미 좋아요한 소설입니다.');
+          throw new ConflictException('이미 좋아요한 일정입니다.');
         }
         throw error;
       }

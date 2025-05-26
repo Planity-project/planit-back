@@ -51,6 +51,16 @@ export class NotificationService {
       content: n.content,
       createdAt: n.createdAt,
       isRead: n.status === 'READ',
+      data:
+        n.type === 'POST'
+          ? n.post
+          : n.type === 'ALBUM'
+            ? n.album
+            : n.type === 'REPORT'
+              ? n.report
+              : n.type === 'TRIP'
+                ? n.trip
+                : null,
     }));
   }
 
