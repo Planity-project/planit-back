@@ -24,7 +24,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Response, Request } from 'express';
-
+import * as passport from 'passport';
 import { REDIRECT_URL } from 'util/api';
 import { SERVER_DOMAIN } from 'util/api';
 
@@ -42,9 +42,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('kakao')
-  @UseGuards(AuthGuard('kakao'))
-  async kakaoAuth() {
-    return;
+  kakaoAuth(@Req() req: Request, @Res() res: Response) {
+    const redirect = req.query.redirect as string;
+
+    passport.authenticate('kakao', {
+      state: redirect, // redirect 값을 state로 전달
+    })(req, res);
   }
 
   @Get('kakao/callback')
@@ -76,9 +79,14 @@ export class AuthController {
   }
 
   @Get('google')
-  @UseGuards(AuthGuard('google'))
-  async googleAuth() {
-    return;
+  googleAuth(@Req() req: Request, @Res() res: Response) {
+    const redirect = req.query.redirect as string;
+
+    // passport.authenticate를 수동 호출
+    passport.authenticate('google', {
+      scope: ['email', 'profile'],
+      state: redirect, // redirect 값을 state로 전달
+    })(req, res);
   }
 
   @Get('google/callback')
@@ -110,9 +118,13 @@ export class AuthController {
   }
 
   @Get('naver')
-  @UseGuards(AuthGuard('naver'))
-  async naverAuth() {
-    return;
+  naverAuth(@Req() req: Request, @Res() res: Response) {
+    const redirect = req.query.redirect as string;
+
+    // state에 redirect 값을 전달
+    passport.authenticate('naver', {
+      state: redirect,
+    })(req, res);
   }
 
   @Get('naver/callback')
