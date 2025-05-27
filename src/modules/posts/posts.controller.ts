@@ -9,8 +9,6 @@ import {
   UseInterceptors,
   UploadedFiles,
   Delete,
-  HttpStatus,
-  HttpException,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { FilesInterceptor } from '@nestjs/platform-express';

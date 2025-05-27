@@ -12,14 +12,12 @@ import { GoogleStrategy } from './google.strategy';
 import { NaverStrategy } from './naver.strategy';
 import { KakaoStrategy } from './kakao.strategy';
 import { JwtAuthGuard } from './jwtauth.gurad';
-import { AdminModule } from '../admin/admin.module';
 import { Admin } from '../admin/entities/admin.entity';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
     PassportModule,
-    AdminModule,
     TypeOrmModule.forFeature([User, Admin]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,

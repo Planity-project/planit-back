@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ReportModule } from '../reports/report.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';

@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Report } from './entities/report.entity';
 import { ReportController } from './report.controller';
 import { ReportService } from './report.service';
-import { UserService } from '../user/user.service';
 
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';

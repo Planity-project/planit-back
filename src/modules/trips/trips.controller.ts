@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { TripService } from './trips.service';
 import { GenerateDateDto } from './dto/gereateWithGemini.dto';
 import { TripFindDto } from './dto/find.dto';

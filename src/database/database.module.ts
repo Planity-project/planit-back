@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 
-import { AdminModule } from 'src/modules/admin/admin.module';
 import { AlbumModule } from 'src/modules/album/album.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { CommentModule } from 'src/modules/comment/comment.module';
@@ -97,7 +96,6 @@ dotenv.config();
       Report,
     ]),
     UserModule,
-    AdminModule,
     AlbumModule,
     AuthModule,
     CommentModule,

@@ -13,7 +13,6 @@ import {
   addressToChange,
   requestGemini,
   generateSchedulePrompts,
-  generateSchedulePromptEn,
 } from 'util/generator';
 @Injectable()
 export class TripService {
