@@ -479,6 +479,7 @@ export class AlbumService {
       where: { inviteLink: invite },
       relations: ['user'],
     });
+    console.log(data, 'Data', invite);
     const result = {
       id: data?.id,
       title: data?.title,
@@ -530,6 +531,7 @@ export class AlbumService {
     albumId: number,
   ): Promise<{ result: boolean; message: string; albumId?: number }> {
     // 1. 유저, 앨범 조회 (groups + groups.user 포함)
+    console.log(userId, albumId, 'albumGroupJoinUser');
     const user = await this.userRepository.findOne({ where: { id: userId } });
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
