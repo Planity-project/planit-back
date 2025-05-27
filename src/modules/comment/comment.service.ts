@@ -35,11 +35,21 @@ export class CommentService {
     parentId?: number;
   }) {
     const user = await this.userRepository.findOneByOrFail({ id: userId });
-    const albumImage = await this.albumImageRepository.findOneByOrFail({
-      id: albumImageId,
+
+    const albumImage = await this.albumImageRepository.findOne({
+      where: { id: albumImageId },
+      relations: ['user'],
     });
+
+    if (!albumImage) {
+      throw new Error('앨범 이미지를 찾을 수 없습니다.');
+    }
+
     const parent = parentId
-      ? await this.commentRepository.findOneBy({ id: parentId })
+      ? await this.commentRepository.findOne({
+          where: { id: parentId },
+          relations: ['user'], // ✅ 부모 댓글 작성자 정보 필요
+        })
       : null;
 
     const newComment = this.commentRepository.create({
@@ -71,7 +81,7 @@ export class CommentService {
         );
       }
 
-      //게시글 작성자에게 알림 (본인 제외, 부모 댓글 작성자와 다를 때만)
+      // 게시글 작성자에게 알림 (본인 제외, 부모 댓글 작성자와 다를 때만)
       if (
         albumImage.user.id !== user.id &&
         albumImage.user.id !== parent.user.id
