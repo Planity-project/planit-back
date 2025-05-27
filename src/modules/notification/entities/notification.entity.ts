@@ -80,7 +80,7 @@ export class Notification {
     nullable: true,
     onDelete: 'CASCADE',
   })
-  albumImage: AlbumGroup | null;
+  albumImage: AlbumImage | null;
 
   @ManyToOne(() => Trip, {
     nullable: true,
