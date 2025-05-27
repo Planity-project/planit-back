@@ -1,3 +1,3 @@
-export const REDIRECT_URL = 'http://planit.ai.kr';
+export const REDIRECT_URL = 'https://planit.ai.kr';
 
-export const SERVER_DOMAIN = 'http://planit.ai.kr/api';
+export const SERVER_DOMAIN = 'https://planit.ai.kr/api';
