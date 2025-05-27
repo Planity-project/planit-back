@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
+import { Repository, IsNull, In } from 'typeorm';
 
 import { Album } from './entities/album.entity';
 import { AlbumGroup } from './entities/albumGroup.entity';
@@ -167,8 +167,21 @@ export class AlbumService {
   }
 
   //앨범 타이틀 정보 4개씩 전달
-  async findPaginated(page: number, limit: number) {
+  async findPaginated(page: number, limit: number, userId: number) {
+    // 1) userId가 속한 그룹의 앨범들 찾기
+    const albumGroups = await this.albumGroupRepository.find({
+      where: { user: { id: userId } },
+      relations: ['albums'],
+    });
+    const albumIds = albumGroups.map((group) => group.albums.id);
+
+    if (albumIds.length === 0) {
+      return { items: [], total: 0 };
+    }
+
+    // 2) albumIds로 페이징해서 앨범 조회
     const [items, total] = await this.albumRepository.findAndCount({
+      where: { id: In(albumIds) },
       skip: (page - 1) * limit,
       take: limit,
       order: { createdAt: 'DESC' },

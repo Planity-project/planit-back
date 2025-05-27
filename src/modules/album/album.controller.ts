@@ -33,7 +33,7 @@ import { AlbumImageSubmitDto } from './dto/albumImageSubmit.dto';
 import { UpdateAlbumDto } from './dto/updateAlbum.dto';
 import { getDetailDataDto } from './dto/getDetailData.dto';
 import { AlbumPhotoDetailResponseDto } from './dto/getAlbumPhotoData.dto';
-import { QueryFailedError } from 'typeorm';
+import { QueryFailedError, In } from 'typeorm';
 import { SERVER_DOMAIN } from 'util/api';
 @ApiTags('Album')
 @ApiExtraModels(
@@ -94,10 +94,18 @@ export class AlbumController {
     description: '페이징된 앨범 목록 반환',
     type: findAllAlbumDto,
   })
-  async findAllAlbum(@Query('page') page = 1, @Query('limit') limit = 4) {
+  async findAllAlbum(
+    @Query('page') page = 1,
+    @Query('limit') limit = 4,
+    @Query('userId') userId: number,
+  ) {
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
-    return await this.albumService.findPaginated(pageNumber, limitNumber);
+    return await this.albumService.findPaginated(
+      pageNumber,
+      limitNumber,
+      userId,
+    );
   }
 
   // 전체 앨범 디테일 가져오기
