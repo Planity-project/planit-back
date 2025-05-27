@@ -11,7 +11,8 @@ async function bootstrap() {
   const seeder = app.select(SeederModule).get(SeederService, { strict: true });
 
   await seeder.runSeed();
-  await seeder.generatePlaceJson();
+  // await seeder.generatePlaceJson();
+  // 이걸 사용하고 run seed하면 데이터 재생성, 사용 안하면 데이터 재생성 x
 
   await app.close();
 }

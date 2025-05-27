@@ -409,6 +409,7 @@ export class AlbumService {
   ): Promise<{ result: boolean; liked: boolean; message: string }> {
     const albumImage = await this.albumImageRepository.findOne({
       where: { id: albumImageId },
+      relations: ['user'],
     });
     if (!albumImage) {
       return {
@@ -454,7 +455,7 @@ export class AlbumService {
       });
       await this.likeRepository.save(newLike);
 
-      if (albumImage.user.id !== user.id) {
+      if (albumImage.user && albumImage.user.id !== user.id) {
         await this.notificationService.createNotification(
           user,
           `${user.nickname}님이 회원님의 게시글을 좋아합니다.`,
