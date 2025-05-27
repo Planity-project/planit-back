@@ -183,7 +183,11 @@ export class MapController {
       }
 
       // 추가로, body.categories 배열이 있으면 거기에 맞게 필터링
-      if (Array.isArray(categories) && categories.length > 0) {
+      if (
+        Array.isArray(categories) &&
+        categories.length > 0 &&
+        !categories.includes('전체')
+      ) {
         filtered = filtered.filter((place) =>
           categories.includes(place.category),
         );
