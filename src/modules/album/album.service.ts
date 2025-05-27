@@ -475,7 +475,6 @@ export class AlbumService {
     titleImg: string | undefined;
     owner: string | undefined;
   }> {
-    console.log(invite, '링크');
     const data = await this.albumRepository.findOne({
       where: { inviteLink: invite },
       relations: ['user'],

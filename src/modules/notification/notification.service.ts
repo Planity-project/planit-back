@@ -252,7 +252,6 @@ export class NotificationService {
     targetId: number,
     obj: object,
   ): Promise<void> {
-    console.log(sender, text, type, targetId, obj, '알림');
     const user = await this.userRepository.findOne({ where: { id: targetId } });
     if (!user) {
       console.error('유저 정보 찾을 수 없음(알림 데이터 생성 실패)');

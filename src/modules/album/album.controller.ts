@@ -74,7 +74,6 @@ export class AlbumController {
     @Body() body: SubmitAlbumDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log(body);
     const { userId, title, url, titleImg } = body;
     const fileUrl = `${SERVER_DOMAIN}/uploads/albums/head/${file.filename}`;
 
@@ -115,7 +114,6 @@ export class AlbumController {
     description: '특정 앨범의 상세 정보를 조회합니다.',
   })
   async getDetailData(@Query('albumId') albumId: number) {
-    console.log(albumId, 'detailData');
     return await this.albumService.findDetailData(albumId);
   }
 
@@ -250,7 +248,6 @@ export class AlbumController {
     @Query('albumId') albumId: number,
     @Query('userId') userId: number,
   ) {
-    console.log(albumId, userId, 'Dfsdfs');
     return await this.albumService.albumPhotoDetail(albumId, userId);
   }
 

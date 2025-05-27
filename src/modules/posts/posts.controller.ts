@@ -179,7 +179,6 @@ export class PostsController {
     @Query('postId') postId: string,
     @Query('userId') userId: string,
   ) {
-    console.log(postId, userId, 'detailData');
     return await this.postsService.getOnePosts(Number(postId), Number(userId));
   }
 

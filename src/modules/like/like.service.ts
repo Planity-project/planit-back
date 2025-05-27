@@ -22,7 +22,6 @@ export class LikeService {
     userId: number,
     postId: number,
   ): Promise<{ liked: boolean }> {
-    console.log(userId, postId, 'service');
     const existing = await this.entityManager.findOne(Like, {
       where: {
         user: { id: userId },

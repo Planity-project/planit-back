@@ -31,7 +31,6 @@ export class LikeController {
     @Req() req,
     @Query('postId', ParseIntPipe) postId: number,
   ): Promise<{ liked: boolean }> {
-    console.log(req.user.id, postId, 'Controller');
     return this.likeService.togglePostLike(req.user.id, postId);
   }
 
@@ -44,7 +43,6 @@ export class LikeController {
     @Req() req,
     @Param('commentId', ParseIntPipe) commentId: number,
   ): Promise<{ liked: boolean }> {
-    console.log(req.user.id, commentId, 'commentToggle');
     return this.likeService.toggleCommentLike(req.user.id, commentId);
   }
 

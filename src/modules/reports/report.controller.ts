@@ -98,7 +98,6 @@ export class ReportController {
     @Body() reportData: { reason: string },
     @Req() req: any,
   ): Promise<Report> {
-    console.log('req.user:', req.user);
     if (!reportData.reason || reportData.reason.trim() === '') {
       throw new BadRequestException('신고 사유를 입력해주세요.');
     }

@@ -105,7 +105,6 @@ export class PostsService {
     postId: number,
     userId: number,
   ): Promise<{ dayData: any; postData: any }> {
-    console.log(postId, userId, 'getOnePosts');
     const result = await this.postRepository.findOne({
       where: { id: postId },
       relations: [

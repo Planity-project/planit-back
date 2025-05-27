@@ -284,7 +284,6 @@ export class SeederService {
 
       currentPage++;
     }
-    console.log(results);
     return results;
   }
 

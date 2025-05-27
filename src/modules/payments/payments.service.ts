@@ -49,7 +49,6 @@ export class PaymentsService {
       };
 
       const { data }: any = await axios.request(options);
-      console.log('결제 응답:', data);
 
       // 2. 결제 상태 검증
       if (data.status !== 'PAID') {

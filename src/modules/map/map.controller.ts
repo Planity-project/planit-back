@@ -198,8 +198,6 @@ export class MapController {
 
       const startIdx = page === 0 ? 0 : 20 + (page - 1) * 10;
       const paged = filtered.slice(startIdx, startIdx + pageSize);
-      console.log('시작', paged, '끝');
-      // 셔플은 첫 페이지에서만 실행
       const shuffled = page === 0 ? shuffleArray(paged) : paged;
       return { locations: shuffled };
     } catch (error) {

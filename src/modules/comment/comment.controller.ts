@@ -39,7 +39,6 @@ export class CommentController {
   @ApiResponse({ status: 201, description: '댓글 작성 성공' })
   @ApiBody({ type: CreateCommentDto })
   async create(@Req() req, @Body() createCommentDto: CreateCommentDto) {
-    console.log('🔍 req.user:', req.user);
     const loginUserId = req.user.id;
 
     if (!createCommentDto.albumImageId) {

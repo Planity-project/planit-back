@@ -207,7 +207,6 @@ export class TripService {
       ],
     });
 
-    console.log(data[0].tripDays[0].places, 'data');
     return data;
   }
 
