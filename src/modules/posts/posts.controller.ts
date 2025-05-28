@@ -175,9 +175,12 @@ export class PostsController {
   })
   async getDetailData(
     @Query('postId') postId: string,
-    @Query('userId') userId: string,
+    @Query('userId') userId?: string,
   ) {
-    return await this.postsService.getOnePosts(Number(postId), Number(userId));
+    return await this.postsService.getOnePosts(
+      Number(postId),
+      userId ? Number(userId) : null,
+    );
   }
 
   @Get('likePosts')

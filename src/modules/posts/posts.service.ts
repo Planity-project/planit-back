@@ -103,7 +103,7 @@ export class PostsService {
 
   async getOnePosts(
     postId: number,
-    userId: number,
+    userId?: number | null,
   ): Promise<{ dayData: any; postData: any }> {
     const result = await this.postRepository.findOne({
       where: { id: postId },
@@ -123,7 +123,9 @@ export class PostsService {
     if (!result) {
       throw new BadRequestException('post를 찾을 수 없습니다.');
     }
-    const likeCheck = result.likes.find((x) => x.user.id === userId);
+    const likeCheck = userId
+      ? result.likes.find((x) => x.user.id === userId)
+      : null;
     const postData = {
       id: result.id,
       titleImg: result.images[0]?.url ?? '/defaultImage.png',
