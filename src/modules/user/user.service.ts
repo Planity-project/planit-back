@@ -83,6 +83,7 @@ export class UserService {
     id: number,
     nickname: string,
   ): Promise<User | { result: boolean; message: string }> {
+    console.log(id, nickname, '요청 값 닉네임');
     const nick = await this.userRepository.findOne({ where: { nickname } });
     if (nick && nick.id !== id) {
       return { result: false, message: '이미 사용중인 닉네임입니다.' };
@@ -93,7 +94,9 @@ export class UserService {
     }
 
     user.nickname = nickname;
-    await this.userRepository.save(user);
+    console.log(user, '유저');
+    const data = await this.userRepository.save(user);
+    console.log(data, '저장후 유저');
     return { result: true, message: '등록 성공' };
   }
 
