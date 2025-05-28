@@ -42,7 +42,7 @@ export class TripService {
   async generateWithGemini(body: any) {
     const prompt = generateSchedulePrompt(body.schedule);
     const data = await requestGemini(prompt);
-
+    console.log('🔵 Gemini 응답 원문:\n', data);
     const jsonStart = data.indexOf('{');
     const jsonEnd = data.lastIndexOf('}');
     if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
@@ -51,6 +51,7 @@ export class TripService {
 
     const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
     const fullResult = JSON.parse(jsonSubstring);
+    console.log('🟡 파싱할 JSON Substring:\n', jsonSubstring);
 
     // 이후 코드는 기존과 동일하게 진행
     const dates = Object.keys(fullResult);
