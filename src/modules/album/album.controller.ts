@@ -280,9 +280,9 @@ export class AlbumController {
   ) {
     console.log(userId, albumId, targetId, 'dearwer');
     return await this.albumService.albumDelegationRole(
-      userId,
-      albumId,
-      targetId,
+      Number(userId),
+      Number(albumId),
+      Number(targetId),
     );
   }
 

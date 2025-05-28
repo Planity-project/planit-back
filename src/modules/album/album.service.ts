@@ -346,9 +346,9 @@ export class AlbumService {
 
   //앨범 그룹 사용자 권한 변경
   async albumDelegationRole(
-    currentOwnerId: number,
+    userId: number,
     albumId: number,
-    newOwnerId: number,
+    targetId: number,
   ): Promise<{ result: boolean; message: string }> {
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
@@ -360,7 +360,7 @@ export class AlbumService {
     }
 
     const currentOwnerGroup = album.groups.find(
-      (group) => group.user.id === currentOwnerId && group.role === 'OWNER',
+      (group) => group.user.id === userId && group.role === 'OWNER',
     );
 
     if (!currentOwnerGroup) {
@@ -371,7 +371,7 @@ export class AlbumService {
     }
 
     const newOwnerGroup = album.groups.find(
-      (group) => group.user.id === newOwnerId,
+      (group) => group.user.id === targetId,
     );
 
     if (!newOwnerGroup) {
