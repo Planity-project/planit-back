@@ -278,6 +278,7 @@ export class AlbumController {
     @Query('albumId') albumId: number,
     @Query('targetId') targetId: number,
   ) {
+    console.log(userId, albumId, targetId, 'dearwer');
     return await this.albumService.albumDelegationRole(
       userId,
       albumId,
