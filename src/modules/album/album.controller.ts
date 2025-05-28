@@ -306,6 +306,7 @@ export class AlbumController {
   @ApiQuery({ name: 'invite', type: String, description: '초대 링크 문자열' })
   @ApiResponse({ status: 200, description: '앨범 정보 반환' })
   async albumInviteFine(@Query('invite') inviteLink: string) {
+    console.log(inviteLink, '초대링크 ');
     return await this.albumService.inviteAlbumFind(inviteLink);
   }
 
