@@ -113,8 +113,6 @@ export class TripService {
 
           const data = await requestGeminiWithRetry(prompt); // 🔄 재시도 로직 사용
 
-          console.log('✅ Gemini 응답 수신:', data.slice(0, 100)); // 길이 제한으로 앞 100자만
-
           const jsonStart = data.indexOf('{');
           const jsonEnd = data.lastIndexOf('}');
           if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
