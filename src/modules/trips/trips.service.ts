@@ -43,20 +43,52 @@ export class TripService {
 
   //최종 일정 생성
   async generateWithGemini(body: any) {
+    async function requestGeminiWithRetry(
+      prompt: string,
+      retries = 3,
+      delayMs = 2000,
+    ): Promise<string> {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          return await requestGemini(prompt);
+        } catch (error: any) {
+          const status =
+            error?.response?.status || error?.code || error?.message;
+          if (status === 503 || status === 'UNAVAILABLE') {
+            console.warn(
+              `⚠️ Gemini 서버 과부하 - 재시도 (${attempt}/${retries})`,
+            );
+            if (attempt < retries)
+              await new Promise((res) => setTimeout(res, delayMs));
+          } else {
+            throw error;
+          }
+        }
+      }
+      throw new Error('Gemini 요청 실패 (재시도 후에도 실패)');
+    }
     try {
       const userId = body.schedule.userId;
+      console.log('🔷 generateWithGemini 시작');
+      console.log('👤 userId:', userId);
 
       if (!userMutexes.has(userId)) {
         userMutexes.set(userId, new Mutex());
+        console.log('🔒 Mutex 생성');
       }
 
       return await userMutexes.get(userId)!.runExclusive(async () => {
+        console.log('🔐 Mutex 획득 완료');
+
         const fullSchedule = body.schedule;
         const dates = fullSchedule.dataTime.map((d) => d.date);
+        console.log('📆 전체 날짜 목록:', dates);
+
         let combinedResult = {};
 
         for (let i = 0; i < dates.length; i += 2) {
           const chunkDates = dates.slice(i, i + 2);
+          console.log(`🧩 Chunk ${i / 2}:`, chunkDates);
 
           const chunkDataTime = fullSchedule.dataTime.filter((d) =>
             chunkDates.includes(d.date),
@@ -74,61 +106,83 @@ export class TripService {
           };
 
           const prompt = generateSchedulePrompt(partialSchedule);
-          const data = await requestGemini(prompt);
+          console.log('📝 Gemini Prompt 생성됨');
+
+          const data = await requestGeminiWithRetry(prompt); // 🔄 재시도 로직 사용
+
+          console.log('✅ Gemini 응답 수신:', data.slice(0, 100)); // 길이 제한으로 앞 100자만
 
           const jsonStart = data.indexOf('{');
           const jsonEnd = data.lastIndexOf('}');
           if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
             throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
           }
+
           const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
           const partialResult = JSON.parse(jsonSubstring);
+          console.log('📦 Partial result parsed:', Object.keys(partialResult));
 
           combinedResult = { ...combinedResult, ...partialResult };
         }
 
-        // DB 저장: 트랜잭션 권장
+        // DB 저장
         return await this.saveTripFromResult(combinedResult, fullSchedule);
       });
     } catch (error) {
-      console.error('generateWithGemini error:', error);
-      throw error; // 다시 던져서 500 에러 발생시키기
+      console.error('🔥 generateWithGemini error:', error);
+      throw error;
     }
   }
 
   async saveTripFromResult(fullResult: any, fullSchedule: any) {
+    console.log('🔹 saveTripFromResult 시작');
+
     const dates = Object.keys(fullResult);
+    console.log('📆 날짜 키:', dates);
+
     const userData = await this.userRepository.findOne({
       where: { id: fullSchedule.userId },
     });
-    if (!userData) throw new Error('유저를 찾을 수 없습니다');
+    if (!userData) {
+      console.error('❌ 유저를 찾을 수 없습니다:', fullSchedule.userId);
+      throw new Error('유저를 찾을 수 없습니다');
+    }
 
-    // 트랜잭션 시작
     return await this.tripRepository.manager.transaction(
       async (transactionalEntityManager) => {
+        console.log('🔐 트랜잭션 시작');
+
         const createTripData: Partial<Trip> = {
           title: fullSchedule.location,
           startDate: new Date(dates[0]),
           endDate: new Date(dates[dates.length - 1]),
           user: userData,
         };
+
         const trip = await transactionalEntityManager.save(
           Trip,
           createTripData,
         );
+        console.log('📌 Trip 저장 완료:', trip.id);
 
         const entries = Object.entries(fullResult);
 
         for (let i = 0; i < entries.length; i++) {
           const [dateStr, schedules] = entries[i];
+          console.log(`📅 TripDay 저장 시도: ${dateStr}`);
+
           const dayData = {
             date: dateStr,
             todayOrder: i + 1,
             trip: trip,
           };
+
           const savedDay = await transactionalEntityManager.save(
             TripDay,
             dayData,
+          );
+          console.log(
+            `✅ TripDay 저장됨 (ID: ${savedDay.id}, Order: ${dayData.todayOrder})`,
           );
 
           for (const item of schedules as any) {
@@ -145,17 +199,20 @@ export class TripService {
               rating,
               reviewCount,
             } = item;
+
             let finalLat = lat;
             let finalLng = lng;
 
             if (!finalLat || !finalLng) {
               try {
+                console.log(`📍 위경도 없음 → 주소로 변환 시도: ${address}`);
                 const result = await addressToChange(address);
                 finalLat = result.latitude;
                 finalLng = result.longitude;
+                console.log(`🧭 변환 결과: lat=${finalLat}, lng=${finalLng}`);
               } catch (error) {
                 console.warn(
-                  `${placeName}의 위경도 검색 실패: ${error.message}`,
+                  `⚠️ ${placeName} 위경도 검색 실패: ${error.message}`,
                 );
               }
             }
@@ -174,6 +231,8 @@ export class TripService {
               reviewCount,
             });
 
+            console.log(`✅ Place 저장 완료: ${savedPlace.id} (${placeName})`);
+
             await transactionalEntityManager.save(TripScheduleItem, {
               startTime: start,
               endTime: end,
@@ -183,6 +242,8 @@ export class TripService {
               tripDay: savedDay,
               place: savedPlace,
             });
+
+            console.log(`📋 TripScheduleItem 저장 완료: ${placeName}`);
           }
         }
 
@@ -190,12 +251,15 @@ export class TripService {
           user: userData,
           trip,
         });
+
         const savedPost = await transactionalEntityManager.save(Post, post);
+        console.log(`📝 Post 저장 완료: ${savedPost.id}`);
 
         return savedPost.id;
       },
     );
   }
+
   async findAll() {
     const data: any = await this.tripRepository.find({
       relations: [
