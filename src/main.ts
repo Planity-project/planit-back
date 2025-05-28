@@ -30,6 +30,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  const server = app.getHttpServer();
+
+  // 타임아웃 설정 (10분)
+  server.setTimeout(10 * 60 * 1000);
+
   app.enableCors({
     origin: ['http://localhost:3000', 'http://localhost:4000'], // 모든 origin 허용하되 credentials까지 허용됨
     credentials: true,
