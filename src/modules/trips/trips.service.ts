@@ -86,13 +86,23 @@ export class TripService {
 
         const fullSchedule = body.schedule;
         const dates = fullSchedule.dataTime.map((d) => d.date);
+        const places = fullSchedule.dataPlace;
+
         console.log('📆 전체 날짜 목록:', dates);
+        console.log('📍 전체 장소 개수:', places.length);
 
         let combinedResult = {};
 
-        for (let i = 0; i < dates.length; i += 2) {
-          const chunkDates = dates.slice(i, i + 2);
-          console.log(`🧩 Chunk ${i / 2}:`, chunkDates);
+        // chunk size: 날짜 기준 2일씩
+        const dateChunkSize = 2;
+        // 장소를 날짜 chunk 갯수에 맞춰 나누기
+        const placeChunkSize = Math.ceil(
+          places.length / Math.ceil(dates.length / dateChunkSize),
+        );
+
+        for (let i = 0; i < dates.length; i += dateChunkSize) {
+          const chunkDates = dates.slice(i, i + dateChunkSize);
+          console.log(`🧩 Chunk ${i / dateChunkSize}:`, chunkDates);
 
           const chunkDataTime = fullSchedule.dataTime.filter((d) =>
             chunkDates.includes(d.date),
@@ -101,9 +111,15 @@ export class TripService {
             chunkDates.includes(s.date),
           );
 
+          // 장소 chunk 계산
+          const placeStartIndex =
+            Math.floor(i / dateChunkSize) * placeChunkSize;
+          const placeEndIndex = placeStartIndex + placeChunkSize;
+          const chunkDataPlace = places.slice(placeStartIndex, placeEndIndex);
+
           const partialSchedule = {
             dataTime: chunkDataTime,
-            dataPlace: fullSchedule.dataPlace,
+            dataPlace: chunkDataPlace,
             dataStay: chunkDataStay,
             userId,
             location: fullSchedule.location,
@@ -132,7 +148,12 @@ export class TripService {
               Object.keys(partialResult),
             );
 
-            combinedResult = { ...combinedResult, ...partialResult };
+            // 중복된 날짜 키에 대해 장소 합치기 (중복 제거는 추가 가능)
+            for (const [dateKey, placesList] of Object.entries(partialResult)) {
+              if (!combinedResult[dateKey]) combinedResult[dateKey] = [];
+              combinedResult[dateKey] =
+                combinedResult[dateKey].concat(placesList);
+            }
           } catch (err: any) {
             console.warn(
               `⚠️ Gemini 요청 또는 파싱 실패 (날짜: ${chunkDates.join(', ')}):`,
