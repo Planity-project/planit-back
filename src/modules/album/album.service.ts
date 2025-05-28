@@ -1,17 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull, In } from 'typeorm';
-
 import { Album } from './entities/album.entity';
 import { AlbumGroup } from './entities/albumGroup.entity';
 import { AlbumImage } from './entities/albumImage';
 import { User } from '../user/entities/user.entity';
 import { Comment } from '../comment/entities/comment.entity';
 import { AlbumPhotoDetailResponseDto } from './dto/getAlbumPhotoData.dto';
+import { AlbumListItemDto } from './dto/albumList.dto';
 import { Like } from '../like/entities/like.entity';
 import { Notification } from '../notification/entities/notification.entity';
-
 import { NotificationService } from '../notification/notification.service';
+
 @Injectable()
 export class AlbumService {
   constructor(
@@ -135,20 +135,25 @@ export class AlbumService {
   }
 
   // 앨범 그룹 목록
-  async getAlbumList() {
-    const groups = await this.albumGroupRepository.find({
-      relations: ['user', 'albums', 'payments'],
+  async getAlbumList(): Promise<AlbumListItemDto[]> {
+    const albums = await this.albumRepository.find({
+      relations: ['user', 'groups'],
       order: { createdAt: 'DESC' },
     });
 
-    return groups.map((group) => ({
-      id: group.id,
-      album_title: group.albums?.title,
-      leader: group.user?.nickname,
-      is_paid: group.type === 'PAID',
-      created_at: group.createdAt,
-    }));
+    return albums.map((album) => {
+      const ownerGroup = album.groups.find((g) => g.role === 'OWNER');
+
+      return {
+        id: album.id,
+        album_title: album.title,
+        leader: ownerGroup?.user?.nickname ?? '알 수 없음',
+        is_paid: ownerGroup?.type === 'PAID',
+        created_at: album.createdAt,
+      };
+    });
   }
+
   // 앨범 권한 확인
   async getAlbumRole(AlbumId: number, userId: number): Promise<string> {
     const albumGroup = await this.albumGroupRepository.findOne({
