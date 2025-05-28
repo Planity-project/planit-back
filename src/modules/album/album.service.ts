@@ -309,6 +309,7 @@ export class AlbumService {
     albumId: number,
     userId: number,
   ): Promise<{ result: boolean; message: string }> {
+    console.log(albumId, userId);
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
       relations: ['groups', 'groups.user'], // 👈 유저까지 불러옴
