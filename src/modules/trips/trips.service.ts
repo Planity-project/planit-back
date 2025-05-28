@@ -8,12 +8,17 @@ import { TripScheduleItem } from './entities/tripscheduleitems.entity';
 import { Trip } from './entities/trips.entity';
 import { Post } from '../posts/entities/post.entity';
 import { User } from '../user/entities/user.entity';
+import { Mutex } from 'async-mutex';
 
 import {
   addressToChange,
   requestGemini,
+  generateSchedulePrompt,
   generateSchedulePrompts,
+  generateSchedulePromptEn,
 } from 'util/generator';
+
+const userMutexes = new Map<number, Mutex>();
 @Injectable()
 export class TripService {
   constructor(
@@ -38,164 +43,154 @@ export class TripService {
 
   //최종 일정 생성
   async generateWithGemini(body: any) {
-    const prompts = generateSchedulePrompts(body.schedule);
-    const fullResult: Record<string, any[]> = {};
+    const userId = body.schedule.userId;
 
-    for (const { prompt } of prompts) {
-      const data = await requestGemini(prompt);
-      const jsonStart = data.indexOf('{');
-      const jsonEnd = data.lastIndexOf('}');
-      if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
-        throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
-      }
-      const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
-      const parsed = JSON.parse(jsonSubstring);
-      Object.assign(fullResult, parsed); // 날짜 키로 합침
+    if (!userMutexes.has(userId)) {
+      userMutexes.set(userId, new Mutex());
     }
 
-    // 이후 코드는 기존과 동일하게 진행
+    return await userMutexes.get(userId)!.runExclusive(async () => {
+      const fullSchedule = body.schedule;
+      const dates = fullSchedule.dataTime.map((d) => d.date);
+      let combinedResult = {};
+
+      for (let i = 0; i < dates.length; i += 2) {
+        const chunkDates = dates.slice(i, i + 2);
+
+        const chunkDataTime = fullSchedule.dataTime.filter((d) =>
+          chunkDates.includes(d.date),
+        );
+        const chunkDataStay = fullSchedule.dataStay.filter((s) =>
+          chunkDates.includes(s.date),
+        );
+
+        const partialSchedule = {
+          dataTime: chunkDataTime,
+          dataPlace: fullSchedule.dataPlace,
+          dataStay: chunkDataStay,
+          userId,
+          location: fullSchedule.location,
+        };
+
+        const prompt = generateSchedulePrompt(partialSchedule);
+        const data = await requestGemini(prompt);
+
+        const jsonStart = data.indexOf('{');
+        const jsonEnd = data.lastIndexOf('}');
+        if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
+          throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
+        }
+        const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
+        const partialResult = JSON.parse(jsonSubstring);
+
+        combinedResult = { ...combinedResult, ...partialResult };
+      }
+
+      // DB 저장: 트랜잭션 권장
+      return await this.saveTripFromResult(combinedResult, fullSchedule);
+    });
+  }
+
+  async saveTripFromResult(fullResult: any, fullSchedule: any) {
     const dates = Object.keys(fullResult);
     const userData = await this.userRepository.findOne({
-      where: { id: body.schedule.userId },
+      where: { id: fullSchedule.userId },
     });
-    if (!userData) {
-      throw new Error('유저를 찾을 수 없습니다');
-    }
+    if (!userData) throw new Error('유저를 찾을 수 없습니다');
 
-    const createTripData: Partial<Trip> = {
-      title: body.schedule.location,
-      startDate: new Date(dates[0]),
-      endDate: new Date(dates[dates.length - 1]),
-      user: userData,
-    };
+    // 트랜잭션 시작
+    return await this.tripRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        const createTripData: Partial<Trip> = {
+          title: fullSchedule.location,
+          startDate: new Date(dates[0]),
+          endDate: new Date(dates[dates.length - 1]),
+          user: userData,
+        };
+        const trip = await transactionalEntityManager.save(
+          Trip,
+          createTripData,
+        );
 
-    const trip = await this.tripRepository.save(createTripData);
+        const entries = Object.entries(fullResult);
 
-    const entries = Object.entries(fullResult);
-    for (let i = 0; i < entries.length; i++) {
-      const [dateStr, schedules] = entries[i];
-      const dayData = {
-        date: dateStr,
-        todayOrder: i + 1,
-        trip: trip,
-      };
-      const savedDay = await this.tripDayRepository.save(dayData);
+        for (let i = 0; i < entries.length; i++) {
+          const [dateStr, schedules] = entries[i];
+          const dayData = {
+            date: dateStr,
+            todayOrder: i + 1,
+            trip: trip,
+          };
+          const savedDay = await transactionalEntityManager.save(
+            TripDay,
+            dayData,
+          );
 
-      for (const item of schedules as any) {
-        const {
-          순서: todayOrder,
-          start,
-          end,
-          장소: placeName,
-          위도: lat,
-          경도: lng,
-          주소: address,
-          타입: category,
-          image,
-          rating,
-          reviewCount,
-        } = item;
-        let finalLat = lat;
-        let finalLng = lng;
+          for (const item of schedules as any) {
+            const {
+              순서: todayOrder,
+              start,
+              end,
+              장소: placeName,
+              위도: lat,
+              경도: lng,
+              주소: address,
+              타입: category,
+              image,
+              rating,
+              reviewCount,
+            } = item;
+            let finalLat = lat;
+            let finalLng = lng;
 
-        // 위경도 누락 시 Kakao API로 보완
-        if (!finalLat || !finalLng) {
-          try {
-            const result = await addressToChange(address);
-            finalLat = result.latitude;
-            finalLng = result.longitude;
-          } catch (error) {
-            console.warn(`${placeName}의 위경도 검색 실패: ${error.message}`);
+            if (!finalLat || !finalLng) {
+              try {
+                const result = await addressToChange(address);
+                finalLat = result.latitude;
+                finalLng = result.longitude;
+              } catch (error) {
+                console.warn(
+                  `${placeName}의 위경도 검색 실패: ${error.message}`,
+                );
+              }
+            }
+
+            const savedPlace = await transactionalEntityManager.save(Place, {
+              name: placeName,
+              category,
+              address,
+              lat: finalLat,
+              lng: finalLng,
+              todayOrder,
+              trip,
+              tripDay: savedDay,
+              image,
+              rating,
+              reviewCount,
+            });
+
+            await transactionalEntityManager.save(TripScheduleItem, {
+              startTime: start,
+              endTime: end,
+              title: placeName,
+              todayOrder,
+              trip,
+              tripDay: savedDay,
+              place: savedPlace,
+            });
           }
         }
 
-        const savedPlace = await this.placeRepository.save({
-          name: placeName,
-          category,
-          address,
-          lat: finalLat,
-          lng: finalLng,
-          todayOrder,
+        const post = this.postRepository.create({
+          user: userData,
           trip,
-          tripDay: savedDay,
-          image,
-          rating,
-          reviewCount,
         });
+        const savedPost = await transactionalEntityManager.save(Post, post);
 
-        await this.tripScheduleItemRepository.save({
-          startTime: start,
-          endTime: end,
-          title: placeName,
-          todayOrder,
-          trip,
-          tripDay: savedDay,
-          place: savedPlace,
-        });
-      }
-    }
-
-    const post = this.postRepository.create({
-      user: userData,
-      trip,
-    });
-    const savedPost = await this.postRepository.save(post);
-    return savedPost.id;
+        return savedPost.id;
+      },
+    );
   }
-  //일정 생성하기 전 프리뷰
-  // async previewGeneratedTrip(body: any) {
-  //   const str = generateSchedulePrompt(body);
-  //   const data = await requestGemini(str);
-
-  //   try {
-  //     //  JSON 부분만 추출
-  //     const jsonStart = data.indexOf('{');
-  //     const jsonEnd = data.lastIndexOf('}');
-  //     const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
-
-  //     const parsedData = JSON.parse(jsonSubstring);
-  //     const entries: [string, any[]][] = Object.entries(parsedData); // [['2025-05-14 (수)', [...]], ...]
-
-  //     const previewTrip = {
-  //       title: body.location,
-  //       startDate: new Date(Object.keys(parsedData)[0]),
-  //       endDate: new Date(Object.keys(parsedData).slice(-1)[0]),
-  //       tripDays: entries.map(([date, schedules], index) => {
-  //         const dayOrder = index + 1;
-
-  //         const places = schedules.map((item: any) => ({
-  //           name: item.장소,
-  //           category: item.타입,
-  //           address: item.주소,
-  //           lat: item.위도,
-  //           lng: item.경도,
-  //           todayOrder: item.순서,
-  //           image: item.image,
-  //         }));
-
-  //         const scheduleItems = schedules.map((item: any) => ({
-  //           title: item.장소,
-  //           startTime: item.start,
-  //           endTime: item.end,
-  //           todayOrder: item.순서,
-  //         }));
-
-  //         return {
-  //           date,
-  //           todayOrder: dayOrder,
-  //           places,
-  //           scheduleItems,
-  //         };
-  //       }),
-  //     };
-
-  //     return previewTrip;
-  //   } catch (error) {
-  //     console.error('프리뷰 생성 중 오류 발생:', error);
-  //     throw new Error('프리뷰 생성 실패');
-  //   }
-  // }
-
   async findAll() {
     const data: any = await this.tripRepository.find({
       relations: [

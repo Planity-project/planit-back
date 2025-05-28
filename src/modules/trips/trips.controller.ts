@@ -11,6 +11,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwtauth.gurad';
 import { UseGuards } from '@nestjs/common';
+
 @ApiTags('trip')
 @ApiExtraModels(GenerateDateDto)
 @UseGuards(JwtAuthGuard)
