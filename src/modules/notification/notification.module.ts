@@ -8,7 +8,7 @@ import { Trip } from '../trips/entities/trips.entity';
 import { Album } from '../album/entities/album.entity';
 import { AlbumGroup } from '../album/entities/albumGroup.entity';
 import { AlbumImage } from '../album/entities/albumImage';
-
+import { Comment } from '../comment/entities/comment.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -18,6 +18,7 @@ import { AlbumImage } from '../album/entities/albumImage';
       Album,
       AlbumGroup,
       AlbumImage,
+      Comment,
     ]),
   ],
   providers: [NotificationService],

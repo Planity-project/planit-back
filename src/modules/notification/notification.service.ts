@@ -9,6 +9,7 @@ import { Post } from 'src/modules/posts/entities/post.entity';
 import { Album } from '../album/entities/album.entity';
 import { AlbumGroup } from '../album/entities/albumGroup.entity';
 import { AlbumImage } from '../album/entities/albumImage';
+import { Comment } from '../comment/entities/comment.entity';
 
 @Injectable()
 export class NotificationService {
@@ -25,6 +26,8 @@ export class NotificationService {
     private readonly albumGroupRepository: Repository<AlbumGroup>,
     @InjectRepository(AlbumImage)
     private readonly albumImageRepository: Repository<AlbumImage>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
   ) {}
 
   // ✅ 유저의 모든 알림 조회
@@ -258,15 +261,29 @@ export class NotificationService {
       return;
     }
     if (type === 'ALBUM') {
+      const comment = obj as Comment;
+
+      // albumImage + album 관계까지 불러오기
+      const commentWithAlbum = await this.commentRepository.findOne({
+        where: { id: comment.id },
+        relations: ['albumImage', 'albumImage.album'],
+      });
+
+      if (!commentWithAlbum?.albumImage?.album) {
+        console.error('앨범 정보를 찾을 수 없음(알림 데이터 생성 실패)');
+        return;
+      }
+
       const notification = this.notificationRepository.create({
-        type: type,
+        type,
         content: text,
-        user: user,
+        user,
         status: 'UNREAD',
-        album: obj,
+        album: commentWithAlbum.albumImage.album,
         notifyAt: null,
         isSent: false,
       });
+
       await this.notificationRepository.save(notification);
       return;
     }
