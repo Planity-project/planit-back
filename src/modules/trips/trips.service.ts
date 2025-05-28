@@ -70,6 +70,7 @@ export class TripService {
       }
       throw new Error('Gemini 요청 실패 (재시도 후에도 실패)');
     }
+
     try {
       const userId = body.schedule.userId;
       console.log('🔷 generateWithGemini 시작');
@@ -111,19 +112,34 @@ export class TripService {
           const prompt = generateSchedulePrompt(partialSchedule);
           console.log('📝 Gemini Prompt 생성됨');
 
-          const data = await requestGeminiWithRetry(prompt); // 🔄 재시도 로직 사용
+          try {
+            const data = await requestGeminiWithRetry(prompt);
+            console.log('✅ Gemini 응답 수신:', data.slice(0, 100));
 
-          const jsonStart = data.indexOf('{');
-          const jsonEnd = data.lastIndexOf('}');
-          if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
-            throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
+            const jsonStart = data.indexOf('{');
+            const jsonEnd = data.lastIndexOf('}');
+            if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
+              console.warn(
+                `⚠️ 유효한 JSON 범위를 찾을 수 없습니다. 해당 chunk(${chunkDates.join(', ')}) 건너뜀`,
+              );
+              continue;
+            }
+
+            const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
+            const partialResult = JSON.parse(jsonSubstring);
+            console.log(
+              '📦 Partial result parsed:',
+              Object.keys(partialResult),
+            );
+
+            combinedResult = { ...combinedResult, ...partialResult };
+          } catch (err: any) {
+            console.warn(
+              `⚠️ Gemini 요청 또는 파싱 실패 (날짜: ${chunkDates.join(', ')}):`,
+              err?.message || err,
+            );
+            continue;
           }
-
-          const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
-          const partialResult = JSON.parse(jsonSubstring);
-          console.log('📦 Partial result parsed:', Object.keys(partialResult));
-
-          combinedResult = { ...combinedResult, ...partialResult };
         }
 
         // DB 저장
