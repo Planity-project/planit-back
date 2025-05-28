@@ -385,10 +385,9 @@ export class AlbumService {
     newOwnerGroup.role = 'OWNER';
 
     await this.albumGroupRepository.save([currentOwnerGroup, newOwnerGroup]);
-
     const newOwnerNickname = newOwnerGroup.user.nickname;
     const notifyText = `앨범 "${album.title}"의 소유자가 ${newOwnerNickname}님으로 변경되었습니다.`;
-
+    console.log(notifyText, 'text');
     for (const group of album.groups) {
       await this.notificationService.createNotification(
         currentOwnerGroup.user, // sender: 현재 소유자
