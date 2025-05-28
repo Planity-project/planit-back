@@ -218,7 +218,7 @@ export class AlbumController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const { albumId, userId, title } = body;
-
+    console.log(body, '앨범 업데이트 요청 들어옴');
     // file이 있을 때만 URL 설정
     const fileUrl = file
       ? `${SERVER_DOMAIN}/uploads/albums/head/${file.filename}`
