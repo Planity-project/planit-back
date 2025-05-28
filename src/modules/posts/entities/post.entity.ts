@@ -11,7 +11,6 @@ import {
 import { User } from 'src/modules/user/entities/user.entity';
 import { Location } from 'src/modules/location/entities/location.entity';
 import { Like } from 'src/modules/like/entities/like.entity';
-import { Report } from 'src/modules/reports/entities/report.entity';
 import { Notification } from 'src/modules/notification/entities/notification.entity';
 import { Trip } from 'src/modules/trips/entities/trips.entity';
 import { PostHashtag } from './postHashtags.entity';
