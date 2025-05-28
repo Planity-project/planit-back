@@ -43,52 +43,57 @@ export class TripService {
 
   //최종 일정 생성
   async generateWithGemini(body: any) {
-    const userId = body.schedule.userId;
+    try {
+      const userId = body.schedule.userId;
 
-    if (!userMutexes.has(userId)) {
-      userMutexes.set(userId, new Mutex());
-    }
-
-    return await userMutexes.get(userId)!.runExclusive(async () => {
-      const fullSchedule = body.schedule;
-      const dates = fullSchedule.dataTime.map((d) => d.date);
-      let combinedResult = {};
-
-      for (let i = 0; i < dates.length; i += 2) {
-        const chunkDates = dates.slice(i, i + 2);
-
-        const chunkDataTime = fullSchedule.dataTime.filter((d) =>
-          chunkDates.includes(d.date),
-        );
-        const chunkDataStay = fullSchedule.dataStay.filter((s) =>
-          chunkDates.includes(s.date),
-        );
-
-        const partialSchedule = {
-          dataTime: chunkDataTime,
-          dataPlace: fullSchedule.dataPlace,
-          dataStay: chunkDataStay,
-          userId,
-          location: fullSchedule.location,
-        };
-
-        const prompt = generateSchedulePrompt(partialSchedule);
-        const data = await requestGemini(prompt);
-
-        const jsonStart = data.indexOf('{');
-        const jsonEnd = data.lastIndexOf('}');
-        if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
-          throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
-        }
-        const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
-        const partialResult = JSON.parse(jsonSubstring);
-
-        combinedResult = { ...combinedResult, ...partialResult };
+      if (!userMutexes.has(userId)) {
+        userMutexes.set(userId, new Mutex());
       }
 
-      // DB 저장: 트랜잭션 권장
-      return await this.saveTripFromResult(combinedResult, fullSchedule);
-    });
+      return await userMutexes.get(userId)!.runExclusive(async () => {
+        const fullSchedule = body.schedule;
+        const dates = fullSchedule.dataTime.map((d) => d.date);
+        let combinedResult = {};
+
+        for (let i = 0; i < dates.length; i += 2) {
+          const chunkDates = dates.slice(i, i + 2);
+
+          const chunkDataTime = fullSchedule.dataTime.filter((d) =>
+            chunkDates.includes(d.date),
+          );
+          const chunkDataStay = fullSchedule.dataStay.filter((s) =>
+            chunkDates.includes(s.date),
+          );
+
+          const partialSchedule = {
+            dataTime: chunkDataTime,
+            dataPlace: fullSchedule.dataPlace,
+            dataStay: chunkDataStay,
+            userId,
+            location: fullSchedule.location,
+          };
+
+          const prompt = generateSchedulePrompt(partialSchedule);
+          const data = await requestGemini(prompt);
+
+          const jsonStart = data.indexOf('{');
+          const jsonEnd = data.lastIndexOf('}');
+          if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
+            throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
+          }
+          const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
+          const partialResult = JSON.parse(jsonSubstring);
+
+          combinedResult = { ...combinedResult, ...partialResult };
+        }
+
+        // DB 저장: 트랜잭션 권장
+        return await this.saveTripFromResult(combinedResult, fullSchedule);
+      });
+    } catch (error) {
+      console.error('generateWithGemini error:', error);
+      throw error; // 다시 던져서 500 에러 발생시키기
+    }
   }
 
   async saveTripFromResult(fullResult: any, fullSchedule: any) {
