@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Album } from 'src/modules/album/entities/album.entity';
-import { Payment } from '../entities/payment.entity';
 
 export class PaymentDto {
   @ApiProperty({

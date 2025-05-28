@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { webcrypto } from 'crypto';
 import { SchedulerService } from './modules/scheduler/scheduler.service';
+import * as express from 'express';
 
 if (!globalThis.crypto) {
   globalThis.crypto = webcrypto as unknown as Crypto;
@@ -11,6 +12,11 @@ if (!globalThis.crypto) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // ✅ 여기 추가: 요청 본문 최대 크기 제한 설정
+  app.use(express.json({ limit: '30mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '30mb' }));
+
   await app.get(SchedulerService).handleTripSharePrompts();
   app.use(cookieParser());
 
