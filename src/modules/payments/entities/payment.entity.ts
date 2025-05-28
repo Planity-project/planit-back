@@ -30,7 +30,7 @@ export class Payment {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => Album)
+  @ManyToOne(() => Album, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'albumId' })
   album: Album;
 
