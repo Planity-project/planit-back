@@ -12,7 +12,9 @@ import { User } from '../user/entities/user.entity';
 import {
   addressToChange,
   requestGemini,
+  generateSchedulePrompt,
   generateSchedulePrompts,
+  generateSchedulePromptEn,
 } from 'util/generator';
 @Injectable()
 export class TripService {
@@ -38,20 +40,17 @@ export class TripService {
 
   //최종 일정 생성
   async generateWithGemini(body: any) {
-    const prompts = generateSchedulePrompts(body.schedule);
-    const fullResult: Record<string, any[]> = {};
+    const prompt = generateSchedulePrompt(body.schedule);
+    const data = await requestGemini(prompt);
 
-    for (const { prompt } of prompts) {
-      const data = await requestGemini(prompt);
-      const jsonStart = data.indexOf('{');
-      const jsonEnd = data.lastIndexOf('}');
-      if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
-        throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
-      }
-      const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
-      const parsed = JSON.parse(jsonSubstring);
-      Object.assign(fullResult, parsed); // 날짜 키로 합침
+    const jsonStart = data.indexOf('{');
+    const jsonEnd = data.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
+      throw new Error('유효한 JSON 범위를 찾을 수 없습니다.');
     }
+
+    const jsonSubstring = data.slice(jsonStart, jsonEnd + 1);
+    const fullResult = JSON.parse(jsonSubstring);
 
     // 이후 코드는 기존과 동일하게 진행
     const dates = Object.keys(fullResult);
