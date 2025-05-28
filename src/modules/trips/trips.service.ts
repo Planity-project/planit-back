@@ -43,15 +43,38 @@ export class TripService {
 
   //최종 일정 생성
   async generateWithGemini(body: any) {
-    console.log('🔷 generateWithGemini 시작');
-
+    async function requestGeminiWithRetry(
+      prompt: string,
+      retries = 3,
+      delayMs = 2000,
+    ): Promise<string> {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          return await requestGemini(prompt);
+        } catch (error: any) {
+          const status =
+            error?.response?.status || error?.code || error?.message;
+          if (status === 503 || status === 'UNAVAILABLE') {
+            console.warn(
+              `⚠️ Gemini 서버 과부하 - 재시도 (${attempt}/${retries})`,
+            );
+            if (attempt < retries)
+              await new Promise((res) => setTimeout(res, delayMs));
+          } else {
+            throw error;
+          }
+        }
+      }
+      throw new Error('Gemini 요청 실패 (재시도 후에도 실패)');
+    }
     try {
       const userId = body.schedule.userId;
+      console.log('🔷 generateWithGemini 시작');
       console.log('👤 userId:', userId);
 
       if (!userMutexes.has(userId)) {
-        console.log('🔒 Mutex 생성');
         userMutexes.set(userId, new Mutex());
+        console.log('🔒 Mutex 생성');
       }
 
       return await userMutexes.get(userId)!.runExclusive(async () => {
@@ -85,8 +108,9 @@ export class TripService {
           const prompt = generateSchedulePrompt(partialSchedule);
           console.log('📝 Gemini Prompt 생성됨');
 
-          const data = await requestGemini(prompt);
-          console.log('✅ Gemini 응답 수신:', data?.slice(0, 100)); // 너무 길면 일부만 출력
+          const data = await requestGeminiWithRetry(prompt); // 🔄 재시도 로직 사용
+
+          console.log('✅ Gemini 응답 수신:', data.slice(0, 100)); // 길이 제한으로 앞 100자만
 
           const jsonStart = data.indexOf('{');
           const jsonEnd = data.lastIndexOf('}');
@@ -101,19 +125,12 @@ export class TripService {
           combinedResult = { ...combinedResult, ...partialResult };
         }
 
-        console.log('💾 모든 결과 결합 완료, DB 저장 시도');
-
-        const result = await this.saveTripFromResult(
-          combinedResult,
-          fullSchedule,
-        );
-
-        console.log('✅ DB 저장 완료, 결과:', result);
-        return result;
+        // DB 저장
+        return await this.saveTripFromResult(combinedResult, fullSchedule);
       });
     } catch (error) {
       console.error('🔥 generateWithGemini error:', error);
-      throw error; // Nest가 500 에러로 처리
+      throw error;
     }
   }
 
@@ -242,6 +259,7 @@ export class TripService {
       },
     );
   }
+
   async findAll() {
     const data: any = await this.tripRepository.find({
       relations: [
