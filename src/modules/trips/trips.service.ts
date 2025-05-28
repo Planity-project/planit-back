@@ -53,7 +53,10 @@ export class TripService {
           return await requestGemini(prompt);
         } catch (error: any) {
           const status =
-            error?.response?.status || error?.code || error?.message;
+            error?.response?.status ||
+            error?.code ||
+            error?.response?.data?.error?.status ||
+            error?.message;
           if (status === 503 || status === 'UNAVAILABLE') {
             console.warn(
               `⚠️ Gemini 서버 과부하 - 재시도 (${attempt}/${retries})`,
