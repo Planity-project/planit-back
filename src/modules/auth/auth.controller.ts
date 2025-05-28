@@ -3,14 +3,9 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   UseGuards,
   Req,
   Res,
-  HttpException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -21,12 +16,11 @@ import {
   ApiBody,
   ApiParam,
 } from '@nestjs/swagger';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Response, Request } from 'express';
 import * as passport from 'passport';
 import { REDIRECT_URL } from 'util/api';
-import { SERVER_DOMAIN } from 'util/api';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { UserStatus } from 'src/modules/user/entities/user.entity';
 
 import * as jwt from 'jsonwebtoken';
 import { JwtAuthGuard } from './jwtauth.gurad';
@@ -156,6 +150,12 @@ export class AuthController {
   }
 
   @Get('cookieCheck')
+  @ApiOperation({ summary: '쿠키를 통한 로그인 상태 확인' })
+  @ApiResponse({
+    status: 200,
+    description: '로그인 응답',
+    type: LoginResponseDto,
+  })
   async cookieCheck(@Req() req: Request, @Res() res: Response) {
     const token = req.cookies?.accessToken;
     if (!token) {
@@ -168,14 +168,28 @@ export class AuthController {
         user.email,
         user.provider,
       );
+
+      let isSuspended = false;
+      if (
+        userData &&
+        userData.status === UserStatus.STOP &&
+        userData.suspend_until &&
+        userData.suspend_until > new Date()
+      ) {
+        isSuspended = true;
+      }
+
       return res.status(200).json({
         result: true,
         user: userData,
-      });
+        isSuspended,
+      } as LoginResponseDto);
     } catch (err) {
-      return res
-        .status(401)
-        .json({ result: false, message: 'token error', error: err });
+      return res.status(401).json({
+        result: false,
+        message: 'token error',
+        error: err,
+      } as LoginResponseDto);
     }
   }
 
