@@ -16,7 +16,7 @@ export class UpdateUserDto {
   })
   @IsNumber()
   @Min(1)
-  id: number;
+  userId: number;
 
   @ApiPropertyOptional({
     description: '닉네임',

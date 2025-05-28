@@ -122,14 +122,14 @@ export class UserController {
     },
   })
   async userinfoModify(@Body() userData: UpdateUserDto) {
-    const { id, nickname } = userData;
+    const { userId, nickname } = userData;
 
     // nickname이 없으면 예외 처리
     if (!nickname) {
       throw new Error('닉네임은 필수 항목입니다.');
     }
 
-    return await this.userService.updateUserNickname(id, nickname);
+    return await this.userService.updateUserNickname(userId, nickname);
   }
 
   // ✅ 연동된 계정 조회
