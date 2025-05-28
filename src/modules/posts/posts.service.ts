@@ -280,6 +280,7 @@ export class PostsService {
       postId: post.id,
       title: post.trip?.title,
       endDate: post.trip.endDate ? post.trip.endDate : null,
+      state: post.type,
     }));
   }
 
