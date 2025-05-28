@@ -260,7 +260,10 @@ export class AlbumController {
     @Query('userId') userId: number,
     @Query('albumId') albumId: number,
   ) {
-    return await this.albumService.albumGroupDestroy(userId, albumId);
+    return await this.albumService.albumGroupDestroy(
+      Number(userId),
+      Number(albumId),
+    );
   }
 
   @Get('delegation')
