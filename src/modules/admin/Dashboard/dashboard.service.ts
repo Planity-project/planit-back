@@ -41,6 +41,7 @@ export class DashboardService {
     };
   }
 
+  // 인기 게시물
   async getPopularPosts() {
     const posts = await this.postRepository.find({
       order: { viewCount: 'DESC' },
