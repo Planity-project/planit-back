@@ -137,7 +137,7 @@ export class AlbumService {
   // 앨범 그룹 목록
   async getAlbumList(): Promise<AlbumListItemDto[]> {
     const albums = await this.albumRepository.find({
-      relations: ['user', 'groups'],
+      relations: ['groups', 'groups.user'],
       order: { createdAt: 'DESC' },
     });
 
