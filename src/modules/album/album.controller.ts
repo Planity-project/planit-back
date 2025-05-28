@@ -225,8 +225,8 @@ export class AlbumController {
       : null;
 
     const result = await this.albumService.albumUpdateHead(
-      albumId,
-      userId,
+      Number(albumId),
+      Number(userId),
       fileUrl,
       title,
     );

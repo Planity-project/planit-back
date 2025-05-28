@@ -217,9 +217,9 @@ export class AlbumService {
     title?: string | null,
   ): Promise<{ result: boolean; message: string }> {
     const album = await this.albumRepository.findOne({
-      where: { id: albumId, user: { id: userId } },
+      where: { id: albumId },
+      relations: ['groups', 'groups.user'],
     });
-    console.log(albumId, userId, fileUrl!, title!, '앨범 업데이트');
     if (!album) {
       return { result: false, message: '앨범을 찾을 수 없습니다.' };
     }
