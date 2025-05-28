@@ -56,7 +56,10 @@ export class Post {
   @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
 
-  @OneToOne(() => Trip, (trip) => trip.post, { onDelete: 'CASCADE' })
+  @OneToOne(() => Trip, (trip) => trip.post, {
+    cascade: ['remove'], // Post 삭제 시 Trip 삭제
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   trip: Trip;
 
