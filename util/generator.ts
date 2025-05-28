@@ -324,7 +324,7 @@ export function generateSchedulePrompts(
     prompt += `- 장소 간 동선을 고려해줘.\n`;
     prompt += `- 결과는 **JSON 형태**로 구성해줘. 형식은:\n`;
     prompt += `  {\n    "${date}": [\n      {\n        "순서": 1,\n        "start": "09:00",\n        "end": "11:00",\n        "장소": "경주 탈해왕릉",\n        "위도": lat,\n        "경도": lon,\n        "주소": "...",\n        "타입": "관광지",\n        "image": "...",\n        "rating": 평점,\n        "reviewCount": 리뷰수\n      }\n    ]\n  }\n`;
-    prompt += `- 모든 데이터는 반드시 값을 얻어와야해 무조건 \n`;
+    prompt += `- 모든 데이터는 반드시 값을 얻어와야하고 장소들이 중복되면 안 돼 \n`;
 
     return { date, prompt };
   });
