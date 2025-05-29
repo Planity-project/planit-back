@@ -71,6 +71,13 @@ export class AlbumService {
     }
   }
 
+  // 앨범 제목
+  async findById(id: number): Promise<Album> {
+    const album = await this.albumRepository.findOne({ where: { id } });
+    if (!album) throw new NotFoundException('앨범을 찾을 수 없습니다.');
+    return album;
+  }
+
   // 앨범 찾기
   async findAll(): Promise<Album[]> {
     return await this.albumRepository.find();

@@ -80,6 +80,12 @@ export class AlbumController {
     return this.albumService.submitAlbum(userId, title, url, fileUrl);
   }
 
+  // 엘범 제목 가져오기
+  @Get(':id')
+  async getAlbumById(@Param('id') id: number) {
+    return this.albumService.findById(id);
+  }
+
   // 전체 앨범 데이터 가져오기
   @Get('allData')
   @ApiOperation({
