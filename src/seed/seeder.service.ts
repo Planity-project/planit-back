@@ -146,6 +146,13 @@ export const locationArr = [
     lng: 128.4611,
     radius: 10000,
   },
+  {
+    country: '대한민국',
+    name: '대구',
+    lat: 35.8722,
+    lng: 128.6025,
+    radius: 10000,
+  },
 ];
 
 @Injectable()

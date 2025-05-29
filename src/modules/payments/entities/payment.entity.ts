@@ -34,6 +34,9 @@ export class Payment {
   @JoinColumn({ name: 'albumId' })
   album: Album;
 
-  @ManyToOne(() => AlbumGroup, (albumGroup) => albumGroup.payments)
+  @ManyToOne(() => AlbumGroup, (albumGroup) => albumGroup.payments, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   albumGroup: AlbumGroup;
 }
