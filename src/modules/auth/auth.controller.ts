@@ -178,7 +178,9 @@ export class AuthController {
       ) {
         isSuspended = true;
       }
-
+      if (!isSuspended) {
+        await this.authService.createLoginLog(user.id);
+      }
       return res.status(200).json({
         result: true,
         user: userData,
@@ -194,9 +196,15 @@ export class AuthController {
   }
 
   @Get('logout')
-  async cookieClear(@Res() res: Response) {
+  async cookieClear(@Res() res: Response, @Req() req: Request) {
     const isProd = process.env.NODE_ENV === 'production';
+    const token = req.cookies?.accessToken;
 
+    if (!token) {
+      return res.status(200).json({ result: false });
+    }
+    const user: any = jwt.verify(token, process.env.JWT_SECRET!);
+    await this.authService.deleteLoginLog(user.id);
     res.clearCookie('accessToken', {
       httpOnly: true,
       sameSite: isProd ? 'none' : 'lax',

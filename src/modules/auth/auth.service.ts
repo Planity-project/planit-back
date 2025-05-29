@@ -8,6 +8,7 @@ import { nicknameMaker } from 'util/generator';
 import { Admin } from '../admin/entities/admin.entity';
 import { LoginType } from '../user/entities/user.entity';
 import { UserStatus } from '../user/entities/user.entity';
+import { UserLoginLog } from './loginhistory/entities/userlogin.entity';
 
 // ✅ 타입 선언 추가
 type LoginResponse = {
@@ -21,6 +22,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Admin) private adminRepository: Repository<Admin>,
+    @InjectRepository(UserLoginLog)
+    private userLogRepository: Repository<UserLoginLog>,
   ) {}
 
   // ✅ 관리자 로그인
@@ -106,5 +109,25 @@ export class AuthService {
     });
 
     return users;
+  }
+
+  async createLoginLog(userId: number): Promise<void> {
+    const user: any = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      console.error('유저가 존재하지 않습니다' + 'createLoginLog');
+    }
+    const check: any = await this.userLogRepository.findOne({
+      where: { userId: userId },
+    });
+    if (!check) {
+      const uData = await this.userLogRepository.create(user);
+      await this.userLogRepository.save(uData);
+    }
+  }
+
+  async deleteLoginLog(userId: number): Promise<void> {
+    await this.userLogRepository.delete({ userId });
   }
 }
