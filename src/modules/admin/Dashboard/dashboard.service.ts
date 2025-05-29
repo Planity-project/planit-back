@@ -44,6 +44,7 @@ export class DashboardService {
   // 인기 게시물
   async getPopularPosts() {
     const posts = await this.postRepository.find({
+      where: { type: true },
       order: { viewCount: 'DESC' },
       take: 5,
       relations: ['user'],
