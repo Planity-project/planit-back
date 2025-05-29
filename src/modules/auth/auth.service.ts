@@ -117,6 +117,7 @@ export class AuthService {
     });
     if (!user) {
       console.error('유저가 존재하지 않습니다' + 'createLoginLog');
+      return;
     }
     const check: any = await this.userLogRepository.findOne({
       where: { user: { id: userId } },
