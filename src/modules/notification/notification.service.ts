@@ -108,7 +108,7 @@ export class NotificationService {
       throw new Error('해당 유저의 알림을 찾을 수 없습니다.');
     }
 
-    if (notification.type !== 'POST') {
+    if (notification.type !== 'POST' && notification.type !== 'TRIP') {
       // 'POST'가 아닌 경우 삭제
       await this.notificationRepository.remove(notification);
       return null;
