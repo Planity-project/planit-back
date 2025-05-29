@@ -92,6 +92,7 @@ export class DashboardService {
     } else {
       startDate.setDate(now.getDate() - 6); // 기본값 7일
     }
+    const rawData = await this.loginLogRepository.find();
 
     const raw = await this.loginLogRepository
       .createQueryBuilder('log')
