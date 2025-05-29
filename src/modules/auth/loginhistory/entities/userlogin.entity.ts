@@ -16,9 +16,6 @@ export class UserLoginLog {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column()
-  userId: number;
-
   @ManyToOne(() => User, (user) => user.loginLogs, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
