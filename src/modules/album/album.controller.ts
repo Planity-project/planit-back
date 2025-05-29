@@ -81,10 +81,6 @@ export class AlbumController {
   }
 
   // 엘범 제목 가져오기
-  @Get(':id')
-  async getAlbumById(@Param('id') id: number) {
-    return this.albumService.findById(id);
-  }
 
   // 전체 앨범 데이터 가져오기
   @Get('allData')
@@ -349,5 +345,10 @@ export class AlbumController {
   @ApiResponse({ status: 200, description: '앨범 삭제 성공 여부 반환' })
   async albumDelete(@Query('albumId') albumId: number) {
     return await this.albumService.albumDelete(albumId);
+  }
+
+  @Get(':id')
+  async getAlbumById(@Param('id') id: number) {
+    return this.albumService.findById(id);
   }
 }
