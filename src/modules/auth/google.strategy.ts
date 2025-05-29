@@ -43,7 +43,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       nickname: nickname,
     };
 
-    console.log(userCreate);
     if (!user) {
       await this.authService.create(userCreate);
       const userData = await this.authService.findVelidate(

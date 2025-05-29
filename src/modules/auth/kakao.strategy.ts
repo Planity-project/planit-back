@@ -49,7 +49,6 @@ export class KakaoStrategy extends PassportStrategy(
       nickname: nickname,
     };
 
-    console.log(userCreate);
     if (!user) {
       await this.authService.create(userCreate);
       const userData = await this.authService.findVelidate(

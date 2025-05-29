@@ -51,7 +51,6 @@ export class NaverStrategy extends PassportStrategy(
     };
     const user = await this.authService.findVelidate(email, LoginType.NAVER);
 
-    console.log(userCreate);
     if (!user) {
       await this.authService.create(userCreate);
       const userData = await this.authService.findVelidate(

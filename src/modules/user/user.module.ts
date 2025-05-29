@@ -10,7 +10,6 @@ import { AlbumModule } from '../album/album.module';
 import { AlbumService } from '../album/album.service';
 import { NotificationModule } from '../notification/notification.module';
 
-console.log('UserModule loaded');
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Payment, Album]),

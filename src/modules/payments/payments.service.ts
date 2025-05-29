@@ -92,7 +92,6 @@ export class PaymentsService {
 
       return payment;
     } catch (error) {
-      console.error('결제 검증 오류:', error);
       throw new HttpException(
         '결제 처리 중 오류 발생',
         HttpStatus.INTERNAL_SERVER_ERROR,

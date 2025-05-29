@@ -34,7 +34,6 @@ export class CommentService {
     albumImageId?: number;
     parentId?: number;
   }) {
-    console.log(userId, content, albumImageId, parentId, '댓글');
     const user = await this.userRepository.findOneByOrFail({ id: userId });
 
     const albumImage = await this.albumImageRepository.findOne({

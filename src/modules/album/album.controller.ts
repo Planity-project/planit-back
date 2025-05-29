@@ -100,7 +100,6 @@ export class AlbumController {
     @Query('limit') limit = 4,
     @Query('userId') userId: number,
   ) {
-    console.log(page, limit, userId, '요청 들어옴');
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
     return await this.albumService.findPaginated(
@@ -221,7 +220,7 @@ export class AlbumController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const { albumId, userId, title } = body;
-    console.log(body, '앨범 업데이트 요청 들어옴');
+
     // file이 있을 때만 URL 설정
     const fileUrl = file
       ? `${SERVER_DOMAIN}/uploads/albums/head/${file.filename}`
@@ -284,7 +283,6 @@ export class AlbumController {
     @Query('albumId') albumId: number,
     @Query('targetId') targetId: number,
   ) {
-    console.log(userId, albumId, targetId, 'dearwer');
     return await this.albumService.albumDelegationRole(
       Number(userId),
       Number(albumId),
@@ -309,7 +307,6 @@ export class AlbumController {
   @ApiQuery({ name: 'invite', type: String, description: '초대 링크 문자열' })
   @ApiResponse({ status: 200, description: '앨범 정보 반환' })
   async albumInviteFine(@Query('invite') inviteLink: string) {
-    console.log(inviteLink, '초대링크 ');
     return await this.albumService.inviteAlbumFind(inviteLink);
   }
 

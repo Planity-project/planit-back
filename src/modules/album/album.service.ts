@@ -66,7 +66,6 @@ export class AlbumService {
 
       return { result: true, id: savedAlbum.id };
     } catch (error) {
-      console.error('앨범 생성 중 에러:', error);
       throw new Error('앨범 생성에 실패했습니다. 잠시 후 다시 시도해주세요.');
     }
   }
@@ -186,7 +185,7 @@ export class AlbumService {
       relations: ['albums'],
     });
     const albumIds = albumGroups.map((group) => group.albums.id);
-    console.log(albumIds, albumGroups, '앨범 데이터');
+
     if (albumIds.length === 0) {
       return { items: [], total: 0 };
     }
@@ -198,7 +197,7 @@ export class AlbumService {
       take: limit,
       order: { createdAt: 'DESC' },
     });
-    console.log(items, '앨범 리턴 itesm');
+
     return { items, total };
   }
 
@@ -321,7 +320,6 @@ export class AlbumService {
     albumId: number,
     userId: number,
   ): Promise<{ result: boolean; message: string }> {
-    console.log(albumId, userId);
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
       relations: ['groups', 'groups.user'], // 👈 유저까지 불러옴
@@ -400,7 +398,7 @@ export class AlbumService {
     await this.albumGroupRepository.save([currentOwnerGroup, newOwnerGroup]);
     const newOwnerNickname = newOwnerGroup.user.nickname;
     const notifyText = `앨범 "${album.title}"의 소유자가 ${newOwnerNickname}님으로 변경되었습니다.`;
-    console.log(notifyText, 'text');
+
     for (const group of album.groups) {
       await this.notificationService.createNotification(
         currentOwnerGroup.user, // sender: 현재 소유자

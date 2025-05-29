@@ -17,7 +17,6 @@ import { PostsModule } from 'src/modules/posts/posts.module';
 import { NotificationModule } from 'src/modules/notification/notification.module';
 import { JwtModule } from '@nestjs/jwt';
 
-console.log('ReportModule loaded');
 @Module({
   imports: [
     TypeOrmModule.forFeature([
