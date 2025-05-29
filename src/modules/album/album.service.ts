@@ -179,7 +179,7 @@ export class AlbumService {
       relations: ['albums'],
     });
     const albumIds = albumGroups.map((group) => group.albums.id);
-
+    console.log(albumIds, albumGroups, '앨범 데이터');
     if (albumIds.length === 0) {
       return { items: [], total: 0 };
     }
@@ -191,7 +191,7 @@ export class AlbumService {
       take: limit,
       order: { createdAt: 'DESC' },
     });
-
+    console.log(items, '앨범 리턴 itesm');
     return { items, total };
   }
 

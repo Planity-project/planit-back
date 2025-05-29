@@ -98,6 +98,7 @@ export class AlbumController {
     @Query('limit') limit = 4,
     @Query('userId') userId: number,
   ) {
+    console.log(page, limit, userId, '요청 들어옴');
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
     return await this.albumService.findPaginated(
