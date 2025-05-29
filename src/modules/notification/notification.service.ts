@@ -98,7 +98,7 @@ export class NotificationService {
   async markNoticeAsRead(
     noticeId: number,
     userId: number,
-  ): Promise<Notification> {
+  ): Promise<Notification | null> {
     const notification = await this.notificationRepository.findOne({
       where: { id: noticeId, user: { id: userId } },
       relations: ['user'],
@@ -108,6 +108,13 @@ export class NotificationService {
       throw new Error('해당 유저의 알림을 찾을 수 없습니다.');
     }
 
+    if (notification.type !== 'POST') {
+      // 'POST'가 아닌 경우 삭제
+      await this.notificationRepository.remove(notification);
+      return null;
+    }
+
+    // 'POST'인 경우만 읽음 처리
     notification.status = 'READ';
     return await this.notificationRepository.save(notification);
   }
