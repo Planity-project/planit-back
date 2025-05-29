@@ -10,7 +10,7 @@ export class SchedulerService {
     private readonly tripService: TripService,
   ) {}
 
-  @Cron('0 9 * * *')
+  @Cron('0 0 0 * * *')
   async handleTripSharePrompts() {
     console.log(`[CRON] Trip 알림 스케줄 실행됨: ${new Date().toISOString()}`);
 
