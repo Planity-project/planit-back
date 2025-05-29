@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 
 import { User } from '../user/entities/user.entity';
+import { UserLoginLog } from './loginhistory/entities/userlogin.entity';
 
 import { GoogleStrategy } from './google.strategy';
 import { NaverStrategy } from './naver.strategy';
@@ -18,7 +19,7 @@ import { JwtStrategy } from './jwt.strategy';
 @Module({
   imports: [
     PassportModule,
-    TypeOrmModule.forFeature([User, Admin]),
+    TypeOrmModule.forFeature([User, Admin, UserLoginLog]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '144h' },
