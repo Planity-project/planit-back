@@ -119,7 +119,7 @@ export class AuthService {
       console.error('유저가 존재하지 않습니다' + 'createLoginLog');
     }
     const check: any = await this.userLogRepository.findOne({
-      where: { userId: userId },
+      where: { user: { id: userId } },
     });
     if (!check) {
       const uData = await this.userLogRepository.create(user);
@@ -128,6 +128,6 @@ export class AuthService {
   }
 
   async deleteLoginLog(userId: number): Promise<void> {
-    await this.userLogRepository.delete({ userId });
+    await this.userLogRepository.delete({ user: { id: userId } });
   }
 }
