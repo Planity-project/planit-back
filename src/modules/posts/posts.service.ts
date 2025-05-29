@@ -105,15 +105,6 @@ export class PostsService {
     postId: number,
     userId?: number | null,
   ): Promise<{ dayData: any; postData: any }> {
-    // 1. 조회수 1 증가 (DB 레벨 직접 쿼리)
-    await this.postRepository
-      .createQueryBuilder()
-      .update(Post)
-      .set({ viewCount: () => 'view_count + 1' })
-      .where('id = :id', { id: postId })
-      .execute();
-
-    // 2. 증가된 조회수 반영하여 최신 데이터 다시 조회
     const result = await this.postRepository.findOne({
       where: { id: postId },
       relations: [
@@ -134,12 +125,23 @@ export class PostsService {
       throw new BadRequestException('post를 찾을 수 없습니다.');
     }
 
-    // 3. 로그인한 유저가 좋아요 했는지 체크
+    // ✅ 조회수 증가
+    result.viewCount += 1;
+    await this.postRepository.save(result);
+
     const likeCheck = userId
       ? result.likes.find((x) => x.user.id === userId)
       : null;
 
-    // 4. dayData 생성 (tripDays별 장소와 일정)
+    const postData = {
+      id: result.id,
+      titleImg: result.images[0]?.url ?? '/defaultImage.png',
+      user: result.user.nickname,
+      userImg: result.user.profile_img ?? '/defaultImage.png',
+      like: likeCheck ? true : false,
+      likeCnt: result.likes.length,
+    };
+
     const dayData: Record<string, any[]> = {};
     for (const tripDay of result.trip.tripDays) {
       const dayKey = `day${tripDay.todayOrder}`;
@@ -149,8 +151,8 @@ export class PostsService {
         name: place.name,
         category: place.category,
         image: place.image ?? '/defaultImage.png',
-        startTime: tripDay.scheduleItems[i]?.startTime ?? null,
-        endTime: tripDay.scheduleItems[i]?.endTime ?? null,
+        startTime: tripDay.scheduleItems[i].startTime,
+        endTime: tripDay.scheduleItems[i].endTime,
         lat: place.lat,
         lng: place.lng,
         rating: place.rating,
@@ -158,8 +160,7 @@ export class PostsService {
       }));
     }
 
-    // 5. 반환할 postData 조합
-    const postData = {
+    const data = {
       id: result.id,
       userId: result.user.id,
       createdAt: result.createdAt,
@@ -172,11 +173,11 @@ export class PostsService {
       likeCnt: result.likes.length,
       image: result.images,
       type: result.type,
-      viewCount: result.viewCount,
+      viewCount: result.viewCount, // 필요 시 응답 포함
       ...dayData,
     };
 
-    return { dayData: postData, postData };
+    return { dayData: data, postData };
   }
 
   async updatePostWithDetails(
