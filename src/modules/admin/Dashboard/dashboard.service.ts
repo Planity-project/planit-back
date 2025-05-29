@@ -7,6 +7,7 @@ import { Post } from 'src/modules/posts/entities/post.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { TargetType } from 'src/modules/reports/entities/report.entity';
+import { Like } from 'src/modules/like/entities/like.entity';
 
 @Injectable()
 export class DashboardService {
@@ -21,6 +22,8 @@ export class DashboardService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(Report)
     private readonly reportRepository: Repository<Report>,
+    @InjectRepository(Like)
+    private readonly likeRepository: Repository<Like>,
   ) {}
 
   async getStats() {
@@ -50,12 +53,31 @@ export class DashboardService {
       relations: ['user'],
     });
 
+    // 게시글 ID 배열 뽑기
+    const postIds = posts.map((post) => post.id);
+
+    // 각 게시글의 좋아요 수 조회 (type === 'POST')
+    const likeCountsRaw = await this.likeRepository
+      .createQueryBuilder('like')
+      .select('like.postId', 'postId')
+      .addSelect('COUNT(*)', 'count')
+      .where('like.postId IN (:...postIds)', { postIds })
+      .andWhere('like.type = :type', { type: 'POST' })
+      .groupBy('like.postId')
+      .getRawMany();
+
+    // 결과를 Map으로 변환
+    const likeCountsMap = new Map<number, number>();
+    for (const row of likeCountsRaw) {
+      likeCountsMap.set(Number(row.postId), Number(row.count));
+    }
+
     return posts.map((post) => ({
       id: post.id,
       title: post.title,
       author: post.user?.nickname,
       views: post.viewCount,
-      like: post.likeCount,
+      like: likeCountsMap.get(post.id) ?? 0,
     }));
   }
 

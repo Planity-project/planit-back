@@ -10,13 +10,14 @@ import { UserLoginLog } from 'src/modules/auth/loginhistory/entities/userlogin.e
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
+import { Like } from 'src/modules/like/entities/like.entity';
 
 @Module({
   imports: [
     UserModule,
     PostsModule,
     LoginHistoryModule,
-    TypeOrmModule.forFeature([User, UserLoginLog, Post, Report, Comment]),
+    TypeOrmModule.forFeature([User, UserLoginLog, Post, Report, Comment, Like]),
   ],
   controllers: [DashboardController],
   providers: [DashboardService],
