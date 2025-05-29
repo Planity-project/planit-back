@@ -120,12 +120,19 @@ export class PostsService {
         'trip.tripDays.place',
       ],
     });
+
     if (!result) {
       throw new BadRequestException('post를 찾을 수 없습니다.');
     }
+
+    // ✅ 조회수 증가
+    result.viewCount += 1;
+    await this.postRepository.save(result);
+
     const likeCheck = userId
       ? result.likes.find((x) => x.user.id === userId)
       : null;
+
     const postData = {
       id: result.id,
       titleImg: result.images[0]?.url ?? '/defaultImage.png',
@@ -138,14 +145,13 @@ export class PostsService {
     const dayData: Record<string, any[]> = {};
     for (const tripDay of result.trip.tripDays) {
       const dayKey = `day${tripDay.todayOrder}`;
-
       dayData[dayKey] = tripDay.place.map((place, i) => ({
         id: place.id,
         todayOrder: i + 1,
         name: place.name,
         category: place.category,
         image: place.image ?? '/defaultImage.png',
-        startTime: tripDay.scheduleItems[i].startTime, // 만약 Place에 시간 정보가 있다면
+        startTime: tripDay.scheduleItems[i].startTime,
         endTime: tripDay.scheduleItems[i].endTime,
         lat: place.lat,
         lng: place.lng,
@@ -167,10 +173,11 @@ export class PostsService {
       likeCnt: result.likes.length,
       image: result.images,
       type: result.type,
+      viewCount: result.viewCount, // 필요 시 응답 포함
       ...dayData,
     };
 
-    return { dayData: data, postData: postData };
+    return { dayData: data, postData };
   }
 
   async updatePostWithDetails(
