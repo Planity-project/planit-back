@@ -58,7 +58,6 @@ export class Post {
 
   @OneToOne(() => Trip, (trip) => trip.post, {
     cascade: ['remove'], // Post 삭제 시 Trip 삭제
-    onDelete: 'CASCADE',
   })
   @JoinColumn()
   trip: Trip;

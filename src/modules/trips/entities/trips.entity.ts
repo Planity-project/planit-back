@@ -72,7 +72,7 @@ export class Trip {
     description: '연관된 게시글',
   })
   @OneToOne(() => Post, (post) => post.trip, {
-    cascade: ['remove'], // Trip 삭제 시 Post 삭제
+    // Trip 삭제 시 Post 삭제
     onDelete: 'CASCADE',
   })
   post: Post;
