@@ -245,4 +245,22 @@ export class AuthController {
 
     res.json({ user });
   }
+
+  @Get('testLogin')
+  async testLogin(@Res() res: Response) {
+    const isProd = process.env.NODE_ENV === 'production';
+    try {
+      const token = await this.authService.testLogin();
+      res.cookie('accessToken', token, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        sameSite: isProd ? 'none' : 'lax',
+        secure: isProd,
+      });
+      return { result: true, message: '테스트 로그인 성공' };
+    } catch (e) {
+      console.error(e, '테스트 로그인 실패');
+      return { result: false, message: `${e}` };
+    }
+  }
 }

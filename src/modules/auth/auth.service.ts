@@ -140,4 +140,38 @@ export class AuthService {
   async deleteLoginLog(userId: number): Promise<void> {
     await this.userLogRepository.delete({ user: { id: userId } });
   }
+
+  async testLogin() {
+    const testData = await this.userRepository.create({
+      email: 'test@test.com',
+      nickname: nicknameMaker(),
+      type: LoginType.TEST,
+    });
+    const testCheck = await this.userRepository.findOne({
+      where: { email: 'test@test.com' },
+    });
+
+    if (!testCheck) {
+      const data = await this.userRepository.save(testData);
+      const payload = {
+        id: data.id,
+        email: data.email,
+        nickname: data.nickname,
+        provider: data.type,
+      };
+
+      const token = this.jwtService.sign(payload);
+      return token;
+    } else {
+      const payload = {
+        id: testCheck.id,
+        email: testCheck.email,
+        nickname: testCheck.nickname,
+        provider: testCheck.type,
+      };
+
+      const token = this.jwtService.sign(payload);
+      return token;
+    }
+  }
 }

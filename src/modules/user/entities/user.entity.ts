@@ -21,6 +21,7 @@ export enum LoginType {
   KAKAO = 'kakao',
   NAVER = 'naver',
   GOOGLE = 'google',
+  TEST = 'test',
 }
 
 export enum UserStatus {
