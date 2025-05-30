@@ -257,10 +257,10 @@ export class AuthController {
         sameSite: isProd ? 'none' : 'lax',
         secure: isProd,
       });
-      return { result: true, message: '테스트 로그인 성공' };
+      return res.json({ result: true, message: '테스트 로그인 성공' });
     } catch (e) {
       console.error(e, '테스트 로그인 실패');
-      return { result: false, message: `${e}` };
+      return res.json({ result: false, message: `${e}` });
     }
   }
 }
