@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserStatus } from 'src/modules/user/entities/user.entity';
 import { Repository, In } from 'typeorm';
 import { UserLoginLog } from 'src/modules/auth/loginhistory/entities/userlogin.entity';
+import { UserCuulativeLog } from 'src/modules/auth/loginhistory/entities/userCumulativeLog.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
@@ -16,6 +17,8 @@ export class DashboardService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserLoginLog)
     private readonly loginLogRepository: Repository<UserLoginLog>,
+    @InjectRepository(UserCuulativeLog)
+    private readonly userCumulativeLogRepository: Repository<UserCuulativeLog>,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     @InjectRepository(Comment)
@@ -28,13 +31,11 @@ export class DashboardService {
 
   async getStats() {
     const totalUsers = await this.userRepository.count();
-    const activeUsers = await this.userRepository.count({
-      where: { status: UserStatus.ACTIVE },
-    });
+    const activeUsers = await this.loginLogRepository.count();
     const suspendedUsers = await this.userRepository.count({
       where: { status: UserStatus.STOP },
     });
-    const loginCount = await this.loginLogRepository.count();
+    const loginCount = await this.userCumulativeLogRepository.count();
 
     return {
       totalUsers,

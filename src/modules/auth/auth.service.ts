@@ -9,7 +9,7 @@ import { Admin } from '../admin/entities/admin.entity';
 import { LoginType } from '../user/entities/user.entity';
 import { UserStatus } from '../user/entities/user.entity';
 import { UserLoginLog } from './loginhistory/entities/userlogin.entity';
-
+import { UserCuulativeLog } from './loginhistory/entities/userCumulativeLog.entity';
 // ✅ 타입 선언 추가
 type LoginResponse = {
   accessToken: string;
@@ -24,7 +24,16 @@ export class AuthService {
     @InjectRepository(Admin) private adminRepository: Repository<Admin>,
     @InjectRepository(UserLoginLog)
     private userLogRepository: Repository<UserLoginLog>,
+    @InjectRepository(UserCuulativeLog)
+    private userCumullRepository: Repository<UserCuulativeLog>,
   ) {}
+  async userCumulativeLogUpdate(userId?: number): Promise<void> {
+    if (!userId) {
+      return;
+    }
+    const createUser = this.userCumullRepository.create({ userId });
+    await this.userCumullRepository.save(createUser);
+  }
 
   // ✅ 관리자 로그인
   async loginAdmin(email: string, password: string): Promise<LoginResponse> {

@@ -57,6 +57,7 @@ export class NaverStrategy extends PassportStrategy(
         email,
         LoginType.NAVER,
       );
+      await this.authService.userCumulativeLogUpdate(userData?.id);
       const payload = {
         id: userData?.id,
         email: userData?.email,
@@ -77,6 +78,7 @@ export class NaverStrategy extends PassportStrategy(
         nickname: user.nickname,
         provider: user.type,
       };
+      await this.authService.userCumulativeLogUpdate(user?.id);
       const jwt = this.jwtService.sign(payload);
       done(null, {
         email: email,

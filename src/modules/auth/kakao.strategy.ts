@@ -55,6 +55,7 @@ export class KakaoStrategy extends PassportStrategy(
         email,
         LoginType.KAKAO,
       );
+      await this.authService.userCumulativeLogUpdate(userData?.id);
       const payload = {
         id: userData?.id,
         email: userData?.email,
@@ -75,6 +76,7 @@ export class KakaoStrategy extends PassportStrategy(
         nickname: user.nickname,
         provider: user.type,
       };
+      await this.authService.userCumulativeLogUpdate(user?.id);
       const jwt = this.jwtService.sign(payload);
       done(null, {
         email: email,
