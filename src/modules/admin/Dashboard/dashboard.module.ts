@@ -7,7 +7,7 @@ import { LoginHistoryModule } from 'src/modules/auth/loginhistory/loginhistory.m
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/modules/user/entities/user.entity';
 import { UserLoginLog } from 'src/modules/auth/loginhistory/entities/userlogin.entity';
-import { UserCuulativeLog } from 'src/modules/auth/loginhistory/entities/userCumulativeLog.entity';
+import { UserCumulativeLog } from 'src/modules/auth/loginhistory/entities/userCumulativeLog.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { Report } from 'src/modules/reports/entities/report.entity';
 import { Comment } from 'src/modules/comment/entities/comment.entity';
@@ -25,7 +25,7 @@ import { Like } from 'src/modules/like/entities/like.entity';
       Report,
       Comment,
       Like,
-      UserCuulativeLog,
+      UserCumulativeLog,
     ]),
   ],
   controllers: [DashboardController],
