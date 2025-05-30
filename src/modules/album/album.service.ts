@@ -337,7 +337,7 @@ export class AlbumService {
         message: '해당 유저는 이 앨범에 속해 있지 않습니다.',
       };
     }
-
+    console.log(targetGroup, '타겟');
     if (targetGroup.role == 'OWNER') {
       return { result: false, message: '그룹장은 강퇴할 수 없습니다.' };
     }
