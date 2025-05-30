@@ -96,6 +96,7 @@ dotenv.config();
       PostImage,
       Trip,
       Report,
+      UserCumulativeLog,
     ]),
     UserModule,
     AlbumModule,
