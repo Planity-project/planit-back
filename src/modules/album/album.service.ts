@@ -338,7 +338,7 @@ export class AlbumService {
       };
     }
 
-    if (targetGroup.role === 'OWNER') {
+    if (targetGroup.role == 'OWNER') {
       return { result: false, message: '그룹장은 강퇴할 수 없습니다.' };
     }
 
