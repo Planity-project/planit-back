@@ -347,6 +347,8 @@ export class AlbumController {
   @Post('exitalbum')
   async albumExit(@Body() body: any) {
     const { albumId, userId } = body;
+
+    return await this.albumService.albumExit(albumId, userId);
   }
   @Get(':id')
   async getAlbumById(@Param('id') id: number) {
