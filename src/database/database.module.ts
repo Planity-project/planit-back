@@ -40,6 +40,7 @@ import { TripDay } from 'src/modules/trips/entities/tripday.entity';
 import { TripScheduleItem } from 'src/modules/trips/entities/tripscheduleitems.entity';
 import { Banner } from 'src/modules/admin/banner/entities/banner.entity';
 import { UserLoginLog } from 'src/modules/auth/loginhistory/entities/userlogin.entity';
+import { UserCumulativeLog } from 'src/modules/auth/loginhistory/entities/userCumulativeLog.entity';
 
 dotenv.config();
 
@@ -73,6 +74,7 @@ dotenv.config();
         TripScheduleItem,
         Banner,
         UserLoginLog,
+        UserCumulativeLog,
       ],
       synchronize: true,
       logging: false,
