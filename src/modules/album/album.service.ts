@@ -317,8 +317,8 @@ export class AlbumService {
 
   //앨범 그룹 강퇴
   async albumGroupDestroy(
-    albumId: number,
     userId: number,
+    albumId: number,
   ): Promise<{ result: boolean; message: string }> {
     const album = await this.albumRepository.findOne({
       where: { id: albumId },
@@ -611,5 +611,29 @@ export class AlbumService {
       message: '그룹에 성공적으로 참여했습니다.',
       albumId: album.id,
     };
+  }
+
+  async albumExit(
+    albumId: number,
+    userId: number,
+  ): Promise<{ result: boolean; message: string }> {
+    const album = await this.albumRepository.findOne({
+      where: { id: albumId },
+      relations: ['groups', 'groups.user'],
+    });
+
+    if (!album) {
+      console.error('albumExit , 앨범을 찾을 수 없음');
+      return { result: false, message: '앨범을 찾을 수 없습니다.' };
+    }
+
+    const user = album.groups.find((group) => group.user.id === userId);
+
+    if (!user) {
+      console.error('albumExit , 유저를 찾을 수 없습니다');
+      return { result: false, message: '' };
+    }
+    await this.albumGroupRepository.remove(user);
+    return { result: true, message: '방 나가기 성공' };
   }
 }
