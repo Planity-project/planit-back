@@ -16,7 +16,6 @@
 >
 > 📌 [⑤ ERD](#-erd)  
 > 📌 [⑥  API명세서](#-api명세서)  
-> 📌 [⑦  화면 구성](#-화면-구성)  
 > 📌 [⑧  주요 기능](#-주요-기능)  
 
 <br/>
@@ -167,51 +166,6 @@
 
 <br/>
 
-# 📰 화면 구성
-
-<div align="center">
- <table>
-  <tr>
-   <th> MAIN </th>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/4f6d2a42-b685-4078-b810-62516f9cab25"/></td>
-  </tr>
- </table>
-
- <table>
-  <tr>
-   <th> CREATE TRIP </th>
-   <th> ALBUM </th>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/7f24a248-9d84-4f45-a0b8-609d5f6c4bb9"/></td>
-    <td><img src="https://github.com/user-attachments/assets/4b80774d-57ce-4df6-b1ad-690079826908"/></td>
-  </tr>
- </table>
-
- <table>
-  <tr>
-   <th> MY ACCOUNT </th>
-   <th> DETAIL </th>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/93c1a316-0abf-48f6-8fe9-3789677468e0"/></td>
-    <td><img src="https://github.com/user-attachments/assets/97c3ac7a-8e8b-4d4e-aece-a6a35f8e2e6f"/></td>
-  </tr>
- </table>
-
- <table>
-  <tr>
-   <th>반응형</th>
-  </tr>
-  <tr>
-   <td> <img src="https://github.com/user-attachments/assets/67052b88-14a1-498e-a956-564a5823a821"/> </td>
-  </tr>
- </table>
-</div>
-
-<br/>
 
 # ⚙ 주요 기능
 
