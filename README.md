@@ -140,6 +140,7 @@
   
    ![AWS EC2](https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
    ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
+   ![Route 53](https://img.shields.io/badge/Route%2053-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
 
 </div>
@@ -215,7 +216,7 @@
 # ⚙ 주요 기능
 
 👤 소셜 로그인 및 회원가입
-사용 기술: Passport, JWT, OAuth2, MySQL
+사용 기술: Passport, JWT, OAuth2
 
 지원 플랫폼: 카카오, 네이버, 구글
 
@@ -245,6 +246,7 @@ Gemini API에 요청 후 일정 추천 응답 파싱
 <br/>
 
 📍 장소 검색 및 선택
+
 사용 기술: GooglePlace API, Kakao Local, 캐시 매니저
 
 처리 로직:
