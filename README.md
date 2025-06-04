@@ -170,7 +170,7 @@
 
 # ⚙ 주요 기능
 
-👤 소셜 로그인 및 회원가입
+👤소셜 로그인 및 회원가입<br/>
 사용 기술: Passport, JWT, OAuth2
 
 지원 플랫폼: 카카오, 네이버, 구글
@@ -188,7 +188,7 @@ OAuth 인증 후 사용자 정보 조회
 사용 기술: PortOne v2 API, Webhook, 결제 기록 저장
 <br/>
 
-🧠 AI 일정 생성 (Gemini API 활용)
+🧠 AI 일정 생성 (Gemini API 활용)<br/>
 사용 기술: Gemini API, Prompt 설계, 여행 계획 자동 생성
 
 처리 로직:
@@ -198,9 +198,12 @@ OAuth 인증 후 사용자 정보 조회
 Gemini API에 요청 후 일정 추천 응답 파싱
 
 응답 데이터를 일정 테이블에 저장
+
+![KakaoTalk_20250604_201826896](https://github.com/user-attachments/assets/d25730cd-495d-42bd-936e-eb3c2d0fb4af)
+
 <br/>
 
-📍 장소 검색 및 선택
+📍 장소 검색 및 선택<br/>
 
 사용 기술: GooglePlace API, Kakao Local, 캐시 매니저
 
@@ -215,6 +218,12 @@ Gemini API에 요청 후 일정 추천 응답 파싱
 🖼 앨범 기능 및 권한 제어
 
 사용 기술: Multer, S3, RBAC, 앨범 권한 위임
+
+![KakaoTalk_20250604_201920485](https://github.com/user-attachments/assets/bf369803-b25d-448f-814e-40d11f2a0e4c)
+
+![KakaoTalk_20250604_201945155](https://github.com/user-attachments/assets/ecb25497-1619-43f2-a930-3b4c8ba88dd9)
+
+
 <br/>
 
 🚨 신고 및 제재 시스템
@@ -226,6 +235,9 @@ Gemini API에 요청 후 일정 추천 응답 파싱
 사용 기술: Scheduler, Notification 테이블, 비동기 메시징
 
 Trips의 endDate를 기준으로 스케쥴러를 이용해 매일 00시에 알림 데이터 생성 로직 처리
+
+![KakaoTalk_20250604_201933334](https://github.com/user-attachments/assets/33ed6c63-16c3-462d-bcd3-158e2c0b9913)
+
 <br/>
 
 🛠 관리자 기능
