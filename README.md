@@ -170,86 +170,96 @@
 
 # ⚙ 주요 기능<br/>
 
-👤소셜 로그인 및 회원가입<br/><br/>
-사용 기술: Passport, JWT, OAuth2
+## 👤소셜 로그인 및 회원가입<br/><br/>
+사용 기술 : Passport, JWT, OAuth2
+- 카카오, 네이버, 구글 3사 플랫폼 소셜 로그인 구현
 
-지원 플랫폼: 카카오, 네이버, 구글
+### 처리 로직
 
-처리 로직:
+- OAuth 인증 후 사용자 정보 조회
 
-OAuth 인증 후 사용자 정보 조회
+- 최초 로그인 시 DB에 사용자 정보 저장 및 JWT 발급
 
-최초 로그인 시 DB에 사용자 정보 저장 및 JWT 발급
+- 닉네임은 작성되어 있는 키워드를 조합해 랜덤 생성, 중복 체크 로직 포함
 
-닉네임은 작성되어 있는 키워드를 조합해 랜덤 생성, 중복 체크 로직 포함
-
-💳 결제
+## 💳 결제
 
 사용 기술: PortOne v2 API, Webhook, 결제 기록 저장
-<br/><br/><br/>
+<img width = "700" src = "https://github.com/user-attachments/assets/cd65f3e8-8039-4a6f-baf0-dfb18bc96469" />
 
-🧠 AI 일정 생성 (Gemini API 활용)<br/><br/>
-사용 기술: Gemini API, Prompt 설계, 여행 계획 자동 생성
+<br/>
+<br/>
+<br/>
 
-처리 로직:
+## 🧠 AI 일정 생성 (Gemini API 활용)<br/><br/>
+- Gemini API, Prompt 설계, 여행 계획 자동 생성
 
-사용자가 선택한 날짜 및 지역 기반으로 프롬프트 생성
+### 처리 로직
 
-Gemini API에 요청 후 일정 추천 응답 파싱
+- 사용자가 선택한 날짜 및 지역 기반으로 프롬프트 생성
 
-응답 데이터를 일정 테이블에 저장
+- Gemini API에 요청 후 일정 추천 응답 파싱
+
+- 응답 데이터를 일정 테이블에 저장
 
 <img width = "700" src = "https://github.com/user-attachments/assets/d25730cd-495d-42bd-936e-eb3c2d0fb4af" />
 
-<br/><br/><br/>
+<br/>
+<br/>
+<br/>
 
-📍 장소 검색 및 선택<br/><br/>
+## 📍 장소 검색 및 선택<br/><br/>
 
-사용 기술: GooglePlace API, Kakao Local, 캐시 매니저
+사용 API : GooglePlace API, Kakao Local, 캐시 매니저
 
-처리 로직:
+### 처리 로직
 
-지역 선택 시 JSON 파일에 있는 데이터를 추출해서 가져옴
+- 지역 선택 시 JSON 파일에 있는 데이터를 추출해서 가져옴
 
-유저 선택 장소를 DB에 저장
+- 유저 선택 장소를 DB에 저장
 
-동일 요청 반복 방지를 위해 초기 seed 파일로 장소들을 생성 (요청 제어를 할 수 있도록 함), JSON 파일로 저장 후 JSON 데이터를 이용해 불러오도록 처리<br/><br/><br/>
+- 동일 요청 반복 방지를 위해 초기 seed 파일로 장소들을 생성 (요청 제어를 할 수 있도록 함), JSON 파일로 저장 후 JSON 데이터를 이용해 불러오도록 처리<br/><br/><br/>
+<br/>
+<br/>
 
-🖼 앨범 기능 및 권한 제어<br/><br/>
+##  🖼 앨범 기능 및 권한 제어
+<br/><br/>
 
-사용 기술: Multer, S3, RBAC, 앨범 권한 위임
-
-<img width = "700" src = "https://github.com/user-attachments/assets/bf369803-b25d-448f-814e-40d11f2a0e4c" />
+- Multer, S3, RBAC, 앨범 권한 위임
 
 <img width="700" src = "https://github.com/user-attachments/assets/ecb25497-1619-43f2-a930-3b4c8ba88dd9" />
 
 
-<br/><br/><br/>
-
-🚨 신고 및 제재 시스템<br/><br/>
 <br/>
-사용 기술: 관리자 승인 기반 신고 처리, 제재 로직 <br/>
+<br/>
+<br/>
+
+## 🚨 신고 및 제재 시스템<br/><br/>
+<br/>
+사용 기술 : 관리자 승인 기반 신고 처리, 제재 로직 <br/>
 <img width="700" src="https://github.com/user-attachments/assets/9b341eac-8c41-4487-8511-81cf99f8b9e5"/>
-<br/><br/>
-📨 알림 기능
+<br/>
+<br/>
 
-사용 기술: Scheduler, Notification 테이블, 비동기 메시징
+## 📨 알림 기능
 
-Trips의 endDate를 기준으로 스케쥴러를 이용해 매일 00시에 알림 데이터 생성 로직 처리
+- Scheduler, Notification 테이블, 비동기 메시징
+
+- Trips의 endDate를 기준으로 스케쥴러를 이용해 매일 00시에 알림 데이터 생성 로직 처리
 
 <img width="700" src = "https://github.com/user-attachments/assets/33ed6c63-16c3-462d-bcd3-158e2c0b9913"/>
 
 <br/>
+<br/>
+<br/>
 
-🛠 관리자 기능
+## 🛠 관리자 기능
 
-기능:
+- 회원 수, 접속자 수, 인기 게시글 집계
 
-회원 수, 접속자 수, 인기 게시글 집계
+- 광고 배너 등록 및 수정
 
-광고 배너 등록 및 수정
-
-유저 신고/제재 관리, 블랙리스트 처리 로직
+- 유저 신고/제재 관리, 블랙리스트 처리 로직
 
 
 <br/>
