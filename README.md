@@ -171,7 +171,7 @@
 # ⚙ 주요 기능<br/>
 
 ## 👤소셜 로그인 및 회원가입<br/><br/>
-사용 기술 : Passport, JWT, OAuth2
+- Passport, JWT, OAuth2
 - 카카오, 네이버, 구글 3사 플랫폼 소셜 로그인 구현
 
 ### 처리 로직
@@ -184,7 +184,8 @@
 
 ## 💳 결제
 
-사용 기술: PortOne v2 API, Webhook, 결제 기록 저장
+- PortOne v2 API, Webhook, 결제 기록 저장
+
 <img width = "700" src = "https://github.com/user-attachments/assets/cd65f3e8-8039-4a6f-baf0-dfb18bc96469" />
 
 <br/>
@@ -210,7 +211,7 @@
 
 ## 📍 장소 검색 및 선택<br/><br/>
 
-사용 API : GooglePlace API, Kakao Local, 캐시 매니저
+- GooglePlace API, Kakao Local, 캐시 매니저
 
 ### 처리 로직
 
@@ -235,7 +236,8 @@
 
 ## 🚨 신고 및 제재 시스템<br/><br/>
 <br/>
-사용 기술 : 관리자 승인 기반 신고 처리, 제재 로직 <br/>
+
+- 관리자 승인 기반 신고 처리, 제재 로직 <br/>
 <img width="700" src="https://github.com/user-attachments/assets/9b341eac-8c41-4487-8511-81cf99f8b9e5"/>
 <br/>
 <br/>
