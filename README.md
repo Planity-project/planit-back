@@ -168,9 +168,9 @@
 <br/>
 
 
-# ⚙ 주요 기능
+# ⚙ 주요 기능<br/>
 
-👤소셜 로그인 및 회원가입<br/>
+👤소셜 로그인 및 회원가입<br/><br/>
 사용 기술: Passport, JWT, OAuth2
 
 지원 플랫폼: 카카오, 네이버, 구글
@@ -186,9 +186,9 @@ OAuth 인증 후 사용자 정보 조회
 💳 결제
 
 사용 기술: PortOne v2 API, Webhook, 결제 기록 저장
-<br/>
+<br/><br/><br/>
 
-🧠 AI 일정 생성 (Gemini API 활용)<br/>
+🧠 AI 일정 생성 (Gemini API 활용)<br/><br/>
 사용 기술: Gemini API, Prompt 설계, 여행 계획 자동 생성
 
 처리 로직:
@@ -199,11 +199,11 @@ Gemini API에 요청 후 일정 추천 응답 파싱
 
 응답 데이터를 일정 테이블에 저장
 
-![KakaoTalk_20250604_201826896](https://github.com/user-attachments/assets/d25730cd-495d-42bd-936e-eb3c2d0fb4af)
+<img width = "700" src = "https://github.com/user-attachments/assets/d25730cd-495d-42bd-936e-eb3c2d0fb4af" />
 
-<br/>
+<br/><br/><br/>
 
-📍 장소 검색 및 선택<br/>
+📍 장소 검색 및 선택<br/><br/>
 
 사용 기술: GooglePlace API, Kakao Local, 캐시 매니저
 
@@ -219,24 +219,25 @@ Gemini API에 요청 후 일정 추천 응답 파싱
 
 사용 기술: Multer, S3, RBAC, 앨범 권한 위임
 
-![KakaoTalk_20250604_201920485](https://github.com/user-attachments/assets/bf369803-b25d-448f-814e-40d11f2a0e4c)
+<img width = "700" src = "https://github.com/user-attachments/assets/bf369803-b25d-448f-814e-40d11f2a0e4c" />
 
-![KakaoTalk_20250604_201945155](https://github.com/user-attachments/assets/ecb25497-1619-43f2-a930-3b4c8ba88dd9)
+<img width="700" src = "https://github.com/user-attachments/assets/ecb25497-1619-43f2-a930-3b4c8ba88dd9" />
 
 
+<br/><br/><br/>
+
+🚨 신고 및 제재 시스템<br/><br/>
 <br/>
-
-🚨 신고 및 제재 시스템
-
-사용 기술: 관리자 승인 기반 신고 처리, 제재 로직
-
+사용 기술: 관리자 승인 기반 신고 처리, 제재 로직 <br/>
+<img width="700" src="https://github.com/user-attachments/assets/9b341eac-8c41-4487-8511-81cf99f8b9e5"/>
+<br/><br/>
 📨 알림 기능
 
 사용 기술: Scheduler, Notification 테이블, 비동기 메시징
 
 Trips의 endDate를 기준으로 스케쥴러를 이용해 매일 00시에 알림 데이터 생성 로직 처리
 
-![KakaoTalk_20250604_201933334](https://github.com/user-attachments/assets/33ed6c63-16c3-462d-bcd3-158e2c0b9913)
+<img width="700" src = "https://github.com/user-attachments/assets/33ed6c63-16c3-462d-bcd3-158e2c0b9913"/>
 
 <br/>
 
@@ -249,6 +250,8 @@ Trips의 endDate를 기준으로 스케쥴러를 이용해 매일 00시에 알�
 광고 배너 등록 및 수정
 
 유저 신고/제재 관리, 블랙리스트 처리 로직
+
+
 <br/>
 
 
