@@ -44,7 +44,7 @@
    <th> 손한별 </th>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/1b2416a2-14b2-4309-a478-afd02949ae8f" width="300" height="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/e304bb33-84b1-4730-ae5e-b312a85b665a" width="300" height="250"></td>
       <td><img src="https://github.com/user-attachments/assets/f4db678f-3563-41d9-bdea-dd7ee3d71250" width="300" height="250"></td>
     <td><img src="https://github.com/user-attachments/assets/d7edca34-25d3-4859-b011-dc0aea7a5350" width="300" height="250"></td>
   </tr>
